@@ -178,7 +178,8 @@ def main():
     # Botón para ejecutar el backtest
     if st.button("Ejecutar Backtest"):
         close_to_close = close_to_close_option == "close to close"
-        realizar_backtest(r'C:\Users\Lenovo Thinkpad E14\Downloads/datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', balance_inicial_input, pct_allocation_input,start_date, end_date, option_days_input, option_offset_input, close_to_close)
+        #realizar_backtest(r'C:\Users\Lenovo Thinkpad E14\Downloads/datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', balance_inicial_input, pct_allocation_input,start_date, end_date, option_days_input, option_offset_input, close_to_close)
+        realizar_backtest('datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', balance_inicial_input, pct_allocation_input,start_date, end_date, option_days_input, option_offset_input, close_to_close)
 
 if __name__ == "__main__":
     main()
