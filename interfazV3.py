@@ -6,6 +6,7 @@ from polygon import RESTClient
 from datetime import timedelta
 from datetime import datetime
 import streamlit as st
+import io
 
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
@@ -100,6 +101,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     resultados_df = pd.DataFrame(resultados)
     graficar_resultados(resultados_df, balance, balance_inicial)
     resultados_df.to_excel('resultados_trades_1.xlsx')
+    return resultados_df, balance
 
 def graficar_resultados(df, final_balance, balance_inicial):
     plt.figure(figsize=(14, 7))
@@ -139,9 +141,36 @@ def main():
     close_to_close = st.checkbox("Close to Close", value=True)
     
     if st.button("Run Backtest"):
-        realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
         st.success("Backtest executed successfully!")
+        
+        # Provide download links for the generated files
+        st.write("### Download Results")
+        
+        # Resultados DataFrame to Excel
+        excel_buffer = io.BytesIO()
+        resultados_df.to_excel(excel_buffer, index=False)
+        st.download_button(label="Download Excel Results", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        
+        # Display and download the plot
+        st.write("### Plot")
+        fig, ax = plt.subplots(figsize=(14, 7))
+        resultados_df['Ganancia acumulada'] = resultados_df['Resultado'].cumsum() + balance_inicial
+        ax = resultados_df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b', ax=ax)
+        ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
+        ax.set_xlabel('Fecha')
+        ax.set_ylabel('Ganancia/Pérdida Acumulada')
+        plt.xticks(rotation=45)
+        ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+        plt.legend()
+        plt.grid(True, which='both', linestyle='-', linewidth=0.5)
+        plt.tight_layout()
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png')
+        st.image(img_buffer)
+        st.download_button(label="Download Plot", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
 if __name__ == "__main__":
     main()
+
 
