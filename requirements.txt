@@ -1,5 +1,5 @@
 yfinance
 pandas
 matplotlib
-polygon-api
+polygon-api-client
 streamlit
