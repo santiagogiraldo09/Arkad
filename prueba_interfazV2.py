@@ -152,7 +152,7 @@ def main():
     )
     
     st.title("Backtesting ARKAD")
-    st.image(r'C:\Users\Lenovo Thinkpad E14\Downloads\Arkad.jpeg', width=200)
+    #st.image(r'C:\Users\Lenovo Thinkpad E14\Downloads\Arkad.jpeg', width=200)
     
         # Widget para ingresar el valor de option_days
     option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
