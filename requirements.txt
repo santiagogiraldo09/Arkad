@@ -3,4 +3,4 @@ pandas
 matplotlib
 polygon-api-client
 streamlit
-openpyx1
+openpyxl
