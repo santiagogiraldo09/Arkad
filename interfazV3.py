@@ -125,19 +125,19 @@ def main():
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     
     # Option Days input
-    option_days_input = st.number_input("Option Days:", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("Option Offset:", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("**Option Offset:** (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     data_filepath = 'datos_8.xlsx'
-    api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
-    ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("Initial Balance", min_value=0, value=100000)
-    pct_allocation = st.number_input("Percentage Allocation", min_value=0.0, max_value=1.0, value=0.05)
-    fecha_inicio = st.date_input("Start Date", value=pd.Timestamp("2024-01-01"))
-    fecha_fin = st.date_input("End Date", value=pd.Timestamp("2024-12-31"))
+    #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
+    #ticker = st.text_input("Ticker Symbol", "SPY")
+    balance_inicial = st.number_input("Balance inicial", min_value=0, value=100000, step= 1000)
+    pct_allocation = st.number_input("Porcentaje de Asignación de Capital:", min_value=0.001, max_value=0.6, value=0.05)
+    fecha_inicio = st.date_input("Fecha de inicio del periodo de backtest:", value=pd.Timestamp("2024-01-01"))
+    fecha_fin = st.date_input("Fecha de finalización del periodo de backtest:", value=pd.Timestamp("2024-12-31"))
     trade_type = st.radio('Tipo de Operación', ('Close to Close', 'Open to Close'))
 
     if trade_type == 'Close to Close':
