@@ -132,7 +132,7 @@ def main():
     
     # Additional inputs for the backtest function
     data_filepath = 'datos_8.xlsx'
-    #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
+    api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     #ticker = st.text_input("Ticker Symbol", "SPY")
     balance_inicial = st.number_input("Balance inicial", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("Porcentaje de Asignación de Capital:", min_value=0.001, max_value=0.6, value=0.05)
