@@ -50,8 +50,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     resultados = []
     client = RESTClient(api_key)
     
-    fecha_inicio = pd.Timestamp(fecha_inicio)
-    fecha_fin = pd.Timestamp(fecha_fin)
+    #fecha_inicio = pd.Timestamp(fecha_inicio)
+    #fecha_fin = pd.Timestamp(fecha_fin)
 
     for date, row in data.iterrows():
         if date < fecha_inicio or date > fecha_fin:
