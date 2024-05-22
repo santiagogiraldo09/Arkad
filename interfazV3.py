@@ -157,6 +157,6 @@ def main():
         # Resultados DataFrame to Excel
         excel_buffer = io.BytesIO()
         resultados_df.to_excel(excel_buffer, index=False)
-        st.download_button(label="Download Excel Results", data=excel_buffer
+        st.download_button(label="Download Excel Results", data=excel_buffer)
 
 
