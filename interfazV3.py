@@ -44,6 +44,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
+@st.cache_data
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, close_to_close=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
