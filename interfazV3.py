@@ -146,7 +146,7 @@ def main():
         close_to_close = False
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio,) pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
         st.success("Backtest executed successfully!")
         
         # Provide download links for the generated files
