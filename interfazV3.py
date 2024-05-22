@@ -136,7 +136,7 @@ def main():
     #ticker = st.text_input("Ticker Symbol", "SPY")
     balance_inicial = st.number_input("**Balance inicial**", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
-    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", value=pd.Timestamp("2024-01-01"))
+    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
     trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close'))
 
