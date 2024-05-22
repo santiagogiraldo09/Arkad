@@ -149,10 +149,12 @@ def main():
         resultados_df, final_balance = realizar_backtest('datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
         st.success("Backtest ejecutado correctamente!")
 
+        '''
         # Guardar resultados en el estado de la sesión
         st.session_state['resultados_df'] = resultados_df
         st.session_state['final_balance'] = final_balance
         st.session_state['balance_inicial'] = balance_inicial
+        '''
         
         # Provide download links for the generated files
         st.write("### Descargar Resultados")
