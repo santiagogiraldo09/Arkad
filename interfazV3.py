@@ -121,8 +121,8 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.show()
 
 def main():
-    st.title("Option Days and Option Offset Setter")
-    st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
+    st.title("Backtesting ARKAD")
+    #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     
     # Option Days input
     option_days_input = st.number_input("Option Days:", min_value=0, max_value=90, value=30, step=1)
@@ -147,18 +147,18 @@ def main():
     
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
-        st.success("Backtest executed successfully!")
+        st.success("Backtest ejecutado correctamente!")
         
         # Provide download links for the generated files
-        st.write("### Download Results")
+        st.write("### Descargar Resultados")
         
         # Resultados DataFrame to Excel
         excel_buffer = io.BytesIO()
         resultados_df.to_excel(excel_buffer, index=False)
-        st.download_button(label="Download Excel Results", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button(label="Descargar Resultados Excel", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         
         # Display and download the plot
-        st.write("### Plot")
+        st.write("### Gráfico")
         fig, ax = plt.subplots(figsize=(14, 7))
         resultados_df['Ganancia acumulada'] = resultados_df['Resultado'].cumsum() + balance_inicial
         ax = resultados_df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b', ax=ax)
@@ -173,7 +173,7 @@ def main():
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
         st.image(img_buffer)
-        st.download_button(label="Download Plot", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
+        st.download_button(label="Descargar Gráfico", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
 if __name__ == "__main__":
     main()
