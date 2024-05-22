@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
-from datetime import timedelta, datetime
+from datetime import timedelta
+from datetime import datetime
 import streamlit as st
 import io
 
-# Función para cargar datos desde un archivo local (en el repositorio de GitHub)
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
@@ -15,7 +15,6 @@ def cargar_datos(filepath):
     data = data.set_index('date')
     return data[['pred']]
 
-# Verificar si la opción existe para las fechas dadas
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
         resp = client.get_aggs(ticker=ticker, multiplier=1, timespan="day", from_=start_date.strftime('%Y-%m-%d'), to=end_date.strftime('%Y-%m-%d'))
@@ -23,7 +22,6 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
 
-# Obtener el historial de datos de una opción específica
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="day", from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
@@ -33,7 +31,6 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-# Encontrar la opción más cercana dentro de un rango de días
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
@@ -47,7 +44,6 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-# Realizar el backtesting con los parámetros dados
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, close_to_close=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -107,7 +103,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     resultados_df.to_excel('resultados_trades_1.xlsx')
     return resultados_df, balance
 
-# Graficar los resultados del backtesting
 def graficar_resultados(df, final_balance, balance_inicial):
     plt.figure(figsize=(14, 7))
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
@@ -125,14 +120,17 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.savefig('resultados_backtesting.png')
     plt.show()
 
-# Función principal de la aplicación
 def main():
     st.title("Option Days and Option Offset Setter")
     st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     
-    # Inputs para los parámetros de la función de backtesting
+    # Option Days input
     option_days_input = st.number_input("Option Days:", min_value=0, max_value=90, value=30, step=1)
+    
+    # Option Offset input
     option_offset_input = st.number_input("Option Offset:", min_value=0, max_value=90, value=7, step=1)
+    
+    # Additional inputs for the backtest function
     data_filepath = 'datos_8.xlsx'
     api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     ticker = st.text_input("Ticker Symbol", "SPY")
@@ -157,6 +155,26 @@ def main():
         # Resultados DataFrame to Excel
         excel_buffer = io.BytesIO()
         resultados_df.to_excel(excel_buffer, index=False)
-        st.download_button(label="Download Excel Results", data=excel_buffer)
+        st.download_button(label="Download Excel Results", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        
+        # Display and download the plot
+        st.write("### Plot")
+        fig, ax = plt.subplots(figsize=(14, 7))
+        resultados_df['Ganancia acumulada'] = resultados_df['Resultado'].cumsum() + balance_inicial
+        ax = resultados_df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b', ax=ax)
+        ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
+        ax.set_xlabel('Fecha')
+        ax.set_ylabel('Ganancia/Pérdida Acumulada')
+        plt.xticks(rotation=45)
+        ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+        plt.legend()
+        plt.grid(True, which='both', linestyle='-', linewidth=0.5)
+        plt.tight_layout()
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png')
+        st.image(img_buffer)
+        st.download_button(label="Download Plot", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
+if __name__ == "__main__":
+    main()
 
