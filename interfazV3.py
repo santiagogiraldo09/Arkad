@@ -122,13 +122,13 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 def main():
     st.title("Option Days and Option Offset Setter")
-    st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
+    #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     
     # Option Days input
-    option_days_input = st.number_input("Option Days:", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("Option Offset:", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("**Option Offset:** (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     data_filepath = 'datos_8.xlsx'
@@ -138,7 +138,12 @@ def main():
     pct_allocation = st.number_input("Percentage Allocation", min_value=0.0, max_value=1.0, value=0.05)
     fecha_inicio = st.date_input("Start Date", value=pd.Timestamp("2024-01-01"))
     fecha_fin = st.date_input("End Date", value=pd.Timestamp("2024-12-31"))
-    close_to_close = st.checkbox("Close to Close", value=True)
+    trade_type = st.radio('Tipo de Operación', ('Close to Close', 'Open to Close'))
+
+    if trade_type == 'Close to Close':
+        close_to_close = True
+    else:
+        close_to_close = False
     
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
