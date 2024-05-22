@@ -49,8 +49,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
-    #fecha_inicio = fecha_inicio.date()
-    #fecha_fin = fecha_fin.date()
+    
+    fecha_inicio = pd.Timestamp(fecha_inicio)
+    fecha_fin = pd.Timestamp(fecha_fin)
 
     for date, row in data.iterrows():
         if date < fecha_inicio or date > fecha_fin:
@@ -147,7 +148,10 @@ def main():
     
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
-        st.success("Backtest executed successfully!")
+        st.success("Backtest ejecutado correctamente!")
+        st.write("Resultados:")
+        st.dataframe(resultados_df)
+        st.write(f"Balance final: ${final_balance:,.2f}")
         
         # Provide download links for the generated files
         st.write("### Download Results")
