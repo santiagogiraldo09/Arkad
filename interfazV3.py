@@ -100,11 +100,18 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 print(trade_result)
 
     resultados_df = pd.DataFrame(resultados)
-    graficar_resultados(resultados_df, balance, balance_inicial)
-    resultados_df.to_excel('resultados_trades_1.xlsx')
+    if not resultados_df.empty and 'Resultado' in resultados_df.columns:
+        graficar_resultados(resultados_df, balance, balance_inicial)
+        resultados_df.to_excel('resultados_trades_1.xlsx')
+    else:
+        st.error("No se encontraron resultados válidos para el periodo especificado.")
     return resultados_df, balance
 
 def graficar_resultados(df, final_balance, balance_inicial):
+    if df.empty or 'Resultado' not in df.columns:
+        st.error("No se pueden graficar resultados porque el DataFrame está vacío o falta la columna 'Resultado'.")
+        return
+    
     plt.figure(figsize=(14, 7))
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
     ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
