@@ -121,7 +121,7 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.show()
 
 def main():
-    st.title("Option Days and Option Offset Setter")
+    st.title("Backtesting ARKAD")
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     
     # Option Days input
@@ -134,10 +134,10 @@ def main():
     data_filepath = 'datos_8.xlsx'
     api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("Initial Balance", min_value=0, value=100000)
-    pct_allocation = st.number_input("Percentage Allocation", min_value=0.0, max_value=1.0, value=0.05)
-    fecha_inicio = st.date_input("Start Date", value=pd.Timestamp("2024-01-01"))
-    fecha_fin = st.date_input("End Date", value=pd.Timestamp("2024-12-31"))
+    balance_inicial = st.number_input("Balance Inicial", min_value=0, value=100000, step=1000)
+    pct_allocation = st.number_input("Porcentaje de Asignación de Capital:", min_value=0.001, max_value=0.60, value=0.05)
+    fecha_inicio = st.date_input("Fecha de inicio del periodo de backtest:", min_value=datetime(2020, 1, 1))
+    fecha_fin = st.date_input(""Fecha de finalización del periodo de backtest:", max_value=datetime.today())
     trade_type = st.radio('Tipo de Operación', ('Close to Close', 'Open to Close'))
 
     if trade_type == 'Close to Close':
@@ -146,7 +146,7 @@ def main():
         close_to_close = False
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days_input, option_offset_input, close_to_close)
         st.success("Backtest executed successfully!")
         
         # Provide download links for the generated files
