@@ -133,12 +133,12 @@ def main():
     # Additional inputs for the backtest function
     #data_filepath = 'datos_8.xlsx'
     #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
-    ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("Balance inicial", min_value=0, value=100000, step= 1000)
-    pct_allocation = st.number_input("Porcentaje de Asignación de Capital:", min_value=0.001, max_value=0.6, value=0.05)
-    fecha_inicio = st.date_input("Fecha de inicio del periodo de backtest:", value=pd.Timestamp("2024-01-01"))
-    fecha_fin = st.date_input("Fecha de finalización del periodo de backtest:", value=pd.Timestamp("2024-12-31"))
-    trade_type = st.radio('Tipo de Operación', ('Close to Close', 'Open to Close'))
+    #ticker = st.text_input("Ticker Symbol", "SPY")
+    balance_inicial = st.number_input("**Balance inicial**", min_value=0, value=100000, step= 1000)
+    pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
+    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", value=pd.Timestamp("2024-01-01"))
+    fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", value=pd.Timestamp("2024-12-31"))
+    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close'))
 
     if trade_type == 'Close to Close':
         close_to_close = True
@@ -146,7 +146,7 @@ def main():
         close_to_close = False
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest('datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , ticker, balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
+        resultados_df, final_balance = realizar_backtest('datos_8.xlsx', 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
         st.success("Backtest ejecutado correctamente!")
         
         # Provide download links for the generated files
