@@ -9,11 +9,11 @@ import streamlit as st
 import io
 import os
 
-'''
-def listar_archivos_en_directorio(directorio, extension=".xlsx"):
+
+#def listar_archivos_en_directorio(directorio, extension=".xlsx"):
     # Lista todos los archivos en el directorio con la extensión especificada
-    return [f for f in os.listdir(directorio) if f.endswith(extension)]
-'''
+    #return [f for f in os.listdir(directorio) if f.endswith(extension)]
+
 
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
@@ -139,15 +139,14 @@ def main():
     st.title("Backtesting ARKAD")
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
 
-    '''
+    
     # Listar archivos disponibles en el repositorio
-    directorio_datos = 'ruta/al/directorio/de/datos'
-    archivos_disponibles = listar_archivos_en_directorio(directorio_datos)
+    #directorio_datos = 'ruta/al/directorio/de/datos'
+    #archivos_disponibles = listar_archivos_en_directorio(directorio_datos)
     
     # Opción de selección del archivo
-    archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
-    archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
-    '''
+    #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
+    #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     # Option Days input
     option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
