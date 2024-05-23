@@ -142,11 +142,12 @@ def main():
     
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
-    archivos_disponibles = listar_archivos_xlxs(directorio_datos)
+    archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
-    # Opción de selección del archivo
-    archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
-    archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
+    # Opción de selección del archivo .xlsx
+    data_filepath = st.selectbox("Seleccionar archivo de datos históricos", archivos_disponibles)
+    #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
+    #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     # Option Days input
     option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
