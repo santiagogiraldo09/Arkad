@@ -212,7 +212,7 @@ def main():
             zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
 
         '''
-        Comprimir ambbos archivos y descargarlos en un archivo ZIP:
+        Comprimir ambos archivos y descargarlos en un archivo ZIP:
         '''
         
         with open("resultados.zip", "rb") as f:
