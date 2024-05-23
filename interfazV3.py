@@ -210,6 +210,10 @@ def main():
         with zipfile.ZipFile("resultados.zip", "w") as zf:
             zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
             zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
+
+        '''
+        Comprimir ambbos archivos y descargarlos en un archivo ZIP:
+        '''
         
         with open("resultados.zip", "rb") as f:
             st.download_button(
