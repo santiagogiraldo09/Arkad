@@ -10,9 +10,9 @@ import io
 import os
 
 
-def listar_archivos_xlsx(directorio):
-    # Lista todos los archivos en el directorio
-    return [f for f in os.listdir(directorio) if f.endswith('.xlsx')]
+def listar_archivos_xlxs(directorio):
+    archivos = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.xlsx')]
+    return archivos
 
 
 def cargar_datos(filepath):
