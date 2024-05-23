@@ -205,6 +205,19 @@ def main():
         st.image(img_buffer)
         st.download_button(label="Descargar Gráfico", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
+        # Crear archivo zip con ambos archivos
+        with zipfile.ZipFile("resultados.zip", "w") as zf:
+            zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
+            zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
+        
+        with open("resultados.zip", "rb") as f:
+            st.download_button(
+                label="Descargar Resultados ZIP",
+                data=f,
+                file_name="resultados.zip",
+                mime="application/zip"
+            )
+
 if __name__ == "__main__":
     main()
 
