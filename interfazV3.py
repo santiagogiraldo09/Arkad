@@ -102,7 +102,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                     'Resultado': trade_result,
                     'Contratos': num_contratos,
-                    'Opcion': option_name
+                    'Opcion': option_name,
+                    'Open': df_option[['open']]
                 })
                 print(trade_result)
 
