@@ -4,3 +4,4 @@ matplotlib
 polygon-api-client
 streamlit
 openpyxl
+scikit-learn
