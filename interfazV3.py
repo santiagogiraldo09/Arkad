@@ -100,6 +100,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
                 etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
 
                 resultados.append({
@@ -113,8 +114,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Contratos': num_contratos,
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
-                    #'Open': df_option['open'].iloc[0]
                     'Open': etf_open_price
+                    'Close': etf_close_price
                 })
                 print(trade_result)
 
