@@ -93,6 +93,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                 balance += trade_result
+
+                # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
+                etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
+    
+                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
+                etf_data = yf.download(etf_symbol, start=date, end=date + pd.Timedelta(days=1))
+                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+
+
                 resultados.append({
                     'Fecha': date, 
                     'Tipo': 'Call' if row['pred'] == 1 else 'Put', 
@@ -104,7 +113,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Contratos': num_contratos,
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
-                    'Open': df_option['open'].iloc[0]
+                    #'Open': df_option['open'].iloc[0]
+                    'Open': etf_open_price
                 })
                 print(trade_result)
 
