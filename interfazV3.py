@@ -224,6 +224,22 @@ def main():
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
                       & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
+        if close_to_close == True:
+            datos['Signal'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
+        else:
+            datos['Signal'] = 0
+            
+        # datos = datos.reset_index(drop=True)
+        # datos = datos[['Fecha', 'L0-direction_SPY',
+        #                'prediction', 'L0-open_SPY', 'L0-close_SPY']]
+        # datos['acierto'] = np.where(
+        #     datos['L0-direction_SPY'] == datos['prediction'], 1, 0)
+        # # desempeño de modelo en entrenamiento
+        # datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
+        # datos['cumsum'] = datos['acierto'].cumsum()
+        # # desempeño portafolio acumulado importante si definimos un inicio
+        # datos['accu'] = datos['cumsum']/(datos.index + 1)
+        
         datos.to_excel(excel_buffer, index=False)
         
         # datos[(datos['Fecha'] >= fecha_inicio)
