@@ -95,10 +95,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 balance += trade_result
 
                 # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
-                etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
+                #etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
     
                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
-                etf_data = yf.download(etf_symbol, start=date, end=date + pd.Timedelta(days=1))
+                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
 
 
