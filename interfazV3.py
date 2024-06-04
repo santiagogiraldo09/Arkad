@@ -5,6 +5,7 @@ from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
 from datetime import timedelta
 from datetime import datetime
+from sklearn.metrics import confusion_matrix
 import streamlit as st
 import io
 import os
@@ -229,7 +230,7 @@ def main():
         if close_to_close:
             datos['Direction'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
         elif not close_to_close:
-            datos['Direction'] = (datos['Open'] > datos['Close']).astype(int)
+            datos['Direction'] = (datos['Open'] < datos['Close']).astype(int)
         else:
             datos['Direction'] = 0
 
@@ -244,6 +245,33 @@ def main():
         datos['cumsum'] = datos['acierto'].cumsum()
         # desempeño portafolio acumulado importante si definimos un inicio
         datos['accu'] = datos['cumsum']/(datos.index + 1)
+        
+        # Muestra el DataFrame actualizado
+        datos['open_to_close_pct'] = datos['Close']/datos['Open'] - 1
+
+        # Calcula la ganancia
+        datos['Ganancia'] = datos.apply(lambda row: abs(
+            row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
+
+        # Calcula la ganancia acumulada
+        datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
+
+        # f1 Score
+        conf_matrix = confusion_matrix(
+            datos['Direction'], datos['Pred'])
+
+        # Calculate F1-score
+        tp, fp, fn, tn = conf_matrix.ravel()
+        datos['tp'] = tp
+        datos['tn'] = tn
+        datos['fp'] = fp
+        datos['fn'] = fn
+        precision = tp / (tp + fp)
+        datos['precision'] = precision
+        recall = tp / (tp + fn)
+        datos['recall'] = recall
+        f1_score = 2 * (precision * recall) / (precision + recall)
+        datos['f1_score'] = f1_score
         
         datos.to_excel(excel_buffer, index=False)
         
