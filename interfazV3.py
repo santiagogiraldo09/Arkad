@@ -9,6 +9,7 @@ import streamlit as st
 import io
 import os
 import zipfile
+import numpy as np
 
 
 def listar_archivos_xlxs(directorio):
@@ -105,7 +106,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 resultados.append({
                     'Fecha': date, 
-                    'Tipo': 'Call' if row['pred'] == 1 else 'Put', 
+                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
+                    'Pred': row['pred'],
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
@@ -234,16 +236,16 @@ def main():
         else:
             datos['Direction'] = 0
             
-        # datos = datos.reset_index(drop=True)
-        # datos = datos[['Fecha', 'L0-direction_SPY',
-        #                'prediction', 'L0-open_SPY', 'L0-close_SPY']]
-        # datos['acierto'] = np.where(
-        #     datos['L0-direction_SPY'] == datos['prediction'], 1, 0)
-        # # desempeño de modelo en entrenamiento
-        # datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
-        # datos['cumsum'] = datos['acierto'].cumsum()
-        # # desempeño portafolio acumulado importante si definimos un inicio
-        # datos['accu'] = datos['cumsum']/(datos.index + 1)
+        
+            
+        datos = datos.reset_index(drop=True)
+        datos['acierto'] = np.where(
+            datos['Direction'] == datos['Pred'], 1, 0)
+        # desempeño de modelo en entrenamiento
+        datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
+        datos['cumsum'] = datos['acierto'].cumsum()
+        # desempeño portafolio acumulado importante si definimos un inicio
+        datos['accu'] = datos['cumsum']/(datos.index + 1)
         
         datos.to_excel(excel_buffer, index=False)
         
