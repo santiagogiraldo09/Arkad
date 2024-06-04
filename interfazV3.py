@@ -5,13 +5,11 @@ from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
 from datetime import timedelta
 from datetime import datetime
-import sklearn
 import streamlit as st
 import io
 import os
 import zipfile
 import numpy as np
-from sklearn.metrics import confusion_matrix
 
 
 def listar_archivos_xlxs(directorio):
@@ -257,12 +255,21 @@ def main():
         # Calcula la ganancia acumulada
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
-        # f1 Score
-        conf_matrix = confusion_matrix(
-            datos['Direction'], datos['Pred'])
-
-        # Calculate F1-score
-        tp, fp, fn, tn = conf_matrix.ravel()
+        matrix=np.zeros((2,2)) # form an empty matric of 2x2
+        for i in range(len(datos['Pred'])): #the confusion matrix is for 2 classes: 1,0
+                #1=positive, 0=negative
+            if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0: 
+                matrix[0,0]+=1 #True Positives
+            elif int(datos['Pred'][i])==-1 and int(datos['Direction'][i])==1:
+                   matrix[0,1]+=1 #False Positives
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==1:
+                  matrix[1,0]+=1 #False Negatives
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==0:
+                matrix[1,1]+=1 #True Negatives
+            
+                    
+            # Calculate F1-score
+        tp, fp, fn, tn = matrix.ravel()
         datos['tp'] = tp
         datos['tn'] = tn
         datos['fp'] = fp
@@ -273,6 +280,9 @@ def main():
         datos['recall'] = recall
         f1_score = 2 * (precision * recall) / (precision + recall)
         datos['f1_score'] = f1_score
+
+        #the above code adds up the frequencies of the tps,tns,fps,fns and a matrix is formed
+        return matrix
         
         datos.to_excel(excel_buffer, index=False)
         
