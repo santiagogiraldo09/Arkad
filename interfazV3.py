@@ -223,8 +223,8 @@ def main():
             
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
 
-        datos = datos[(datos['Fecha'] >= fecha_inicio + timedelta(days=4))
-                      & (datos['Fecha'] <= fecha_fin - timedelta(days=4))]
+        datos = datos[(datos['Fecha'] >= fecha_inicio)
+                      & (datos['Fecha'] <= fecha_fin)]
         
         # Crear archivo zip con ambos archivos
         with zipfile.ZipFile("resultados.zip", "w") as zf:
