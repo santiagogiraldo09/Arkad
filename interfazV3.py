@@ -5,6 +5,7 @@ from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
 from datetime import timedelta
 from datetime import datetime
+import sklearn
 import streamlit as st
 import io
 import os
