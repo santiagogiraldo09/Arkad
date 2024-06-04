@@ -5,7 +5,7 @@ from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
 from datetime import timedelta
 from datetime import datetime
-from sklearn.metrics import confusion_matrix
+# from sklearn.metrics import confusion_matrix
 import streamlit as st
 import io
 import os
@@ -256,22 +256,22 @@ def main():
         # Calcula la ganancia acumulada
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
-        # f1 Score
-        conf_matrix = confusion_matrix(
-            datos['Direction'], datos['Pred'])
+        # # f1 Score
+        # conf_matrix = confusion_matrix(
+        #     datos['Direction'], datos['Pred'])
 
-        # Calculate F1-score
-        tp, fp, fn, tn = conf_matrix.ravel()
-        datos['tp'] = tp
-        datos['tn'] = tn
-        datos['fp'] = fp
-        datos['fn'] = fn
-        precision = tp / (tp + fp)
-        datos['precision'] = precision
-        recall = tp / (tp + fn)
-        datos['recall'] = recall
-        f1_score = 2 * (precision * recall) / (precision + recall)
-        datos['f1_score'] = f1_score
+        # # Calculate F1-score
+        # tp, fp, fn, tn = conf_matrix.ravel()
+        # datos['tp'] = tp
+        # datos['tn'] = tn
+        # datos['fp'] = fp
+        # datos['fn'] = fn
+        # precision = tp / (tp + fp)
+        # datos['precision'] = precision
+        # recall = tp / (tp + fn)
+        # datos['recall'] = recall
+        # f1_score = 2 * (precision * recall) / (precision + recall)
+        # datos['f1_score'] = f1_score
         
         datos.to_excel(excel_buffer, index=False)
         
