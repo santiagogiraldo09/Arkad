@@ -258,9 +258,9 @@ def main():
         matrix=np.zeros((2,2)) # form an empty matric of 2x2
         for i in range(len(datos['Pred'])): #the confusion matrix is for 2 classes: 1,0
                 #1=positive, 0=negative
-            if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0: 
+            if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==1: 
                 matrix[0,0]+=1 #True Positives
-            elif int(datos['Pred'][i])==-1 and int(datos['Direction'][i])==1:
+            elif int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0:
                    matrix[0,1]+=1 #False Positives
             elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==1:
                   matrix[1,0]+=1 #False Negatives
