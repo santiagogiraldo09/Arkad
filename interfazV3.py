@@ -219,6 +219,13 @@ def main():
         st.image(img_buffer)
         st.download_button(label="Descargar Gráfico", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
+        
+            
+        datos = pd.read_excel(r"resultados_trades_1.xlsx")
+
+        datos = datos[(datos['L0-date'] >= fecha_inicio - timedelta(days=4))
+                      & (datos['L0-date'] <= fecha_fin - timedelta(days=4))]
+        
         # Crear archivo zip con ambos archivos
         with zipfile.ZipFile("resultados.zip", "w") as zf:
             zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
