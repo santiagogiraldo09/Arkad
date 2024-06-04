@@ -226,15 +226,13 @@ def main():
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
                       & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
-        if close_to_close == True:
+        if close_to_close:
             datos['Direction'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
-        else:
-            datos['Direction'] = 0
-            
-        if close_to_close == False:
+        elif not close_to_close:
             datos['Direction'] = (datos['Open'] > datos['Close']).astype(int)
         else:
             datos['Direction'] = 0
+
             
         
             
