@@ -222,7 +222,8 @@ def main():
         
             
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
-        datos[['prueba']] = datos[['Fecha']]
+        datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
+                      & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
         datos.to_excel(excel_buffer, index=False)
         
         # datos[(datos['Fecha'] >= fecha_inicio)
