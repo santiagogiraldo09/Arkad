@@ -222,8 +222,8 @@ def main():
         
             
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
-
         datos[['prueba']] = datos[['Fecha']]
+        datos.to_excel(excel_buffer, index=False)
         
         # datos[(datos['Fecha'] >= fecha_inicio)
         #               & (datos['Fecha'] <= fecha_fin)]
@@ -232,6 +232,7 @@ def main():
         with zipfile.ZipFile("resultados.zip", "w") as zf:
             zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
             zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
+            zf.writestr("datos.xlsx", excel_buffer.getvalue())
 
         '''
         Comprimir ambos archivos y descargarlos en un archivo ZIP:
