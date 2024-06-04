@@ -225,9 +225,14 @@ def main():
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
                       & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
         if close_to_close == True:
-            datos['Signal'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
+            datos['Direction'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
         else:
-            datos['Signal'] = 0
+            datos['Direction'] = 0
+            
+        if close_to_close == False:
+            datos['Direction'] = (datos['Open'] > datos['Close']).astype(int)
+        else:
+            datos['Direction'] = 0
             
         # datos = datos.reset_index(drop=True)
         # datos = datos[['Fecha', 'L0-direction_SPY',
