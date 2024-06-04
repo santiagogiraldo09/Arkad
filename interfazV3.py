@@ -268,7 +268,7 @@ def main():
                 matrix[1,1]+=1 #True Negatives
             
                     
-            # Calculate F1-score
+        # Calculate F1-score
         tp, fp, fn, tn = matrix.ravel()
         datos['tp'] = tp
         datos['tn'] = tn
@@ -282,7 +282,6 @@ def main():
         datos['f1_score'] = f1_score
 
         #the above code adds up the frequencies of the tps,tns,fps,fns and a matrix is formed
-        return matrix
         
         datos.to_excel(excel_buffer, index=False)
         
