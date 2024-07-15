@@ -67,6 +67,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if row['pred'] not in [0, 1]:
             continue
 
+        #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
+        #if data_for_date.empty or len(data_for_date) < 2:
+            #continue
+
+
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         if data_for_date.empty:
             continue
@@ -77,15 +82,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             index = 1
             option_price = round(data_for_date['Close'].iloc[0])
         elif trade_type == 'Close to Open':
-            precio_usar_apertura = 'open'
-            precio_usar_cierre = 'close'
-            index = 0
+            precio_usar_apertura = 'close'
+            precio_usar_cierre = 'open'
+            index = 1
             option_price = round(data_for_date['Close'].iloc[0])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
@@ -232,9 +237,6 @@ def main():
 
         
             
-        datos = pd.read_excel(r"resultados_trades_1.xlsx")
-        datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
-                      & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio)) & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
         if trade_type == 'Close to Close':
