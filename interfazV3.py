@@ -53,7 +53,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, close_to_close=False):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -71,14 +71,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if data_for_date.empty:
             continue
 
-        if close_to_close:
+        if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'close'
             index = 1
-        else:
+            option_price = round(data_for_date['Close'].iloc[0])
+        elif trade_type == 'Close to Open':
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
+            option_price = round(data_for_date['Close'].iloc[0])
+        else: #Open to Close
+            precio_usar_apertura = 'open'
+            precio_usar_cierre = 'close'
+            index = 0
+            option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
@@ -178,15 +185,17 @@ def main():
     pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
     fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
-    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close'))
+    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
 
+    '''
     if trade_type == 'Close to Close':
         close_to_close = True
     else:
         close_to_close = False
+    '''
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, close_to_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
@@ -226,9 +235,13 @@ def main():
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio))
                       & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
-        if close_to_close:
+        datos = pd.read_excel(r"resultados_trades_1.xlsx")
+        datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio)) & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
+        if trade_type == 'Close to Close':
             datos['Direction'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
-        elif not close_to_close:
+        elif trade_type == 'Close to Open':
+            datos['Direction'] = (datos['Close'].shift(1) < datos['Open']).astype(int)
+        elif trade_type == 'Open to Close':
             datos['Direction'] = (datos['Open'] < datos['Close']).astype(int)
         else:
             datos['Direction'] = 0
