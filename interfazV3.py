@@ -187,12 +187,12 @@ def main():
     fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
     trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
 
-    '''
-    if trade_type == 'Close to Close':
-        close_to_close = True
-    else:
-        close_to_close = False
-    '''
+
+    #if trade_type == 'Close to Close':
+       #close_to_close = True
+    #else:
+        #close_to_close = False
+
     
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type)
