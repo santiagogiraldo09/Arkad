@@ -46,8 +46,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         ticker=ticker_opcion,
         multiplier=15,
         timespan="minute",
-        from_=fecha_inicio.strftime('%Y-%m-%d %H:%M'),  # Incluye horas y minutos
-        to=fecha_fin.strftime('%Y-%m-%d %H:%M')  # Incluye horas y minutos
+        from_=fecha_inicio.strftime('%Y-%m-%d'),
+        to=fecha_fin.strftime('%Y-%m-%d')
     )
     datos = [
         {
