@@ -10,6 +10,8 @@ import io
 import os
 import zipfile
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 def listar_archivos_xlxs(directorio):
     archivos = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.xlsx')]
@@ -171,6 +173,11 @@ def graficar_resultados(df, final_balance, balance_inicial):
     ax.set_xlabel('Fecha')
     ax.set_ylabel('Ganancia/Pérdida Acumulada')
     plt.xticks(rotation=45)
+
+    # Ajuste para mostrar correctamente fechas y horas en el eje x
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
+    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))  # Coloca marcas de horas en el eje x
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
 
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
 
