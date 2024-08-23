@@ -19,7 +19,8 @@ def listar_archivos_xlxs(directorio):
 
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
-    data['date'] = pd.to_datetime(data['date'])  # Asegúrate de conservar la hora
+    data['date'] = pd.to_datetime(data['date'])
+    data['date'] = data['date'].dt.date
     data = data.set_index('date')
     return data[['pred']]
 
@@ -82,10 +83,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
-
-    # Ya no es necesario truncar fecha_inicio y fecha_fin a la fecha sola.
-    fecha_inicio = pd.to_datetime(fecha_inicio)
-    fecha_fin = pd.to_datetime(fecha_fin)
+    fecha_inicio = fecha_inicio.date()
+    fecha_fin = fecha_fin.date()
 
     for date, row in data.iterrows():
         if date < fecha_inicio or date > fecha_fin:
@@ -93,7 +92,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if row['pred'] not in [0, 1]:
             continue
 
-        data_for_date = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         if data_for_date.empty:
             continue
 
@@ -127,7 +126,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
                 else:  # '15 Minutos'
                     option_open_price = df_option['open'].iloc[0]
-                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del periodo
+                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
 
                 max_contract_value = option_open_price * 100
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
@@ -162,7 +161,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         st.error("No se encontraron resultados válidos para el periodo especificado.")
     return resultados_df, balance
 
-
 def graficar_resultados(df, final_balance, balance_inicial):
     if df.empty or 'Resultado' not in df.columns:
         st.error("No se pueden graficar resultados porque el DataFrame está vacío o falta la columna 'Resultado'.")
@@ -172,15 +170,15 @@ def graficar_resultados(df, final_balance, balance_inicial):
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
     ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
     ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
-    ax.set_xlabel('Fecha y Hora')
+    ax.set_xlabel('Fecha')
     ax.set_ylabel('Ganancia/Pérdida Acumulada')
     plt.xticks(rotation=45)
 
-    # Asegúrate de que la gráfica muestre tanto la fecha como la hora
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
-    ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))  # Coloca marcas cada 15 minutos
-
+    # Ajuste para mostrar correctamente fechas y horas en el eje x
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
+    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))  # Coloca marcas de horas en el eje x
     plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
+
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
 
     plt.legend()
@@ -188,7 +186,6 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.tight_layout()
     plt.savefig('resultados_backtesting.png')
     plt.show()
-
 
 def main():
     st.title("Backtesting ARKAD")
