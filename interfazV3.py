@@ -260,4 +260,41 @@ def main():
         for i in range(len(datos['Pred'])):
             if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==1: 
                 matrix[0,0]+=1
-            elif int(datos['Pred'][i])==1 an
+            elif int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0:
+                matrix[0,1]+=1
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==1:
+                matrix[1,0]+=1
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==0:
+                matrix[1,1]+=1
+                    
+        # Calculate F1-score
+        tp, fp, fn, tn = matrix.ravel()
+        datos['tp'] = tp
+        datos['tn'] = tn
+        datos['fp'] = fp
+        datos['fn'] = fn
+        precision = tp / (tp + fp)
+        datos['precision'] = precision
+        recall = tp / (tp + fn)
+        datos['recall'] = recall
+        f1_score = 2 * (precision * recall) / (precision + recall)
+        datos['f1_score'] = f1_score
+
+        datos.to_excel(excel_buffer, index=False)
+        
+        # Crear archivo zip con ambos archivos
+        with zipfile.ZipFile("resultados.zip", "w") as zf:
+            zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
+            zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
+            zf.writestr("datos.xlsx", excel_buffer.getvalue())
+
+        with open("resultados.zip", "rb") as f:
+            st.download_button(
+                label="Descargar Resultados ZIP",
+                data=f,
+                file_name="resultados.zip",
+                mime="application/zip"
+            )
+
+if __name__ == "__main__":
+    main()
