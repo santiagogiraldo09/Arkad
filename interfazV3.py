@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
 from datetime import timedelta
@@ -20,7 +21,8 @@ def listar_archivos_xlxs(directorio):
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
-    data['date'] = data['date'].dt.date
+    
+    # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
     return data[['pred']]
 
@@ -191,6 +193,12 @@ def graficar_resultados(df, final_balance, balance_inicial):
     ax.set_xlabel('Fecha')
     ax.set_ylabel('Ganancia/Pérdida Acumulada')
     plt.xticks(rotation=45)
+    
+    # Ajuste para mostrar correctamente fechas y horas en el eje x
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
+    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))  # Coloca marcas de horas en el eje x
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
+
 
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
 
