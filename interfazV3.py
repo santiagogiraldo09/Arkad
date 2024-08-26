@@ -40,6 +40,30 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    client = RESTClient(api_key)
+    resp = client.get_aggs(
+        ticker=ticker_opcion,
+        multiplier=15,
+        timespan="minute",
+        from_=fecha_inicio.strftime('%Y-%m-%d'),
+        to=fecha_fin.strftime('%Y-%m-%d')
+    )
+    datos = [
+        {
+            'fecha': pd.to_datetime(agg.timestamp, unit='ms'),
+            'open': agg.open,
+            'high': agg.high,
+            'low': agg.low,
+            'close': agg.close,
+            'volume': agg.volume,
+            'vwap': agg.vwap
+        } for agg in resp
+    ]
+    df = pd.DataFrame(datos)
+    df.set_index('fecha', inplace=True)
+    return df
+
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
@@ -53,7 +77,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -97,6 +121,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if option_date:
             option_type = 'C' if row['pred'] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+            
+            if periodo == 'Diario':
+                df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+            else:  # '15 Minutos'
+                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+            
+            if not df_option.empty:
+                if periodo == 'Diario':
+                    option_open_price = df_option[precio_usar_apertura].iloc[0]
+                    option_close_price = df_option[precio_usar_cierre].iloc[index]
+                else:  # '15 Minutos'
+                    option_open_price = df_option['open'].iloc[0]
+                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+
             
             df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
             
@@ -191,7 +229,7 @@ def main():
     fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
     trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
-
+    periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
 
     #if trade_type == 'Close to Close':
        #close_to_close = True
@@ -200,7 +238,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
