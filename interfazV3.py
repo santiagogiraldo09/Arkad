@@ -84,10 +84,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
-    fecha_inicio = fecha_inicio.date()
-    fecha_fin = fecha_fin.date()
+    
+    if periodo == 'Diario':
+        fecha_inicio = fecha_inicio.date()
+        fecha_fin = fecha_fin.date()
+    else:
+        fecha_inicio = pd.Timestamp(fecha_inicio)
+        fecha_fin = pd.Timestamp(fecha_fin)
 
     for date, row in data.iterrows():
+        if periodo == 'Diario':
+            date = date.date()
+        else:
+            date = pd.Timestamp(date)
+            
         if date < fecha_inicio or date > fecha_fin:
             continue
         if row['pred'] not in [0, 1]:
