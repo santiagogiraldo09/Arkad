@@ -52,8 +52,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     all_data = [] #Lista para almacenar todos los datos de cada mes
     
     #convertir las fechas a datetime y obtenerlas en formato "%Y-%m"
-    current_date = datetime().strptime(fecha_inicio, "%Y-%m")
-    end_date = datetime().strptime(fecha_fin, "%Y-%m")
+    current_date = datetime.strptime(fecha_inicio, "%Y-%m")
+    end_date = datetime.strptime(fecha_fin, "%Y-%m")
     
     while current_date <= end_date:
         current_month = current_date.strftime('%Y-%m')
