@@ -46,77 +46,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-'''
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
-    base_url = "https://www.alphavantage.co/query"
-    function = "TIME_SERIES_INTRADAY"
-    interval = "15min"
-    
-    all_data = []
-    current_date = fecha_inicio.replace(day=1)
-    
-    while current_date <= fecha_fin:
-        month = current_date.strftime('%Y-%m')
-        
-        params = {
-            "function": function,
-            "symbol": ticker_opcion,
-            "interval": interval,
-            "apikey": api_key,
-            "outputsize": "full",
-            "extended_hours": "false",
-            "month": month
-        }
-        
-        try:
-            response = requests.get(base_url, params=params)
-            data = response.json()
-            
-            if "Time Series (15min)" not in data:
-                print(f"No se recibieron datos para {ticker_opcion} en {month}")
-            else:
-                time_series = data["Time Series (15min)"]
-                df = pd.DataFrame.from_dict(time_series, orient='index')
-                df.index = pd.to_datetime(df.index)
-                all_data.append(df)
-                
-            # Avanzar al siguiente mes
-            current_date += relativedelta(months=1)
-            
-        except Exception as e:
-            print(f"Error al obtener datos para {ticker_opcion} en {month}: {str(e)}")
-        
-        # Añadir un pequeño retraso para respetar los límites de la API
-        time.sleep(12)  # 12 segundos de espera entre llamadas
-    
-    if not all_data:
-        print(f"No se obtuvieron datos para {ticker_opcion} en el rango de fechas especificado")
-        return pd.DataFrame()
-    
-    # Combinar todos los datos
-    df_combined = pd.concat(all_data)
-    df_combined = df_combined.sort_index()
-    
-    # Renombrar columnas
-    df_combined.columns = ['open', 'high', 'low', 'close', 'volume']
-    
-    # Convertir a valores numéricos
-    for col in df_combined.columns:
-        df_combined[col] = pd.to_numeric(df_combined[col])
-    
-    # Filtrar por rango de fechas exacto
-    df_combined = df_combined[(df_combined.index >= fecha_inicio) & (df_combined.index <= fecha_fin)]
-    
-    if not df_combined.empty:
-        print(f"Datos recibidos para {ticker_opcion}:")
-        print(f"Número de registros: {len(df_combined)}")
-        print(f"Primer registro: {df_combined.iloc[0]}")
-        print(f"Último registro: {df_combined.iloc[-1]}")
-    else:
-        print(f"No hay datos en el rango de fechas especificado para {ticker_opcion}")
-    
-    return df_combined
-'''
+
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     base_url = "https://www.alphavantage.co/query"
     function = "TIME_SERIES_INTRADAY"
