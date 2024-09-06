@@ -49,67 +49,36 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     function = "TIME_SERIES_INTRADAY"
     interval = "15min"
     
-    all_data = [] #Lista para almacenar todos los datos de cada mes
+    params = {
+        "function": function,
+        "symbol": ticker_opcion,
+        "interval": interval,
+        "apikey": api_key,
+        "outputsize": "full",
+        "extended_hours": "false"
+    }
     
-    #convertir las fechas a datetime y obtenerlas en formato "%Y-%m"
-    current_date = datetime.strptime(fecha_inicio, "%Y-%m")
-    end_date = datetime.strptime(fecha_fin, "%Y-%m")
-    
-    while current_date <= end_date:
-        current_month = current_date.strftime('%Y-%m')
-    
-        params = {
-            "function": function,
-            "symbol": ticker_opcion,
-            "interval": interval,
-            "apikey": api_key,
-            "outputsize": "full",
-            "extended_hours": "false"
-        }
-    
-        try:
-            response = requests.get(base_url, params=params)
-            data = response.json()
+    try:
+        response = requests.get(base_url, params=params)
+        data = response.json()
         
-            if "Time Series (15min)" not in data:
-                print(f"No se recibieron datos para {ticker_opcion}")
-                return pd.DataFrame()
-            
-            time_series = data["Time Series (15min)"]
+        if "Time Series (15min)" not in data:
+            print(f"No se recibieron datos para {ticker_opcion}")
+            return pd.DataFrame()
         
-            df = pd.DataFrame.from_dict(time_series, orient='index')
-            df.index = pd.to_datetime(df.index)
-            df = df.sort_index()
-            
-            # Renombrar columnas
-            df.columns = ['open', 'high', 'low', 'close', 'volume']
+        time_series = data["Time Series (15min)"]
         
-            # Convertir a valores numéricos
-            for col in df.columns:
-                df[col] = pd.to_numeric(df[col])
-            
-            #Filtrar por el mes actual
-            df = df[df.index.strftime('%Y-%m') == current_month]
+        df = pd.DataFrame.from_dict(time_series, orient='index')
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
         
-            if not df.empty:
-                print(f"Datos recibidos para {ticker_opcion} en el mes {current_month} con {len(df)} registros")
-                all_data.append(df) #Agregar los datos del mes a la lista
-            
-        except Exception as e:
-            print(f"Error al obtener datos para {ticker_opcion} en el mes {current_month}: {str(e)}")
+        # Renombrar columnas
+        df.columns = ['open', 'high', 'low', 'close', 'volume']
         
-        # Avanzar al siguiente mes
-        current_date += timedelta(days=31)  # Aumenta 31 días para garantizar que pasa al siguiente mes
-        current_date = current_date.replace(day=1)  # Asegura que está en el primer día del siguiente mes
-
-    # Concatenar todos los datos recolectados de cada mes
-    if all_data:
-        result_df = pd.concat(all_data)
-        return result_df
-    else:
-        print(f"No se obtuvieron datos para el rango de fechas {fecha_inicio} a {fecha_fin}.")
-        return pd.DataFrame()
-        '''
+        # Convertir a valores numéricos
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
+        
         # Filtrar por rango de fechas
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         
@@ -126,7 +95,6 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
-   '''
 
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
