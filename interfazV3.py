@@ -74,6 +74,23 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
        return pd.DataFrame()
 
 
+def obtener_valor_cercano(df, hora, tipo='open'):
+    """
+    Encuentra el valor más cercano a la hora solicitada dentro de los datos de 15 minutos.
+    """
+    try:
+        # Filtra los datos que sean mayores o iguales a la hora solicitada
+        df_filtro = df[df.index.time >= hora]
+        if not df_filtro.empty:
+            # Devuelve el primer valor que sea mayor o igual a la hora
+            return df_filtro.iloc[0][tipo]
+        else:
+            # Si no hay ningún valor mayor o igual, se queda con el último valor disponible antes de la hora
+            return df.iloc[-1][tipo]
+    except:
+        return None
+
+
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', hora_open=None, hora_close=None):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -105,14 +122,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     continue
                 
                 if hora_open:
-                    df_option_open = df_option.between_time(hora_open, hora_open)
-                    option_price = df_option_open['open'].iloc[0]
+                    option_price = obtener_valor_cercano(df_option, hora_open, 'open')
                 else:
                     option_price = df_option['open'].iloc[0]  # Hora predeterminada 9:30am
 
                 if hora_close:
-                    df_option_close = df_option.between_time(hora_close, hora_close)
-                    close_price = df_option_close['close'].iloc[0]
+                    close_price = obtener_valor_cercano(df_option, hora_close, 'close')
                 else:
                     close_price = df_option['close'].iloc[-1]  # Hora predeterminada 4:00pm
             else:
@@ -129,14 +144,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 continue
             
             if hora_open:
-                df_option = df_option.between_time(hora_open, hora_open)
-                option_price = df_option['open'].iloc[0]
+                option_price = obtener_valor_cercano(df_option, hora_open, 'open')
             else:
                 option_price = df_option['open'].iloc[0]
             
             if hora_close:
-                df_option = df_option.between_time(hora_close, hora_close)
-                close_price = df_option['close'].iloc[0]
+                close_price = obtener_valor_cercano(df_option, hora_close, 'close')
             else:
                 close_price = df_option['close'].iloc[-1]
 
@@ -183,7 +196,7 @@ def main():
     hora_close = st.time_input("Seleccionar hora de Close", value=datetime.strptime("16:00", "%H:%M").time())
 
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, hora_open, hora_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tu_api_key', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, hora_open, hora_close)
         st.success("Backtest ejecutado correctamente!")
         # Mostrar resultados
         st.dataframe(resultados_df)
@@ -191,3 +204,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
