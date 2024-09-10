@@ -47,7 +47,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 
-def obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, intervalo="Daily"):
+def obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, intervalo="Daily", open_time=None):
     base_url = "https://www.alphavantage.co/query"
     
     # Definir los parámetros con el intervalo seleccionado (diario o 15 minutos)
@@ -100,6 +100,19 @@ def obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, in
 
         # Filtrar los datos entre las fechas seleccionadas
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        # Si el intervalo es diario pero hay hora seleccionada, hacemos consulta intradía
+        if intervalo == "Daily" and open_time:
+            # Volver a hacer consulta en modo intradía para obtener el valor a la hora seleccionada
+            df_intra = obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, intervalo="15min")
+            # Filtrar para la hora seleccionada
+            df_intra = df_intra.between_time(open_time, open_time)
+            if not df_intra.empty:
+                return df_intra
+            else:
+                st.error(f"No se encontraron datos intradía para la hora seleccionada: {open_time}")
+                return pd.DataFrame()
+
 
         if df.empty:
             st.error(f"No se encontraron datos para el rango de fechas seleccionado ({fecha_inicio} a {fecha_fin}).")
