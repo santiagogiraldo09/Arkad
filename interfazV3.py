@@ -112,7 +112,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', open_hour=None, close_hour=None):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -282,6 +282,9 @@ def main():
     trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
     periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
 
+    #Hora de apertura y cierre
+    open_hour = st.time_input('Seleccionar hora de apertura', value=datetime(2023, 1, 1, 9, 30).time()) #Hora predeterminada 9:30am
+    close_hour = st.time_input('Seleccionar hora de cierre', value=datetime(2023, 1, 1, 16, 0).time()) #Hora predeterminada 4:00pm
     #if trade_type == 'Close to Close':
        #close_to_close = True
     #else:
@@ -289,7 +292,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, open_hour, close_hour)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
