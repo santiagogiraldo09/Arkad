@@ -280,6 +280,9 @@ def main():
     fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
     trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
+    # Nuevos inputs para la hora de apertura y cierre
+    open_time = st.time_input("**Seleccionar Hora de Apertura:**", value=datetime.strptime("09:30", "%H:%M").time())
+    close_time = st.time_input("**Seleccionar Hora de Cierre:**", value=datetime.strptime("16:00", "%H:%M").time())
     periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
 
     #if trade_type == 'Close to Close':
