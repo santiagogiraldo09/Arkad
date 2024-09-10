@@ -47,81 +47,74 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 
-def obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, intervalo="Daily", open_time=None):
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     base_url = "https://www.alphavantage.co/query"
+    function = "TIME_SERIES_INTRADAY"
+    interval = "15min"
     
-    # Definir los parámetros con el intervalo seleccionado (diario o 15 minutos)
-    if intervalo == "15min":
-        function = "TIME_SERIES_INTRADAY"
-        params = {
-            "function": function,
-            "symbol": ticker,
-            "interval": "15min",
-            "apikey": api_key,
-            "outputsize": "full",
-        }
-    else:
-        function = "TIME_SERIES_DAILY"
-        params = {
-            "function": function,
-            "symbol": ticker,
-            "apikey": api_key,
-            "outputsize": "full",
-        }
+    params = {
+        "function": function,
+        "symbol": ticker_opcion,
+        "interval": interval,
+        "apikey": api_key,
+        "outputsize": "full",
+        "extended_hours": "false"
+    }
     
-    try:
-        response = requests.get(base_url, params=params)
-        data = response.json()
+    # Inicializamos un DataFrame vacío para almacenar todos los datos
+    df_total = pd.DataFrame()
 
-        # Verificar si se recibieron datos
-        if intervalo == "15min" and "Time Series (15min)" not in data:
-            st.error(f"No se recibieron datos de Alpha Vantage para el intervalo de 15 minutos.")
-            return pd.DataFrame()
-        elif intervalo == "Daily" and "Time Series (Daily)" not in data:
-            st.error(f"No se recibieron datos de Alpha Vantage para el intervalo diario.")
-            return pd.DataFrame()
+    # Bucle para hacer solicitudes en segmentos de hasta 30 días
+    current_start_date = fecha_inicio
 
-        # Seleccionar los datos en función del intervalo
-        if intervalo == "15min":
-            time_series = data["Time Series (15min)"]
-        else:
-            time_series = data["Time Series (Daily)"]
+    while current_start_date <= fecha_fin:
+        current_end_date = min(current_start_date + timedelta(days=30), fecha_fin)
         
-        # Convertir los datos en un DataFrame
-        df = pd.DataFrame.from_dict(time_series, orient='index')
-        df.index = pd.to_datetime(df.index)
-        df = df.sort_index()
+        try:
+            response = requests.get(base_url, params=params)
+            data = response.json()
 
-        # Renombrar las columnas para consistencia
-        df.columns = ['open', 'high', 'low', 'close', 'volume']
-        
-        # Convertir los datos a tipo numérico
-        df = df.apply(pd.to_numeric)
-
-        # Filtrar los datos entre las fechas seleccionadas
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        
-        # Si el intervalo es diario pero hay hora seleccionada, hacemos consulta intradía
-        if intervalo == "Daily" and open_time:
-            # Volver a hacer consulta en modo intradía para obtener el valor a la hora seleccionada
-            df_intra = obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio, fecha_fin, intervalo="15min")
-            # Filtrar para la hora seleccionada
-            df_intra = df_intra.between_time(open_time, open_time)
-            if not df_intra.empty:
-                return df_intra
-            else:
-                st.error(f"No se encontraron datos intradía para la hora seleccionada: {open_time}")
+            if "Time Series (15min)" not in data:
+                print(f"No se recibieron datos para {ticker_opcion} en el rango {current_start_date} a {current_end_date}")
                 return pd.DataFrame()
 
+            time_series = data["Time Series (15min)"]
+            
+            # Convertimos los datos en un DataFrame
+            df = pd.DataFrame.from_dict(time_series, orient='index')
+            df.index = pd.to_datetime(df.index)
+            df = df.sort_index()
 
-        if df.empty:
-            st.error(f"No se encontraron datos para el rango de fechas seleccionado ({fecha_inicio} a {fecha_fin}).")
-        
-        return df
+            # Renombrar columnas
+            df.columns = ['open', 'high', 'low', 'close', 'volume']
 
-    except Exception as e:
-        st.error(f"Error al obtener datos: {str(e)}")
-        return pd.DataFrame()
+            # Convertir a valores numéricos
+            for col in df.columns:
+                df[col] = pd.to_numeric(df[col])
+
+            # Filtrar por el rango de fechas actual
+            df = df[(df.index >= current_start_date) & (df.index <= current_end_date)]
+
+            # Concatenar los datos obtenidos al DataFrame total
+            df_total = pd.concat([df_total, df])
+
+        except Exception as e:
+            print(f"Error al obtener datos para {ticker_opcion} en el rango {current_start_date} a {current_end_date}: {str(e)}")
+            return pd.DataFrame()
+
+        # Avanzamos 30 días en el bucle
+        current_start_date = current_end_date + timedelta(days=1)
+    
+    # Filtrar por el rango total solicitado
+    df_total = df_total[(df_total.index >= fecha_inicio) & (df_total.index <= fecha_fin)]
+    
+    if not df_total.empty:
+        print(f"Datos recibidos para {ticker_opcion} en el rango de {fecha_inicio} a {fecha_fin}")
+        print(f"Número de registros: {len(df_total)}")
+    else:
+        print(f"No hay datos en el rango de fechas especificado para {ticker_opcion}")
+    
+    return df_total
    
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
@@ -194,7 +187,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
             else:  # '15 Minutos'
-                df_option = obtener_historico_alpha_vantage(option_name, api_key, date, date + timedelta(days=option_days))
+                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
             
             if not df_option.empty:
                 if periodo == 'Diario':
@@ -285,29 +278,29 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**: (Trabajar en estos momentos con **modelo_andres_datos_act** el cual contiene datos desde 2022)", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos: (Trabajar en estos momentos con **modelo_andres_datos_act* el cual contiene datos desde 2022)", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     # Option Days input
-    option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("**Option Offset:** (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     #data_filepath = 'datos_8.xlsx'
     #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     #ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("**Balance iniciall**", min_value=0, value=100000, step= 1000)
-    pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
-    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
-    fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
-    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
+    balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
+    pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
+    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
+    fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
+    trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     # Nuevos inputs para la hora de apertura y cierre
-    open_time = st.time_input("**Seleccionar Hora de Apertura:**", value=datetime.strptime("09:30", "%H:%M").time())
-    close_time = st.time_input("**Seleccionar Hora de Cierre:**", value=datetime.strptime("16:00", "%H:%M").time())
-    periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
+    #open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
+    #close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
+    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
 
     #if trade_type == 'Close to Close':
        #close_to_close = True
@@ -316,25 +309,6 @@ def main():
 
     
     if st.button("Run Backtest"):
-        #Convertir fechas y horas seleccionadas
-        fecha_inicio_dt = datetime.combine(fecha_inicio, open_time)
-        fecha_fin_dt = datetime.combine(fecha_fin, close_time)
-        
-        #Seleccionar el intervalo dependiendo del periodo
-        intervalo = "15min" if periodo == "15 minutos" else "Daily"
-        
-        # Llamar a la función para obtener los datos desde Alpha Vantage
-        api_key = "tXoXD_m9y_wE2kLEILzsSERW3djux3an"  # Coloca tu API key aquí
-        ticker = "SPY"  # Por ejemplo
-
-        df = obtener_historico_alpha_vantage(ticker, api_key, fecha_inicio_dt, fecha_fin_dt, intervalo)
-        
-        # Mostrar el valor de apertura de la primera fecha y hora seleccionada
-        if not df.empty:
-            st.write(f"**Valor de apertura ({open_time}) en {fecha_inicio}:** {df['open'].iloc[0]}")
-        else:
-            st.error("No se encontraron datos para mostrar.")
-        
         resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo)
         st.success("Backtest ejecutado correctamente!")
 
@@ -456,6 +430,5 @@ def main():
                 mime="application/zip"
             )
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
-
