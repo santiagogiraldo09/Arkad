@@ -47,10 +47,9 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin, interval="15min", open_hour=None,close_hour=None):
     base_url = "https://www.alphavantage.co/query"
     function = "TIME_SERIES_INTRADAY"
-    interval = "15min"
     
     params = {
         "function": function,
@@ -78,12 +77,15 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Renombrar columnas
         df.columns = ['open', 'high', 'low', 'close', 'volume']
         
-        # Convertir a valores numéricos
-        for col in df.columns:
-            df[col] = pd.to_numeric(df[col])
+        #Convertir a valores numéricos
+        df = df.apply(pd.to_numeric)
         
-        # Filtrar por rango de fechas
+        #Filtrar por rango de fechas
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        #Filtrar por las horas seleccionadas por el usuario
+        if open_hour and close_hour:
+            df = df.between_time(open_hour, close_hour)
         
         if not df.empty:
             print(f"Datos recibidos para {ticker_opcion}:")
@@ -98,6 +100,60 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
+   
+def obtener_historico_intradia(ticker_opcion, api_key, fecha_inicio, fecha_fin, intervalo="15min", open_hour=None, close_hour=None):
+    base_url = "https://www.alphavantage.co/query"
+    
+    params = {
+        "function": "TIME_SERIES_INTRADAY",
+        "symbol": ticker_opcion,
+        "interval": intervalo,
+        "apikey": api_key,
+        "outputsize": "full",
+    }
+    
+    try:
+        response = requests.get(base_url, params=params)
+        data = response.json()
+        
+        time_series_key = f"Time Series ({intervalo})"
+        if time_series_key not in data:
+            print(f"No se recibieron datos intradía para {ticker_opcion}")
+            return pd.DataFrame()
+        
+        time_series = data[time_series_key]
+        
+        df = pd.DataFrame.from_dict(time_series, orient='index')
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
+        
+        # Renombrar columnas
+        df.columns = ['open', 'high', 'low', 'close', 'volume']
+        
+        # Convertir a valores numéricos
+        df = df.apply(pd.to_numeric)
+        
+        # Filtrar por rango de fechas
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        # Filtrar por las horas seleccionadas por el usuario
+        if open_hour and close_hour:
+            df = df.between_time(open_hour, close_hour)
+        
+        if not df.empty:
+            print(f"Datos recibidos para {ticker_opcion} en intervalo {intervalo}:")
+            print(f"Número de registros: {len(df)}")
+            print(f"Primer registro: {df.iloc[0]}")
+            print(f"Último registro: {df.iloc[-1]}")
+        else:
+            print(f"No hay datos en el rango de fechas y horas especificado para {ticker_opcion}")
+        
+        return df
+    
+    except Exception as e:
+       print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+       return pd.DataFrame()
+
    
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
