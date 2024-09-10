@@ -183,7 +183,7 @@ def main():
     hora_close = st.time_input("Seleccionar hora de Close", value=datetime.strptime("16:00", "%H:%M").time())
 
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tu_api_key', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, hora_open, hora_close)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, hora_open, hora_close)
         st.success("Backtest ejecutado correctamente!")
         # Mostrar resultados
         st.dataframe(resultados_df)
