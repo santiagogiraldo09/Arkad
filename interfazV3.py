@@ -112,61 +112,73 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', hora_apertura=None, hora_cierre=None):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', hora_open='09:30', hora_close='16:00'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
+    
+    fecha_inicio = pd.Timestamp(fecha_inicio)
+    fecha_fin = pd.Timestamp(fecha_fin)
 
     for date, row in data.iterrows():
-        # Ignorar si la fecha está fuera del rango del backtest
-        if date.date() < fecha_inicio.date() or date.date() > fecha_fin.date():
+        if date < fecha_inicio or date > fecha_fin:
             continue
-        
         if row['pred'] not in [0, 1]:
             continue
-        
-        # Obtener el precio del activo intradía (con Alpha Vantage)
-        if periodo == '15 minutos':
-            df_intradia = obtener_historico_15min(ticker, api_key, fecha_inicio, fecha_fin, intervalo="15min", hora_apertura=hora_apertura, hora_cierre=hora_cierre)
-        else:
-            df_intradia = obtener_historico_15min(ticker, api_key, fecha_inicio, fecha_fin, intervalo="60min", hora_apertura=hora_apertura, hora_cierre=hora_cierre)
 
-        if df_intradia.empty:
+        # Obtener datos del mercado para este día y el siguiente
+        data_for_date = yf.download(ticker, start=date, end=date + pd.Timedelta(days=2))
+
+        if data_for_date.empty or len(data_for_date) < 2:
             continue
-        
-        # Depuración: Imprimir el DataFrame intradía para verificar que contiene datos
-        print(f"Data for date {date.strftime('%Y-%m-%d')}:\n", df_intradia)
 
-        try:
-            # Comprobar si la clave existe en el DataFrame
-            clave_apertura = date.strftime('%Y-%m-%d') + ' ' + hora_apertura.strftime('%H:%M:%S')
-            precio_usar_apertura = df_intradia.at[clave_apertura, 'open']
-            print(f"Precio de apertura para {clave_apertura}: {precio_usar_apertura}")
+        # Calcular precios de apertura y cierre basados en las horas seleccionadas
+        open_time = pd.Timestamp(date.date()).replace(hour=int(hora_open.split(':')[0]), minute=int(hora_open.split(':')[1]))
+        close_time = pd.Timestamp(date.date()).replace(hour=int(hora_close.split(':')[0]), minute=int(hora_close.split(':')[1]))
+
+        if trade_type == 'Close to Close':
+            precio_usar_apertura = data_for_date['Close'].iloc[0]
+            precio_usar_cierre = data_for_date['Close'].iloc[1]
+        elif trade_type == 'Open to Close':
+            precio_usar_apertura = data_for_date['Open'].iloc[0]
+            precio_usar_cierre = data_for_date['Close'].iloc[0]
+        else:  # Close to Open
+            precio_usar_apertura = data_for_date['Close'].iloc[0]
+            precio_usar_cierre = data_for_date['Open'].iloc[1]
+
+        option_price = round(precio_usar_apertura)
+        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
+        if option_date:
+            option_type = 'C' if row['pred'] == 1 else 'P'
+            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             
-            clave_cierre = date.strftime('%Y-%m-%d') + ' ' + hora_cierre.strftime('%H:%M:%S')
-            precio_usar_cierre = df_intradia.at[clave_cierre, 'close']
-            print(f"Precio de cierre para {clave_cierre}: {precio_usar_cierre}")
-        except KeyError as e:
-            print(f"Error: No se encontró la clave {e} en los datos intradía.")
-            continue  # Saltar esta iteración si no se encuentran los datos
-        
-        # Simular la operación y calcular el resultado
-        max_contract_value = precio_usar_apertura * 100
-        num_contratos = int((balance * pct_allocation) / max_contract_value)
-        trade_result = (precio_usar_cierre - precio_usar_apertura) * 100 * num_contratos
-        balance += trade_result
-        
-        resultados.append({
-            'Fecha': date, 
-            'Tipo': 'Call' if row['pred'] == 1 else 'Put',
-            'Pred': row['pred'],
-            'Precio Entrada': precio_usar_apertura, 
-            'Precio Salida': precio_usar_cierre, 
-            'Resultado': trade_result,
-            'Contratos': num_contratos,
-        })
-        print(f"Trade result: {trade_result}")
+            df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+            
+            if not df_option.empty:
+                option_open_price = df_option['open'].iloc[0]
+                option_close_price = df_option['close'].iloc[-1]
+
+                max_contract_value = option_open_price * 100
+                num_contratos = int((balance * pct_allocation) / max_contract_value)
+                trade_result = (option_close_price - option_open_price) * 100 * num_contratos
+                balance += trade_result
+
+                resultados.append({
+                    'Fecha': date,
+                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
+                    'Pred': row['pred'],
+                    'Fecha Apertura': open_time,
+                    'Fecha Cierre': close_time,
+                    'Precio Entrada': precio_usar_apertura,
+                    'Precio Salida': precio_usar_cierre,
+                    'Resultado': trade_result,
+                    'Contratos': num_contratos,
+                    'Opcion': option_name,
+                    'Open': data_for_date['Open'].iloc[0],
+                    'Close': data_for_date['Close'].iloc[0]
+                })
+                print(trade_result)
 
     resultados_df = pd.DataFrame(resultados)
     if not resultados_df.empty and 'Resultado' in resultados_df.columns:
