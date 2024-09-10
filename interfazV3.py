@@ -61,60 +61,43 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         "extended_hours": "false"
     }
     
-    # Inicializamos un DataFrame vacío para almacenar todos los datos
-    df_total = pd.DataFrame()
-
-    # Bucle para hacer solicitudes en segmentos de hasta 30 días
-    current_start_date = fecha_inicio
-
-    while current_start_date <= fecha_fin:
-        current_end_date = min(current_start_date + timedelta(days=30), fecha_fin)
+    try:
+        response = requests.get(base_url, params=params)
+        data = response.json()
         
-        try:
-            response = requests.get(base_url, params=params)
-            data = response.json()
-
-            if "Time Series (15min)" not in data:
-                print(f"No se recibieron datos para {ticker_opcion} en el rango {current_start_date} a {current_end_date}")
-                return pd.DataFrame()
-
-            time_series = data["Time Series (15min)"]
-            
-            # Convertimos los datos en un DataFrame
-            df = pd.DataFrame.from_dict(time_series, orient='index')
-            df.index = pd.to_datetime(df.index)
-            df = df.sort_index()
-
-            # Renombrar columnas
-            df.columns = ['open', 'high', 'low', 'close', 'volume']
-
-            # Convertir a valores numéricos
-            for col in df.columns:
-                df[col] = pd.to_numeric(df[col])
-
-            # Filtrar por el rango de fechas actual
-            df = df[(df.index >= current_start_date) & (df.index <= current_end_date)]
-
-            # Concatenar los datos obtenidos al DataFrame total
-            df_total = pd.concat([df_total, df])
-
-        except Exception as e:
-            print(f"Error al obtener datos para {ticker_opcion} en el rango {current_start_date} a {current_end_date}: {str(e)}")
+        if "Time Series (15min)" not in data:
+            print(f"No se recibieron datos para {ticker_opcion}")
             return pd.DataFrame()
-
-        # Avanzamos 30 días en el bucle
-        current_start_date = current_end_date + timedelta(days=1)
+        
+        time_series = data["Time Series (15min)"]
+        
+        df = pd.DataFrame.from_dict(time_series, orient='index')
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
+        
+        # Renombrar columnas
+        df.columns = ['open', 'high', 'low', 'close', 'volume']
+        
+        # Convertir a valores numéricos
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
+        
+        # Filtrar por rango de fechas
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        if not df.empty:
+            print(f"Datos recibidos para {ticker_opcion}:")
+            print(f"Número de registros: {len(df)}")
+            print(f"Primer registro: {df.iloc[0]}")
+            print(f"Último registro: {df.iloc[-1]}")
+        else:
+            print(f"No hay datos en el rango de fechas especificado para {ticker_opcion}")
+        
+        return df
     
-    # Filtrar por el rango total solicitado
-    df_total = df_total[(df_total.index >= fecha_inicio) & (df_total.index <= fecha_fin)]
-    
-    if not df_total.empty:
-        print(f"Datos recibidos para {ticker_opcion} en el rango de {fecha_inicio} a {fecha_fin}")
-        print(f"Número de registros: {len(df_total)}")
-    else:
-        print(f"No hay datos en el rango de fechas especificado para {ticker_opcion}")
-    
-    return df_total
+    except Exception as e:
+       print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+       return pd.DataFrame()
    
 def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
@@ -278,29 +261,26 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos: (Trabajar en estos momentos con **modelo_andres_datos_act* el cual contiene datos desde 2022)", archivos_disponibles)
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**: (Trabajar en estos momentos con **modelo_andres_datos_act** el cual contiene datos desde 2022)", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     # Option Days input
-    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("**Option Offset:** (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     #data_filepath = 'datos_8.xlsx'
     #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     #ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
-    pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
-    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
-    fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
-    trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
-    # Nuevos inputs para la hora de apertura y cierre
-    #open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
-    #close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
-    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
+    balance_inicial = st.number_input("**Balance iniciall**", min_value=0, value=100000, step= 1000)
+    pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
+    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
+    fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
+    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
+    periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
 
     #if trade_type == 'Close to Close':
        #close_to_close = True
@@ -430,5 +410,5 @@ def main():
                 mime="application/zip"
             )
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
