@@ -176,7 +176,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
     for date, row in data.iterrows():
         # Ignorar si la fecha está fuera del rango del backtest
-        if date.date() < fecha_inicio or date.date() > fecha_fin:
+        if date.date() < fecha_inicio.date() or date.date() > fecha_fin.date():
             continue
         
         if row['pred'] not in [0, 1]:
