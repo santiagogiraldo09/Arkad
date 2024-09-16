@@ -264,16 +264,16 @@ def main():
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
     #Botón para activar el pop-up
-    if st.button("Información"):
-        st.session_state.show_popup = True
+    #if st.button("Información"):
+        #st.session_state.show_popup = True
         
     #Mostrar el po-up si está activado
-    if st.session_state.show_popup:
-        with st.container():
-            st.markdown("## Este es un Pop-up")
-            st.write("Aquí puedes agregar cualquier contenido que desees mostrar en el pop-up.")
-            if st.button("Cerrar"):
-                st.session_state.show_popup = False
+    #if st.session_state.show_popup:
+        #with st.container():
+            #st.markdown("## Este es un Pop-up")
+            #st.write("Aquí puedes agregar cualquier contenido que desees mostrar en el pop-up.")
+            #if st.button("Cerrar"):
+                #st.session_state.show_popup = False
             
     #st.warning("información relevante.")
     
