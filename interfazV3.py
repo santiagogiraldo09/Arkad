@@ -261,7 +261,10 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**: (Trabajar en estos momentos con **modelo_andres_datos_act** el cual contiene datos desde 2022)", archivos_disponibles)
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
+    #pop-up
+    st.info("información relevante.")
+    
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
