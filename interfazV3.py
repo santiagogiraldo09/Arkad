@@ -325,6 +325,7 @@ def main():
     if data_filepath:
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        
+       
        # Actualizar el tooltip
        tooltip_text = f"""
        <div class="tooltip">
