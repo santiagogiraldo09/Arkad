@@ -263,7 +263,7 @@ def main():
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
     #pop-up
-    #st.info("información relevante.")
+    st.help("información relevante.")
     
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
