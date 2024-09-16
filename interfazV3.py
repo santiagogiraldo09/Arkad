@@ -254,7 +254,8 @@ def graficar_resultados(df, final_balance, balance_inicial):
 def main():
     st.title("Backtesting ARKAD")
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
-
+    if 'show_popup' not in st.session_state:
+        st.session_state.show_popup = False
     
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
@@ -262,7 +263,18 @@ def main():
     
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
-    #pop-up
+    #Botón para activar el pop-up
+    if st.button("Información"):
+        st.session_state.show_popup = True
+        
+    #Mostrar el po-up si está activado
+    if st.session_state.show_popup:
+        with st.container():
+            st.markdown("## Este es un Pop-up")
+            st.write("Aquí puedes agregar cualquier contenido que desees mostrar en el pop-up.")
+            if st.button("Cerrar"):
+                st.session_state.show_popup = False
+            
     #st.warning("información relevante.")
     
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
