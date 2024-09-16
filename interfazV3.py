@@ -311,6 +311,34 @@ def main():
     
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)
+    
+    #Extraer información del nombre del archivo seleccionado
+    def extract_file_info(filename):
+        parts = filename.split('_')
+        operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Unknown')
+        responsible = {'Valen': 'Valentina', 'Santi': 'Santiago'}.get(parts[1], 'Unknown')
+        start_date = 'Fecha inicio: ' + parts[2][2:4] + '/' + parts[2][4:]
+        end_date = 'Fecha fin: ' + parts[3][2:4] + '/' + parts[3][4:]
+        version = parts[4].split('.')[0]
+        return operation, responsible, start_date, end_date, version
+    
+    if data_filepath:
+       operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       
+       # Actualizar el tooltip
+       tooltip_text = f"""
+       <div class="tooltip">
+            &#9432;  <!-- Ícono de información -->
+            <span class="tooltiptext">
+            Tipo de operación: {operation}<br>
+            Responsable del algoritmo: {responsible}<br>
+            {start_date}<br>
+            {end_date}<br>
+            Versión: {version}
+            </span>
+       </div>
+        """
+       st.markdown(tooltip_text, unsafe_allow_html=True)
     #Botón para activar el pop-up
     #if st.button("Información"):
         #st.session_state.show_popup = True
