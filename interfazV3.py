@@ -291,12 +291,12 @@ def main():
     st.markdown(tooltip_style, unsafe_allow_html=True)
 
     # Agregamos el ícono o el botón con tooltip
-    st.markdown('''
-    <div class="tooltip">
-        &#9432;  <!-- Ícono de información -->
-        <span class="tooltiptext">Selecciona el archivo .xlsx con los datos históricos</span>
-    </div>
-    ''', unsafe_allow_html=True)
+    #st.markdown('''
+    #<div class="tooltip">
+        #&#9432;  <!-- Ícono de información -->
+        #<span class="tooltiptext">Selecciona el archivo .xlsx con los datos históricos</span>
+    #</div>
+    #''', unsafe_allow_html=True)
     
     
     
@@ -315,30 +315,39 @@ def main():
     #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
         parts = filename.split('_')
-        operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Unknown')
-        responsible = {'Valen': 'Valentina', 'Santi': 'Santiago'}.get(parts[1], 'Unknown')
-        start_date = 'Fecha inicio: ' + parts[2][2:4] + '/' + parts[2][4:]
-        end_date = 'Fecha fin: ' + parts[3][2:4] + '/' + parts[3][4:]
-        version = parts[4].split('.')[0]
-        return operation, responsible, start_date, end_date, version
+        if len(parts) < 5:  # Verifica que haya suficientes partes en el nombre del archivo
+            return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
     
+        try:
+            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
+            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago'}.get(parts[1], 'Responsable desconocido')
+            start_date = 'Fecha inicio: 20' + parts[2][0:2] + '/' + parts[2][2:4]
+            end_date = 'Fecha fin: 20' + parts[3][0:2] + '/' + parts[3][2:4]
+            version = parts[4].split('.')[0]
+        except IndexError:
+            return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
+    
+        return operation, responsible, start_date, end_date, version
+
     if data_filepath:
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        
-       
        # Actualizar el tooltip
-       tooltip_text = f"""
-       <div class="tooltip">
-            &#9432;  <!-- Ícono de información -->
-            <span class="tooltiptext">
-            Tipo de operación: {operation}<br>
-            Responsable del algoritmo: {responsible}<br>
-            {start_date}<br>
-            {end_date}<br>
-            Versión: {version}
-            </span>
-       </div>
-        """
+       if operation.startawith("Información desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       else:
+           tooltip_text = f"""
+           <div class="tooltip">
+                &#9432;  <!-- Ícono de información -->
+                <span class="tooltiptext">
+                Tipo de operación: {operation}<br>
+                Responsable del algoritmo: {responsible}<br>
+                {start_date}<br>
+                {end_date}<br>
+                Versión: {version}
+                </span>
+           </div>
+            """
        st.markdown(tooltip_text, unsafe_allow_html=True)
     #Botón para activar el pop-up
     #if st.button("Información"):
