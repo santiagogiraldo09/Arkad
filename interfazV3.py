@@ -263,6 +263,7 @@ def main():
         color: #3498db;
         float: right;
         margin-left: 5px;
+        vertical-align: middle;
     }
 
     .tooltip .tooltiptext {
@@ -275,7 +276,7 @@ def main():
         padding: 5px;
         position: absolute;
         z-index: 1;
-        bottom: 125%;
+        bottom: 150%;
         left: 50%;
         margin-left: -60px;
         opacity: 0;
