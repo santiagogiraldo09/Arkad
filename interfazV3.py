@@ -261,6 +261,8 @@ def main():
         display: inline-block;
         cursor: pointer;
         color: #3498db;
+        float: right;
+        margin-left: 5px;
     }
 
     .tooltip .tooltiptext {
@@ -283,6 +285,10 @@ def main():
     .tooltip:hover .tooltiptext {
         visibility: visible;
         opacity: 1;
+    }
+    .alignright {
+        displat: flex;
+        align-items: center;
     }
     </style>
     """
@@ -310,7 +316,7 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)
     #Botón para activar el pop-up
     #if st.button("Información"):
         #st.session_state.show_popup = True
