@@ -274,7 +274,7 @@ def main():
         text-align: center;
         border-radius: 6px;
         padding: 5px;
-        position: absolute;
+        position: relative;
         z-index: 1;
         bottom: 150%;
         left: 50%;
