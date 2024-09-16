@@ -261,7 +261,7 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:)", archivos_disponibles)
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos** Información:)", archivos_disponibles)
     #pop-up
     st.info("información relevante.")
     
