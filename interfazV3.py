@@ -333,7 +333,7 @@ def main():
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        
        # Actualizar el tooltip
-       if operation.startawith("Información desconocida"):
+       if operation.startswith("Información desconocida"):
            tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
        else:
            tooltip_text = f"""
