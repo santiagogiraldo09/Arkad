@@ -261,9 +261,6 @@ def main():
         display: inline-block;
         cursor: pointer;
         color: #3498db;
-        float: right;
-        margin-left: 5px;
-        vertical-align: middle;
     }
 
     .tooltip .tooltiptext {
@@ -274,7 +271,7 @@ def main():
         text-align: center;
         border-radius: 6px;
         padding: 5px;
-        position: relative;
+        position: absolute;
         z-index: 1;
         bottom: 150%;
         left: 50%;
@@ -286,10 +283,6 @@ def main():
     .tooltip:hover .tooltiptext {
         visibility: visible;
         opacity: 1;
-    }
-    .alignright {
-        displat: flex;
-        align-items: center;
     }
     </style>
     """
