@@ -253,6 +253,54 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 def main():
     st.title("Backtesting ARKAD")
+    
+    tooltip_style = """
+    <style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #3498db;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    </style>
+    """
+
+    # Insertamos el estilo en la aplicación Streamlit
+    st.markdown(tooltip_style, unsafe_allow_html=True)
+
+    # Agregamos el ícono o el botón con tooltip
+    st.markdown('''
+    <div class="tooltip">
+        &#9432;  <!-- Ícono de información -->
+        <span class="tooltiptext">Selecciona el archivo .xlsx con los datos históricos</span>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    
+    
+    
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
     if 'show_popup' not in st.session_state:
         st.session_state.show_popup = False
