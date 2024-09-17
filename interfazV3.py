@@ -312,7 +312,8 @@ def main():
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
-    
+    # Opción de selección del archivo .xlsx
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)
     
     #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
@@ -331,36 +332,25 @@ def main():
     
         return operation, responsible, start_date, end_date, version
 
-    col1, col2 = st.columns([1, 3])
-    
-    with col1:
-        st.markdown('''
-        <div class = "tooltip" id="info-icon">
-            &#9432;
-            <span class="tooltiptext" id="info-text"></span>
-        </div>
-        ''', unsafe_allow_html=True)
-    
-    with col2:
-        # Opción de selección del archivo .xlsx
-        data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)    
-        
     if data_filepath:
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        
        # Actualizar el tooltip
-       tooltip_text = f"""
-       <div class="tooltip">
-             &#9432;  <!-- Ícono de información -->
-             <span class="tooltiptext">
-             Tipo de operación: {operation}<br>
-             Responsable del algoritmo: {responsible}<br>
-             Rango de fechas: {start_date}<br>
-             {end_date}<br>
-             Versión: {version}
-             </span>
-       </div>
-         """
+       if operation.startswith("Información desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       else:
+           tooltip_text = f"""
+           <div class="tooltip">
+                &#9432;  <!-- Ícono de información -->
+                <span class="tooltiptext">
+                Tipo de operación: {operation}<br>
+                Responsable del algoritmo: {responsible}<br>
+                Rango de fechas: {start_date}<br>
+                {end_date}<br>
+                Versión: {version}
+                </span>
+           </div>
+            """
        st.markdown(tooltip_text, unsafe_allow_html=True)
     #Botón para activar el pop-up
     #if st.button("Información"):
