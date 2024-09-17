@@ -505,6 +505,8 @@ def main():
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
         matrix=np.zeros((2,2)) # form an empty matric of 2x2
+        print(datos.columns)
+
         for i in range(len(datos[column_name])): #the confusion matrix is for 2 classes: 1,0
                 #1=positive, 0=negative
             if int(datos[column_name][i])==1 and int(datos['Direction'][i])==1: 
