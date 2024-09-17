@@ -27,6 +27,8 @@ def cargar_datos(filepath):
     #Verificar que exista la columna 'date'
     if 'date' not in data.columns:
         return None, None
+    if 'pred' not in data.colums:
+        return None, None
     
     data['date'] = pd.to_datetime(data['date'])
     
