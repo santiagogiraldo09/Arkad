@@ -262,7 +262,7 @@ def main():
         cursor: pointer;
         color: #3498db;
         float: right;
-        margin-left: 5pc;
+        margin-left: 15px;
         vertical_align: middle;
     }
 
