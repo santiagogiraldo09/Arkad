@@ -23,23 +23,30 @@ def listar_archivos_xlxs(directorio):
 
 
 def cargar_datos(filepath):
-    data = pd.read_excel(filepath)
-    #Verificar que exista la columna 'date'
-    if 'proba(0)' or 'proba(1)' or 'toggle_false' or 'toggle_true' not in data.columns:
-        return None, None
-    
-    data['date'] = pd.to_datetime(data['date'])
-    
-    # No modificamos la columna 'date', manteniendo tanto fecha como hora
-    data = data.set_index('date')
-    
-    if 'threshold' in data.columns:
-        threshold_value = data['threshold'].iloc[0]
-    else:
-        #st.error("No cuenta con dato de threshold óptimo este archivo.")
-        threshold_value = None
+    try:
+        data = pd.read_excel(filepath)       
+        data['date'] = pd.to_datetime(data['date'])        
+        # No modificamos la columna 'date', manteniendo tanto fecha como hora
+        data = data.set_index('date')
         
-    return data[['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']], threshold_value
+        #Verificar columnas
+        required_columns = ['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']
+        missing_columns = [col for col in required_columns if col not in data.columns]
+        if missing_columns:
+            raise ValueError("Faltan las siguientes columnas en el Dataframse: " + ",".join(missing_columns))
+           
+        threshold_value = data['threshold'].iloc[0] if 'threshold' in data.columns else None
+        return data[required_columns], threshold_value
+    except Exception as e:
+        print(F"Error cargando los datos: {e}")
+        return pd.DataFrame(), None
+        #if 'threshold' in data.columns:
+            #threshold_value = data['threshold'].iloc[0]
+        #else:
+            #st.error("No cuenta con dato de threshold óptimo este archivo.")
+            #threshold_value = None
+            
+        return data[['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
