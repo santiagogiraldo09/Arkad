@@ -261,7 +261,7 @@ def main():
         display: inline-block;
         cursor: pointer;
         color: #3498db;
-        float: left;
+        float: middle;
         margin-left: 15px;
         vertical_align: middle;
     }
