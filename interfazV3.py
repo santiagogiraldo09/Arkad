@@ -390,7 +390,7 @@ def main():
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     #Toogle
-    on = st.toogle("Prueba")
+    on = st.toggle("Prueba")
     # Option Days input
     option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
