@@ -39,7 +39,7 @@ def cargar_datos(filepath):
         #st.error("No cuenta con dato de threshold óptimo este archivo.")
         threshold_value = None
         
-    return data[['pred']], threshold_value
+    return data[['prob(0)', 'prob(1)', 'toggle_true', 'toggle_false']], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -123,11 +123,14 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', toggle_activated=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
+    
+    #Elegir la columna correcta en función del toggle
+    column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     
     if periodo == 'Diario':
         fecha_inicio = fecha_inicio.date()
@@ -144,8 +147,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
         if date < fecha_inicio or date > fecha_fin:
             continue
-        if row['pred'] not in [0, 1]:
+        if row[column_name] not in [0, 1]:
             continue
+        
+        action = row[column_name]
 
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
         #if data_for_date.empty or len(data_for_date) < 2:
@@ -173,9 +178,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana(client, date, option_price, action, option_days, option_offset, ticker)
         if option_date:
-            option_type = 'C' if row['pred'] == 1 else 'P'
+            option_type = 'C' if action == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             
             if periodo == 'Diario':
@@ -196,6 +201,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             if not df_option.empty:
                 option_open_price = df_option[precio_usar_apertura].iloc[0]
+                option_close_price = df_option[precio_usar_cierre].iloc[index]
                 max_contract_value = option_open_price * 100
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
@@ -390,7 +396,7 @@ def main():
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
     #Toogle
-    on = st.toggle("Operar según el Threshold")
+    toggle_activated = st.toggle("Operar según el Threshold")
     # Option Days input
     option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
