@@ -130,8 +130,9 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', toggle_activated=False):
-    data = cargar_datos(data_filepath)
+def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', toggle_activated=False):
+    data, threshold_value = data_tuple
+    #data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
@@ -433,7 +434,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, toggle_activated)
+        resultados_df, final_balance = realizar_backtest((data, threshold_value), 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, toggle_activated)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
