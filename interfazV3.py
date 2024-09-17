@@ -261,6 +261,9 @@ def main():
         display: inline-block;
         cursor: pointer;
         color: #3498db;
+        float: right;
+        margin-left: 5pc;
+        vertical_align: middle;
     }
 
     .tooltip .tooltiptext {
