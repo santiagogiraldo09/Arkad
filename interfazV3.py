@@ -324,8 +324,8 @@ def main():
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago'}.get(parts[1], 'Responsable desconocido')
-            start_date = parts[2][2:4] + '/' + parts[2][4:6] + '/20' + parts[2][0:2]
-            end_date = parts[3][2:4] + '/' + parts[3][4:6] + '/20' + parts[3][0:2]
+            start_date = parts[2][2:4] + '/' + parts[2][4:6] #+ '/20' + parts[2][0:2]
+            end_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[3][0:2]
             version = parts[4].split('.')[0]
         except IndexError:
             return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
@@ -345,7 +345,7 @@ def main():
                 <span class="tooltiptext">
                 Tipo de operación: {operation}<br>
                 Responsable del algoritmo: {responsible}<br>
-                {start_date}<br>
+                Rango de fechas{start_date}<br>
                 {end_date}<br>
                 Versión: {version}
                 </span>
