@@ -305,8 +305,8 @@ def main():
     
     
     #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
-    if 'show_popup' not in st.session_state:
-        st.session_state.show_popup = False
+    #if 'show_popup' not in st.session_state:
+        #st.session_state.show_popup = False
     
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
@@ -324,8 +324,8 @@ def main():
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago'}.get(parts[1], 'Responsable desconocido')
-            start_date = 'Fecha inicio: 20' + parts[2][0:2] + '/' + parts[2][2:4]
-            end_date = 'Fecha fin: 20' + parts[3][0:2] + '/' + parts[3][2:4]
+            start_date = parts[2][2:4] + '/' + parts[2][4:6] + '/20' + parts[2][0:2]
+            end_date = parts[3][2:4] + '/' + parts[3][4:6] + '/20' + parts[3][0:2]
             version = parts[4].split('.')[0]
         except IndexError:
             return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
