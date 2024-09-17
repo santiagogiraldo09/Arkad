@@ -276,9 +276,8 @@ def main():
         padding: 10px;
         position: absolute;
         z-index: 1;
-        bottom: 150%;
-        left: 50%;
-        margin-left: -100px;
+        top: -5px;
+        right: 105%;
         opacity: 0;
         transition: opacity 0.3s;
     }
