@@ -262,23 +262,23 @@ def main():
         cursor: pointer;
         color: #3498db;
         float: left:
-        margin-left: 3px;
+        margin-left: 5px;
         vertical_align: middle;
     }
 
     .tooltip .tooltiptext {
         visibility: hidden;
-        width: 120px;
+        width: 220px;
         background-color: black;
         color: #fff;
-        text-align: center;
+        text-align: left;  /*Alineación de texto*/
         border-radius: 6px;
-        padding: 5px;
+        padding: 10px;
         position: absolute;
         z-index: 1;
         bottom: 150%;
         left: 50%;
-        margin-left: -50px;
+        margin-left: -100px;
         opacity: 0;
         transition: opacity 0.3s;
     }
