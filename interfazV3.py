@@ -312,8 +312,7 @@ def main():
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
-    # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)
+    
     
     #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
@@ -331,6 +330,9 @@ def main():
             return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
     
         return operation, responsible, start_date, end_date, version
+    
+    # Opción de selección del archivo .xlsx
+    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**:", archivos_disponibles)
 
     if data_filepath:
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
