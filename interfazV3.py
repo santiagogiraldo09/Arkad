@@ -278,7 +278,7 @@ def main():
         z-index: 1;
         bottom: 150%;
         left: 50%;
-        margin-left: -120px;
+        margin-left: -50px;
         opacity: 0;
         transition: opacity 0.3s;
     }
