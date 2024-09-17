@@ -32,7 +32,7 @@ def cargar_datos(filepath):
     if 'threshold' in data.columns:
         threshold_value = data['threshold'].iloc[0]
     else:
-        st.error("No cuenta con dato de threshold óptimo este archivo.")
+        #st.error("No cuenta con dato de threshold óptimo este archivo.")
         threshold_value = None
         
     return data[['pred']], threshold_value
@@ -350,7 +350,7 @@ def main():
        if threshold_value is not None:
            st.write(f"**Threshold óptimo: {threshold_value}**")
        else:
-           st.error("No se pudo encontrar el valor del threshold en el archivo.")
+           st.write("**Threshold óptimo:** No se pudo encontrar el valor del threshold en el archivo.")
        # Actualizar el tooltip
        if operation.startswith("Información desconocida"):
            tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
