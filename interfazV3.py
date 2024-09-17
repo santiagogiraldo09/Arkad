@@ -487,7 +487,7 @@ def main():
             
         datos = datos.reset_index(drop=True)
         datos['acierto'] = np.where(
-            datos['Direction'] == datos['Pred'], 1, 0)
+            datos['Direction'] == datos[column_name], 1, 0)
         # desempeño de modelo en entrenamiento
         datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
         datos['cumsum'] = datos['acierto'].cumsum()
