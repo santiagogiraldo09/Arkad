@@ -39,7 +39,7 @@ def cargar_datos(filepath):
         #st.error("No cuenta con dato de threshold óptimo este archivo.")
         threshold_value = None
         
-    return data[['prob(0)', 'prob(1)', 'toggle_true', 'toggle_false']], threshold_value
+    return data[['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
