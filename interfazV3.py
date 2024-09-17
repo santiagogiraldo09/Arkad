@@ -28,7 +28,14 @@ def cargar_datos(filepath):
     
     # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
-    return data[['pred']]
+    
+    if 'threshold' in data.columns:
+        threshold_value = data['threshold'].iloc[0]
+    else:
+        st.error("No cuenta con dato de threshold óptimo este archivo.")
+        threshold_value = None
+        
+    return data[['pred']], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -338,7 +345,12 @@ def main():
 
     if data_filepath:
        operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       data, threshold_value = cargar_datos(data_filepath)
        
+       if threshold_value is not None:
+           st.write(f"**Threshold óptimo: {threshold_value}**")
+       else:
+           st.error("No se pudo encontrar el valor del threshold en el archivo.")
        # Actualizar el tooltip
        if operation.startswith("Información desconocida"):
            tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
