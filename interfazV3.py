@@ -25,7 +25,7 @@ def listar_archivos_xlxs(directorio):
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     #Verificar que exista la columna 'date'
-    if 'date' or 'pred' not in data.columns:
+    if 'date' not in data.columns:
         return None, None
     
     data['date'] = pd.to_datetime(data['date'])
