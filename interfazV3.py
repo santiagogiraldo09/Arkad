@@ -226,8 +226,7 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                     resultados.append({
                         'Fecha': date, 
                         'Tipo': 'Call' if action == 1 else 'Put',
-                        'toggle_false': action,
-                        'toggle_true': action,
+                        '{column_name}': action,
                         'Fecha Apertura': df_option.index[0],
                         'Fecha Cierre': df_option.index[index],
                         'Precio Entrada': option_open_price, 
@@ -484,8 +483,8 @@ def main():
             datos['Direction'] = 0
 
             
-        st.write(f"Valor de column_name: {column_name}")
-        st.write(f"Columnas disponibles: {list(datos.columns)}")
+        #st.write(f"Valor de column_name: {column_name}")
+        #st.write(f"Columnas disponibles: {list(datos.columns)}")
             
         datos = datos.reset_index(drop=True)
         datos['acierto'] = np.where(
