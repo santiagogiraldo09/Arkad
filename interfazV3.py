@@ -483,7 +483,8 @@ def main():
             datos['Direction'] = 0
 
             
-        
+        st.write(f"Valor de column_name: {column_name}")
+        st.write(f"Columnas disponibles: {list(datos.columns)}")
             
         datos = datos.reset_index(drop=True)
         datos['acierto'] = np.where(
