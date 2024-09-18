@@ -117,13 +117,13 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
    
-def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
+def encontrar_opcion_cercana(client, base_date, option_price, action, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
     best_date = None
     for offset in range(min_days, max_days + 1):
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if pred == 1 else 'P'
+        option_type = 'C' if action == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
         if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
             best_date = option_date
