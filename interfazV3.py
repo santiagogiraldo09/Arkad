@@ -222,19 +222,11 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                     etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
     
-<<<<<<< HEAD
                     resultados.append({
                         'Fecha': date, 
                         'Tipo': 'Call' if action == 1 else 'Put',
-                        'toogle_false': action,
-                        'toogle_true': action,
-=======
-    
-                    resultados.append({
-                        'Fecha': date, 
-                        'Tipo': 'Call' if action == 1 else 'Put',
-                        '{column_name}': action,
->>>>>>> parent of 945aab7 (Update interfazV3.py)
+                        'toggle_false': action,
+                        'toggle_true': action,
                         'Fecha Apertura': df_option.index[0],
                         'Fecha Cierre': df_option.index[index],
                         'Precio Entrada': option_open_price, 
@@ -247,11 +239,6 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                         'Close': etf_close_price
                     })
                     print(trade_result)
-<<<<<<< HEAD
-                                         
-=======
->>>>>>> parent of 945aab7 (Update interfazV3.py)
-    
         resultados_df = pd.DataFrame(resultados)
         if not resultados_df.empty and 'Resultado' in resultados_df.columns:
             graficar_resultados(resultados_df, balance, balance_inicial)
