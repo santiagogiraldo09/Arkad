@@ -338,11 +338,12 @@ def main():
     #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
         parts = filename.split('_')
-        if len(parts) < 5:  # Verifica que haya suficientes partes en el nombre del archivo
+        if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
             return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
     
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
+            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[1], 'Responsable desconocido')
             start_date = parts[2][2:4] + '/' + parts[2][4:6] #+ '/20' + parts[2][0:2]
             end_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[3][0:2]
@@ -350,7 +351,7 @@ def main():
         except IndexError:
             return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
     
-        return operation, responsible, start_date, end_date, version
+        return operation, info, responsible, start_date, end_date, version
 
     #placeholder para el ícono de información
     info_placeholder = st.empty()
@@ -360,7 +361,7 @@ def main():
     
 
     if data_filepath:
-       operation, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        data, threshold_value = cargar_datos(data_filepath)
        
        if threshold_value is not None:
@@ -376,6 +377,7 @@ def main():
                 &#9432;  <!-- Ícono de información -->
                 <span class="tooltiptext">
                 Tipo de operación: {operation}<br>
+                {info}<br>
                 Responsable del algoritmo: {responsible}<br>
                 Rango de fechas: {start_date}<br>
                 {end_date}<br>
