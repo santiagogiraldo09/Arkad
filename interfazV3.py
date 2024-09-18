@@ -337,9 +337,12 @@ def main():
     
     #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
+        #Valores por defecto
+        default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
+                      "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
         parts = filename.split('_')
         if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
-            return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
+            return default_values
     
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
@@ -348,10 +351,11 @@ def main():
             start_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
             end_date = parts[4][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
             version = parts[5].split('.')[0]
+        
+            return operation, info, responsible, start_date, end_date, version
         except IndexError:
-            return "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo", "Información desconocida del algoritmo"
-    
-        return operation, info, responsible, start_date, end_date, version
+            return default_values
+        
 
     #placeholder para el ícono de información
     info_placeholder = st.empty()
