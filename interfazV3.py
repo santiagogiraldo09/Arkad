@@ -226,7 +226,8 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                     resultados.append({
                         'Fecha': date, 
                         'Tipo': 'Call' if action == 1 else 'Put',
-                        'Pred': action,
+                        'toggle_false': action,
+                        'toggle_true': action,
                         'Fecha Apertura': df_option.index[0],
                         'Fecha Cierre': df_option.index[index],
                         'Precio Entrada': option_open_price, 
