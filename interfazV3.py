@@ -222,23 +222,42 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                     etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
     
-    
-                    resultados.append({
-                        'Fecha': date, 
-                        'Tipo': 'Call' if action == 1 else 'Put',
-                        '{column_name}': action,
-                        'Fecha Apertura': df_option.index[0],
-                        'Fecha Cierre': df_option.index[index],
-                        'Precio Entrada': option_open_price, 
-                        'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
-                        'Resultado': trade_result,
-                        'Contratos': num_contratos,
-                        'Opcion': option_name,
-                        #'Open': df_option[['open']]
-                        'Open': etf_open_price,
-                        'Close': etf_close_price
-                    })
-                    print(trade_result)
+                    if column_name == 'toogle_false':
+                        resultados.append({
+                            'Fecha': date, 
+                            'Tipo': 'Call' if action == 1 else 'Put',
+                            'toogle_false': action,
+                            'Fecha Apertura': df_option.index[0],
+                            'Fecha Cierre': df_option.index[index],
+                            'Precio Entrada': option_open_price, 
+                            'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                            'Resultado': trade_result,
+                            'Contratos': num_contratos,
+                            'Opcion': option_name,
+                            #'Open': df_option[['open']]
+                            'Open': etf_open_price,
+                            'Close': etf_close_price
+                        })
+                        print(trade_result)
+                    else:
+                        resultados.append({
+                            'Fecha': date, 
+                            'Tipo': 'Call' if action == 1 else 'Put',
+                            'toogle_true': action,
+                            'Fecha Apertura': df_option.index[0],
+                            'Fecha Cierre': df_option.index[index],
+                            'Precio Entrada': option_open_price, 
+                            'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                            'Resultado': trade_result,
+                            'Contratos': num_contratos,
+                            'Opcion': option_name,
+                            #'Open': df_option[['open']]
+                            'Open': etf_open_price,
+                            'Close': etf_close_price
+                        })
+                        print(trade_result)
+                        
+                      
     
         resultados_df = pd.DataFrame(resultados)
         if not resultados_df.empty and 'Resultado' in resultados_df.columns:
