@@ -204,7 +204,7 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                         option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
     
                 
-                df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
+                #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
                 
                 if not df_option.empty:
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
