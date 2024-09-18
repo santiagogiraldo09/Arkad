@@ -343,7 +343,7 @@ def main():
     
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
-            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[0], 'Información desconocida')
+            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
             start_date = parts[2][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
             end_date = parts[3][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
