@@ -24,12 +24,13 @@ def listar_archivos_xlxs(directorio):
 
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
-    if data is not None:
+    if 'date' in data.columns:
         data['date'] = pd.to_datetime(data['date'])
-        data = data.set_index('date')
-        return data
     else:
         return None
+        
+    data = data.set_index('date')
+    return data
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
