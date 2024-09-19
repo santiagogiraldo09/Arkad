@@ -35,7 +35,7 @@ def cargar_datos(filepath):
         raise ValueError("Faltan las siguientes columnas en el Dataframse: " + ",".join(missing_columns))
        
     threshold_value = data['threshold'].iloc[0] if 'threshold' in data.columns else None
-    return data[required_columns], threshold_value
+    return data['toggle_true','toggle_false'], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
