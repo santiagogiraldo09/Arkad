@@ -555,5 +555,5 @@ def main():
                 mime="application/zip"
             )
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     main()
