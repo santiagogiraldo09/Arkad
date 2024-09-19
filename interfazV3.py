@@ -23,12 +23,30 @@ def listar_archivos_xlxs(directorio):
 
 
 def cargar_datos(filepath):
-    data = pd.read_excel(filepath)
-    data['date'] = pd.to_datetime(data['date'])
-    
-    # No modificamos la columna 'date', manteniendo tanto fecha como hora
-    data = data.set_index('date')
-    return data[['pred']]
+    try:
+        data = pd.read_excel(filepath)       
+        data['date'] = pd.to_datetime(data['date'])        
+        # No modificamos la columna 'date', manteniendo tanto fecha como hora
+        data = data.set_index('date')
+        
+        #Verificar columnas
+        required_columns = ['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']
+        missing_columns = [col for col in required_columns if col not in data.columns]
+        if missing_columns:
+            raise ValueError("Faltan las siguientes columnas en el Dataframse: " + ",".join(missing_columns))
+           
+        threshold_value = data['threshold'].iloc[0] if 'threshold' in data.columns else None
+        return data[required_columns], threshold_value
+    except Exception as e:
+        print(F"Error cargando los datos: {e}")
+        return pd.DataFrame(), None
+        #if 'threshold' in data.columns:
+            #threshold_value = data['threshold'].iloc[0]
+        #else:
+            #st.error("No cuenta con dato de threshold óptimo este archivo.")
+            #threshold_value = None
+            
+        return data[['proba(0)', 'proba(1)', 'toggle_true', 'toggle_false']], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -99,144 +117,127 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
    
-def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
+def encontrar_opcion_cercana(client, base_date, option_price, action, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
     best_date = None
     for offset in range(min_days, max_days + 1):
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if pred == 1 else 'P'
+        option_type = 'C' if action == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
         if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
             best_date = option_date
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
-    data = cargar_datos(data_filepath)
+def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+    data, threshold_value = data_tuple
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
     
-    if periodo == 'Diario':
-        fecha_inicio = fecha_inicio.date()
-        fecha_fin = fecha_fin.date()
-    else:
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
 
-    for date, row in data.iterrows():
+    for date, row in data.iterrows():    
         if periodo == 'Diario':
-            date = date.date()
+            fecha_inicio = fecha_inicio.date()
+            fecha_fin = fecha_fin.date()
         else:
-            date = pd.Timestamp(date)
-            
-        if date < fecha_inicio or date > fecha_fin:
-            continue
-        if row['pred'] not in [0, 1]:
-            continue
-
-        #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
-        #if data_for_date.empty or len(data_for_date) < 2:
-            #continue
-
-
-        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        if data_for_date.empty:
-            continue
-
-        if trade_type == 'Close to Close':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'close'
-            index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
-        elif trade_type == 'Close to Open':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'open'
-            index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
-        else: #Open to Close
-            precio_usar_apertura = 'open'
-            precio_usar_cierre = 'close'
-            index = 0
-            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            
-        option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
-        if option_date:
-            option_type = 'C' if row['pred'] == 1 else 'P'
-            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            
+            fecha_inicio = pd.Timestamp(fecha_inicio)
+            fecha_fin = pd.Timestamp(fecha_fin)
+    
+        for date, row in data.iterrows():
             if periodo == 'Diario':
-                df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-            else:  # '15 Minutos'
-                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                date = date.date()
+            else:
+                date = pd.Timestamp(date)
+                
+            if date < fecha_inicio or date > fecha_fin:
+                continue
+            if row[column_name] in [0, 1]:
+                continue
             
-            if not df_option.empty:
+            action = row[column_name]
+        
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            if data_for_date.empty:
+                continue
+    
+            if trade_type == 'Close to Close':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'close'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            elif trade_type == 'Close to Open':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'open'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            else: #Open to Close
+                precio_usar_apertura = 'open'
+                precio_usar_cierre = 'close'
+                index = 0
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                
+            option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+            option_date = encontrar_opcion_cercana(client, date, option_price, action, option_days, option_offset, ticker)
+            if option_date:
+                option_type = 'C' if action == 1 else 'P'
+                option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                
                 if periodo == 'Diario':
+                    df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                else:  # '15 Minutos'
+                    df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                
+                if not df_option.empty:
+                    if periodo == 'Diario':
+                        option_open_price = df_option[precio_usar_apertura].iloc[0]
+                        option_close_price = df_option[precio_usar_cierre].iloc[index]
+                    else:  # '15 Minutos'
+                        option_open_price = df_option['open'].iloc[0]
+                        option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+    
+                               
+                if not df_option.empty:
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
-                else:  # '15 Minutos'
-                    signal_time = date  # La fecha con la hora exacta de la predicción
-
-                    # Filtramos para obtener el registro que coincide exactamente con la hora de la señal
-                    registro_señal = df_option[df_option.index == signal_time]
-                    
-                    if not registro_señal.empty:
-                        # Si encontramos un registro exacto, usamos esos valores
-                        option_open_price = registro_señal['open'].iloc[0]
-                        option_close_price = registro_señal['close'].iloc[0]
-                    else:
-                        # Si no hay un registro exacto para la hora de la señal, buscamos el más cercano
-                        registro_señal_mas_cercano = df_option.iloc[(df_option.index - signal_time).abs().argmin()]
-                        option_open_price = registro_señal_mas_cercano['open']
-                        option_close_price = registro_señal_mas_cercano['close']
-                    #option_open_price = df_option['open'].iloc[0]
-                    #option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
-
-            
-            df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
-            
-            if not df_option.empty:
-                option_open_price = df_option[precio_usar_apertura].iloc[0]
-                max_contract_value = option_open_price * 100
-                num_contratos = int((balance * pct_allocation) / max_contract_value)
-                trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                balance += trade_result
-
-                # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
-                #etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
+                    max_contract_value = option_open_price * 100
+                    num_contratos = int((balance * pct_allocation) / max_contract_value)
+                    trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                    balance += trade_result
     
-                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
-                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-
-
-                resultados.append({
-                    'Fecha': date, 
-                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
-                    'Pred': row['pred'],
-                    'Fecha Apertura': df_option.index[0],
-                    'Fecha Cierre': df_option.index[index],
-                    'Precio Entrada': option_open_price, 
-                    'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
-                    'Resultado': trade_result,
-                    'Contratos': num_contratos,
-                    'Opcion': option_name,
-                    #'Open': df_option[['open']]
-                    'Open': etf_open_price,
-                    'Close': etf_close_price
-                })
-                print(trade_result)
-
-    resultados_df = pd.DataFrame(resultados)
-    if not resultados_df.empty and 'Resultado' in resultados_df.columns:
-        graficar_resultados(resultados_df, balance, balance_inicial)
-        resultados_df.to_excel('resultados_trades_1.xlsx')
-    else:
-        st.error("No se encontraron resultados válidos para el periodo especificado.")
-    return resultados_df, balance
+                    # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
+                    #etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
+        
+                    # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
+                    etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                    etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                    etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+    
+                    resultados.append({
+                        'Fecha': date, 
+                        'Tipo': 'Call' if action == 1 else 'Put',
+                        'toggle_false': action,
+                        'toggle_true': action,
+                        'Fecha Apertura': df_option.index[0],
+                        'Fecha Cierre': df_option.index[index],
+                        'Precio Entrada': option_open_price, 
+                        'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                        'Resultado': trade_result,
+                        'Contratos': num_contratos,
+                        'Opcion': option_name,
+                        #'Open': df_option[['open']]
+                        'Open': etf_open_price,
+                        'Close': etf_close_price
+                    })
+                    print(trade_result)
+        resultados_df = pd.DataFrame(resultados)
+        if not resultados_df.empty and 'Resultado' in resultados_df.columns:
+            graficar_resultados(resultados_df, balance, balance_inicial)
+            resultados_df.to_excel('resultados_trades_1.xlsx')
+        else:
+            st.error("No se encontraron resultados válidos para el periodo especificado.")
+        return resultados_df, balance
 
 def graficar_resultados(df, final_balance, balance_inicial):
     if df.empty or 'Resultado' not in df.columns:
@@ -267,39 +268,161 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 def main():
     st.title("Backtesting ARKAD")
-    #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
+    
+    tooltip_style = """
+    <style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #3498db;
+        float: left:
+        margin-left: 5px;
+        vertical_align: middle;
+    }
 
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 220px;
+        background-color: black;
+        color: #fff;
+        text-align: left;  /Alineación de texto/
+        border-radius: 6px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        top: -5px;
+        right: 105%;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    </style>
+    """
+
+    # Insertamos el estilo en la aplicación Streamlit
+    st.markdown(tooltip_style, unsafe_allow_html=True)
+
+    # Agregamos el ícono o el botón con tooltip
+    #st.markdown('''
+    #<div class="tooltip">
+        #&#9432;  <!-- Ícono de información -->
+        #<span class="tooltiptext">Selecciona el archivo .xlsx con los datos históricos</span>
+    #</div>
+    #''', unsafe_allow_html=True)
+    
+    
+    
+    
+    #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
+    #if 'show_popup' not in st.session_state:
+        #st.session_state.show_popup = False
     
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
+    
+    #Extraer información del nombre del archivo seleccionado
+    def extract_file_info(filename):
+        #Valores por defecto
+        default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
+                      "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
+        parts = filename.split('_')
+        if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
+            return default_values
+    
+        try:
+            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
+            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
+            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
+            start_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
+            end_date = parts[4][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
+            version = parts[5].split('.')[0]
+        
+            return operation, info, responsible, start_date, end_date, version
+        except IndexError:
+            return default_values
+        
+
+    #placeholder para el ícono de información
+    info_placeholder = st.empty()
+    
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("**Seleccionar archivo de datos históricos**: (Trabajar en estos momentos con **modelo_andres_datos_act** el cual contiene datos desde 2022)", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos*:", archivos_disponibles)
+    
+
+    if data_filepath:
+       operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       data, threshold_value = cargar_datos(data_filepath)
+       
+       if threshold_value is not None:
+           st.write(f"*Threshold óptimo: {threshold_value}*")
+       else:
+           st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
+       # Actualizar el tooltip
+       if operation.startswith("Información desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       else:
+           tooltip_text = f"""
+           <div class="tooltip">
+                &#9432;  <!-- Ícono de información -->
+                <span class="tooltiptext">
+                Tipo de operación: {operation}<br>
+                {info}<br>
+                Responsable del algoritmo: {responsible}<br>
+                Rango de fechas: {start_date}<br>
+                {end_date}<br>
+                Versión: {version}
+                </span>
+           </div>
+            """
+       info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
+    #Botón para activar el pop-up
+    #if st.button("Información"):
+        #st.session_state.show_popup = True
+        
+    #Mostrar el po-up si está activado
+    #if st.session_state.show_popup:
+        #with st.container():
+            #st.markdown("## Este es un Pop-up")
+            #st.write("Aquí puedes agregar cualquier contenido que desees mostrar en el pop-up.")
+            #if st.button("Cerrar"):
+                #st.session_state.show_popup = False
+            
+    #st.warning("información relevante.")
+    
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
+    #Toogle
+    toggle_activated = st.toggle("Se opera si se supera el Threshold")
+    column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     # Option Days input
-    option_days_input = st.number_input("**Option Days:** (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("**Option Offset:** (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     #data_filepath = 'datos_8.xlsx'
     #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
     #ticker = st.text_input("Ticker Symbol", "SPY")
-    balance_inicial = st.number_input("**Balance iniciall**", min_value=0, value=100000, step= 1000)
-    pct_allocation = st.number_input("**Porcentaje de Asignación de Capital:**", min_value=0.001, max_value=0.6, value=0.05)
-    fecha_inicio = st.date_input("**Fecha de inicio del periodo de backtest:**", min_value=datetime(2020, 1, 1))
-    fecha_fin = st.date_input("**Fecha de finalización del periodo de backtest:**", max_value=datetime.today())
-    trade_type = st.radio('**Tipo de Operación**', ('Close to Close', 'Open to Close', 'Close to Open'))
+    balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
+    pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
+    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
+    fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
+    trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
-    #open_time = st.time_input("**Seleccionar Hora de Apertura:**", value=datetime.strptime("09:30", "%H:%M").time())
-    #close_time = st.time_input("**Seleccionar Hora de Cierre:**", value=datetime.strptime("16:00", "%H:%M").time())
+    #open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
+    #close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     
-    periodo = st.radio("**Selecionar periodo de datos**", ('Diario','15 minutos'))
+    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
 
     #if trade_type == 'Close to Close':
        #close_to_close = True
@@ -308,7 +431,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo)
+        resultados_df, final_balance = realizar_backtest((data, threshold_value), 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
@@ -357,11 +480,12 @@ def main():
             datos['Direction'] = 0
 
             
-        
+        st.write(f"Valor de column_name: {column_name}")
+        st.write(f"Columnas disponibles: {list(datos.columns)}")
             
         datos = datos.reset_index(drop=True)
         datos['acierto'] = np.where(
-            datos['Direction'] == datos['Pred'], 1, 0)
+            datos['Direction'] == datos[column_name], 1, 0)
         # desempeño de modelo en entrenamiento
         datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
         datos['cumsum'] = datos['acierto'].cumsum()
@@ -379,15 +503,17 @@ def main():
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
         matrix=np.zeros((2,2)) # form an empty matric of 2x2
-        for i in range(len(datos['Pred'])): #the confusion matrix is for 2 classes: 1,0
+        print(datos.columns)
+
+        for i in range(len(datos[column_name])): #the confusion matrix is for 2 classes: 1,0
                 #1=positive, 0=negative
-            if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==1: 
+            if int(datos[column_name][i])==1 and int(datos['Direction'][i])==1: 
                 matrix[0,0]+=1 #True Positives
-            elif int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0:
+            elif int(datos[column_name][i])==1 and int(datos['Direction'][i])==0:
                    matrix[0,1]+=1 #False Positives
-            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==1:
+            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==1:
                   matrix[1,0]+=1 #False Negatives
-            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==0:
+            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==0:
                 matrix[1,1]+=1 #True Negatives
             
                     
@@ -429,5 +555,5 @@ def main():
                 mime="application/zip"
             )
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
