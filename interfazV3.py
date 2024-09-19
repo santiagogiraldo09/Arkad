@@ -26,7 +26,10 @@ def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
     data = data.set_index('date')
-    return data
+    if data is not None:
+        return data
+    else:
+        return None
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
