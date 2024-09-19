@@ -153,7 +153,7 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                 
             if date < fecha_inicio or date > fecha_fin:
                 continue
-            if row[column_name] in [0, 1]:
+            if row[column_name] not in [0.55, 1]:
                 continue
             
             action = row[column_name]
