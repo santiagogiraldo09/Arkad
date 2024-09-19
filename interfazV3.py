@@ -333,10 +333,10 @@ def main():
        operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        data = cargar_datos(data_filepath)
        
-       if data['threshold'] is not None:
-           st.write(f"*Threshold óptimo: {data['threshold']}*")
-       else:
-           st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
+       #if data['threshold'] is not None:
+           #st.write(f"*Threshold óptimo: {data['threshold']}*")
+       #else:
+           #st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
        # Actualizar el tooltip
        if operation.startswith("Información desconocida"):
            tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
