@@ -153,19 +153,9 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                 
             if date < fecha_inicio or date > fecha_fin:
                 continue
-            
-            # Suponiendo que el threshold ya está definido (por ejemplo, threshold_value = 0.5)
-            threshold_value = 0.5  # Esto puede ser un valor predeterminado o leído desde los datos
-            probabilidad = row[column_name]
-            
-            # Si la probabilidad es mayor o igual al umbral, consideramos una compra (Call), si no, una venta (Put)
-            if probabilidad >= threshold_value:
-                action = 1  # Consideramos esto como un "Call"
-            else:
-                action = 0  # Consideramos esto como un "Put"
-
-            #if row[column_name] not in [0, 1]:
-                #continue
+                        
+            if row[column_name] not in [0, 1]:
+                continue
             
             action = row[column_name]
         
@@ -200,6 +190,10 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                 else:  # '15 Minutos'
                     df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 
+                if df_option.empty:
+                    print(f"No se encontraron datos para {ticker} en el intervalo de tiempo especificado.")
+                    continue
+
                 if not df_option.empty:
                     if periodo == 'Diario':
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
