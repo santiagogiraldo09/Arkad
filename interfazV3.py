@@ -261,11 +261,11 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos: (Trabajar en estos momentos con **modelo_andres_datos_act* el cual contiene datos desde 2022)", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     #Toogle
-    toggle_activated = st.toggle("Se opera si se supera el Threshold")
+    toggle_activated = st.toggle("Se opera sólo si se supera el Threshold")
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     
     # Option Days input
