@@ -259,7 +259,11 @@ def main():
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
-       
+    
+    #Toogle
+    toggle_activated = st.toggle("Se opera si se supera el Threshold")
+    column_name = 'toggle_true' if toggle_activated else 'toggle_false'
+    
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
