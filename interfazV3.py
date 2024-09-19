@@ -28,7 +28,14 @@ def cargar_datos(filepath):
     
     # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
-    return data[['pred']]
+    #Verificar columnas
+    required_columns = ['toggle_true', 'toggle_false']
+    missing_columns = [col for col in required_columns if col not in data.columns]
+    if missing_columns:
+        raise ValueError("Faltan las siguientes columnas en el Dataframse: " + ",".join(missing_columns))
+       
+    threshold_value = data['threshold'].iloc[0] if 'threshold' in data.columns else None
+    return data[required_columns], threshold_value
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -112,7 +119,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -133,9 +140,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
         if date < fecha_inicio or date > fecha_fin:
             continue
-        if row['pred'] not in [0, 1]:
+        if row[column_name] not in [0, 1]:
             continue
 
+        action = row[column_name]
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
@@ -162,9 +170,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
-            option_type = 'C' if row['pred'] == 1 else 'P'
+            option_type = 'C' if action == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             
             if periodo == 'Diario':
@@ -201,8 +209,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 resultados.append({
                     'Fecha': date, 
-                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
-                    'Pred': row['pred'],
+                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                    'Pred': row[column_name],
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
