@@ -22,20 +22,11 @@ def listar_archivos_xlxs(directorio):
     return archivos
 
 
-def cargar_datos(filepath, column_name):
+def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
-    
-    # Mostrar las columnas disponibles para ayudar con la depuración
-    print(f"Columnas disponibles en el archivo: {list(data.columns)}")
-    
-    # Verificar si la columna existe
-    if column_name not in data.columns:
-        raise KeyError(f"La columna '{column_name}' no existe en los datos. Las columnas disponibles son: {list(data.columns)}")
-        
-    # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
-    return data[[column_name]]
+    return data
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -119,8 +110,8 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, column_name='toggle_false', option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
-    data = cargar_datos(data_filepath, column_name)
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+    data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
@@ -305,7 +296,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, column_name, option_offset_input, trade_type, periodo)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
