@@ -297,6 +297,31 @@ def main():
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
+    #Extraer información del nombre del archivo seleccionado
+    def extract_file_info(filename):
+        #Valores por defecto
+        default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
+                      "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
+        parts = filename.split('_')
+        if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
+            return default_values
+    
+        try:
+            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
+            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
+            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
+            start_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
+            end_date = parts[4][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
+            version = parts[5].split('.')[0]
+        
+            return operation, info, responsible, start_date, end_date, version
+        except IndexError:
+            return default_values
+        
+
+    #placeholder para el ícono de información
+    info_placeholder = st.empty()
+    
     #Toogle
     toggle_activated = st.toggle("Se opera si se supera el Threshold")
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
