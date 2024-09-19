@@ -253,7 +253,44 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 def main():
     st.title("Backtesting ARKAD")
-    #st.write("Use this interface to set the values for 'option_days' and 'option_offset'.")
+    
+    tooltip_style = """
+    <style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #3498db;
+        float: left:
+        margin-left: 5px;
+        vertical_align: middle;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 220px;
+        background-color: black;
+        color: #fff;
+        text-align: left;  /Alineación de texto/
+        border-radius: 6px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        top: -5px;
+        right: 105%;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    </style>
+    """
+
+    # Insertamos el estilo en la aplicación Streamlit
+    st.markdown(tooltip_style, unsafe_allow_html=True)
 
     
     # Directorio donde se encuentran los archivos .xlsx
