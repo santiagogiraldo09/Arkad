@@ -260,12 +260,64 @@ def main():
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
+    #Extraer información del nombre del archivo seleccionado
+    def extract_file_info(filename):
+        #Valores por defecto
+        default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
+                      "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
+        parts = filename.split('_')
+        if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
+            return default_values
+    
+        try:
+            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
+            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
+            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
+            start_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
+            end_date = parts[4][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
+            version = parts[5].split('.')[0]
+        
+            return operation, info, responsible, start_date, end_date, version
+        except IndexError:
+            return default_values
+        
+
+    #placeholder para el ícono de información
+    info_placeholder = st.empty()
+    
     #Toogle
     toggle_activated = st.toggle("Se opera si se supera el Threshold")
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    
+    if data_filepath:
+       operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       data, threshold_value = cargar_datos(data_filepath)
+       
+       if threshold_value is not None:
+           st.write(f"*Threshold óptimo: {threshold_value}*")
+       else:
+           st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
+       # Actualizar el tooltip
+       if operation.startswith("Información desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       else:
+           tooltip_text = f"""
+           <div class="tooltip">
+                &#9432;  <!-- Ícono de información -->
+                <span class="tooltiptext">
+                Tipo de operación: {operation}<br>
+                {info}<br>
+                Responsable del algoritmo: {responsible}<br>
+                Rango de fechas: {start_date}<br>
+                {end_date}<br>
+                Versión: {version}
+                </span>
+           </div>
+            """
+       info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
