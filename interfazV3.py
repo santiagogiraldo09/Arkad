@@ -153,8 +153,19 @@ def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocati
                 
             if date < fecha_inicio or date > fecha_fin:
                 continue
-            if row[column_name] not in [0.55, 1]:
-                continue
+            
+            # Suponiendo que el threshold ya está definido (por ejemplo, threshold_value = 0.5)
+            threshold_value = 0.5  # Esto puede ser un valor predeterminado o leído desde los datos
+            probabilidad = row[column_name]
+            
+            # Si la probabilidad es mayor o igual al umbral, consideramos una compra (Call), si no, una venta (Put)
+            if probabilidad >= threshold_value:
+                action = 1  # Consideramos esto como un "Call"
+            else:
+                action = 0  # Consideramos esto como un "Put"
+
+            #if row[column_name] not in [0, 1]:
+                #continue
             
             action = row[column_name]
         
