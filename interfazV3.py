@@ -26,6 +26,13 @@ def cargar_datos(filepath, column_name):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
     
+    # Mostrar las columnas disponibles para ayudar con la depuración
+    print(f"Columnas disponibles en el archivo: {list(data.columns)}")
+    
+    # Verificar si la columna existe
+    if column_name not in data.columns:
+        raise KeyError(f"La columna '{column_name}' no existe en los datos. Las columnas disponibles son: {list(data.columns)}")
+        
     # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
     return data[[column_name]]
