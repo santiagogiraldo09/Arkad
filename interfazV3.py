@@ -328,6 +328,34 @@ def main():
     
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    
+    if data_filepath:
+       operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
+       data = cargar_datos(data_filepath)
+       
+       if data['threshold'] is not None:
+           st.write(f"*Threshold óptimo: {data['threshold']}*")
+       else:
+           st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
+       # Actualizar el tooltip
+       if operation.startswith("Información desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       else:
+           tooltip_text = f"""
+           <div class="tooltip">
+                &#9432;  <!-- Ícono de información -->
+                <span class="tooltiptext">
+                Tipo de operación: {operation}<br>
+                {info}<br>
+                Responsable del algoritmo: {responsible}<br>
+                Rango de fechas: {start_date}<br>
+                {end_date}<br>
+                Versión: {version}
+                </span>
+           </div>
+            """
+       info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
+    
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
     
