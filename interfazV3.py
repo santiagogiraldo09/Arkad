@@ -177,8 +177,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
                 else:  # '15 Minutos'
-                    option_open_price = df_option['open'].iloc[0]
-                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+                    signal_time = date  # La fecha con la hora exacta de la predicción
+
+                    # Filtramos para obtener el registro que coincide exactamente con la hora de la señal
+                    registro_señal = df_option[df_option.index == signal_time]
+                    
+                    if not registro_señal.empty:
+                        # Si encontramos un registro exacto, usamos esos valores
+                        option_open_price = registro_señal['open'].iloc[0]
+                        option_close_price = registro_señal['close'].iloc[0]
+                    else:
+                        # Si no hay un registro exacto para la hora de la señal, buscamos el más cercano
+                        registro_señal_mas_cercano = df_option.iloc[(df_option.index - signal_time).abs().argmin()]
+                        option_open_price = registro_señal_mas_cercano['open']
+                        option_close_price = registro_señal_mas_cercano['close']
+                    #option_open_price = df_option['open'].iloc[0]
+                    #option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
 
             
             df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
