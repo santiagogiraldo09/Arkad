@@ -130,8 +130,8 @@ def encontrar_opcion_cercana(client, base_date, option_price, action, option_day
             break
     return best_date
 
-def realizar_backtest(data_tuple, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
-    data, threshold_value = data_tuple
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+    data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
