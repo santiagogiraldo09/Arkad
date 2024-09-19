@@ -28,7 +28,7 @@ def cargar_datos(filepath):
     
     # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
-    return data[['toggle_false', 'toggle_true', 'threshold']]
+    return data[['pred']]
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -99,20 +99,20 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
    
-def encontrar_opcion_cercana(client, base_date, option_price, action, option_days, option_offset, ticker):
+def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
     best_date = None
     for offset in range(min_days, max_days + 1):
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if action == 1 else 'P'
+        option_type = 'C' if pred == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
         if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
             best_date = option_date
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -133,10 +133,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
         if date < fecha_inicio or date > fecha_fin:
             continue
-        if row[column_name] not in [0, 1]:
+        if row['pred'] not in [0, 1]:
             continue
 
-        action = row[column_name]
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
@@ -163,9 +162,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
         if option_date:
-            option_type = 'C' if action == 1 else 'P'
+            option_type = 'C' if row['pred'] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             
             if periodo == 'Diario':
@@ -202,8 +201,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 resultados.append({
                     'Fecha': date, 
-                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                    'Pred': row[column_name],
+                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
+                    'Pred': row['pred'],
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
@@ -262,12 +261,9 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     # Opción de selección del archivo .xlsx
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos: (Trabajar en estos momentos con **modelo_andres_datos_act* el cual contiene datos desde 2022)", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
     #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
-    #Toogle
-    toggle_activated = st.toggle("Se opera sólo si se supera el Threshold")
-    column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     
     # Option Days input
     option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
@@ -298,7 +294,7 @@ def main():
 
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
@@ -351,7 +347,7 @@ def main():
             
         datos = datos.reset_index(drop=True)
         datos['acierto'] = np.where(
-            datos['Direction'] == datos[column_name], 1, 0)
+            datos['Direction'] == datos['Pred'], 1, 0)
         # desempeño de modelo en entrenamiento
         datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
         datos['cumsum'] = datos['acierto'].cumsum()
@@ -369,15 +365,15 @@ def main():
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
         matrix=np.zeros((2,2)) # form an empty matric of 2x2
-        for i in range(len(datos[column_name])): #the confusion matrix is for 2 classes: 1,0
+        for i in range(len(datos['Pred'])): #the confusion matrix is for 2 classes: 1,0
                 #1=positive, 0=negative
-            if int(datos[column_name][i])==1 and int(datos['Direction'][i])==1: 
+            if int(datos['Pred'][i])==1 and int(datos['Direction'][i])==1: 
                 matrix[0,0]+=1 #True Positives
-            elif int(datos[column_name][i])==1 and int(datos['Direction'][i])==0:
+            elif int(datos['Pred'][i])==1 and int(datos['Direction'][i])==0:
                    matrix[0,1]+=1 #False Positives
-            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==1:
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==1:
                   matrix[1,0]+=1 #False Negatives
-            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==0:
+            elif int(datos['Pred'][i])==0 and int(datos['Direction'][i])==0:
                 matrix[1,1]+=1 #True Negatives
             
                     
@@ -419,5 +415,5 @@ def main():
                 mime="application/zip"
             )
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
