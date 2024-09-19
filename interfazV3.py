@@ -22,13 +22,13 @@ def listar_archivos_xlxs(directorio):
     return archivos
 
 
-def cargar_datos(filepath):
+def cargar_datos(filepath, column_name):
     data = pd.read_excel(filepath)
     data['date'] = pd.to_datetime(data['date'])
     
     # No modificamos la columna 'date', manteniendo tanto fecha como hora
     data = data.set_index('date')
-    return data[['pred']]
+    return data[[column_name]]
 
 def verificar_opcion(client, ticker, start_date, end_date):
     try:
@@ -112,8 +112,8 @@ def encontrar_opcion_cercana(client, base_date, option_price, pred, option_days,
             break
     return best_date
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
-    data = cargar_datos(data_filepath)
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, column_name, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario'):
+    data = cargar_datos(data_filepath, column_name)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
@@ -133,7 +133,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
         if date < fecha_inicio or date > fecha_fin:
             continue
-        if row['pred'] not in [0, 1]:
+        if row[column_name] not in [0, 1]:
             continue
 
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
@@ -162,9 +162,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row['pred'], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
-            option_type = 'C' if row['pred'] == 1 else 'P'
+            option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             
             if periodo == 'Diario':
@@ -201,8 +201,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 resultados.append({
                     'Fecha': date, 
-                    'Tipo': 'Call' if row['pred'] == 1 else 'Put',
-                    'Pred': row['pred'],
+                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                    'Pred': row[column_name],
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
@@ -259,11 +259,7 @@ def main():
     # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
-    
-    #Toogle
-    toggle_activated = st.toggle("Se opera si se supera el Threshold")
-    column_name = 'toggle_true' if toggle_activated else 'toggle_false'
-    
+       
     # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
