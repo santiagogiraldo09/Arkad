@@ -38,6 +38,37 @@ def verificar_opcion(client, ticker, start_date, end_date):
         return len(resp) > 0
     except:
         return False
+    
+def get_alpha_vantage_data(ticker, date):
+    api_key = 'tXoXD_m9y_wE2kLEILzsSERW3djux3an'
+    function = 'TIME_SERIES_DAILY'
+    
+    # Formatear la fecha para la API de Alpha Vantage
+    date_str = date.strftime('%Y-%m-%d')
+    
+    url = f'https://www.alphavantage.co/query?function={function}&symbol={ticker}&apikey={api_key}'
+    
+    response = requests.get(url)
+    data = response.json()
+    
+    if 'Time Series (Daily)' in data and date_str in data['Time Series (Daily)']:
+        daily_data = data['Time Series (Daily)'][date_str]
+        etf_open_price = float(daily_data['1. open'])
+        etf_close_price = float(daily_data['4. close'])
+    else:
+        etf_open_price = None
+        etf_close_price = None
+    
+    return etf_open_price, etf_close_price
+
+# Uso de la función
+date = datetime.now().date()  # O cualquier otra fecha que necesites
+ticker = 'SPY'  # Reemplaza con el ticker que necesites
+
+etf_open_price, etf_close_price = get_alpha_vantage_data(ticker, date)
+
+print(f"Precio de apertura: {etf_open_price}")
+print(f"Precio de cierre: {etf_close_price}")
 
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -113,6 +144,12 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
             best_date = option_date
             break
     return best_date
+
+                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
+                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+
 
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
@@ -194,12 +231,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
                 #etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
-    
-                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente
-                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-
+                
+                # Usar la nueva función de Alpha Vantage para obtener los datos del ETF
+                etf_open_price, etf_close_price = get_alpha_vantage_data(ticker, date)
+       
 
                 resultados.append({
                     'Fecha': date, 
