@@ -351,7 +351,7 @@ def main():
                 <span class="tooltiptext">
                 Tipo de operación: {operation}<br>
                 {info}<br>
-                Responsable del algoritmo: {responsible}<br>
+                *Responsable del algoritmo:* {responsible}<br>
                 Rango de fechas: {start_date}<br>
                 {end_date}<br>
                 Versión: {version}
