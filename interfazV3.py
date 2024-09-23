@@ -218,27 +218,44 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
         if periodo == 'Diario':
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        else:
+            
+            if trade_type == 'Close to Close':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'close'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            elif trade_type == 'Close to Open':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'open'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            else: #Open to Close
+                precio_usar_apertura = 'open'
+                precio_usar_cierre = 'close'
+                index = 0
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            if data_for_date.empty:
+                continue
+        else: #periodo = 15 min
             #data_for_date = obtener_datos_alpha_vantage(api_key, ticker, start=date, end=date + pd.DateOffset(days=1))
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        if data_for_date.empty:
-            continue
-
-        if trade_type == 'Close to Close':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'close'
-            index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
-        elif trade_type == 'Close to Open':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'open'
-            index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
-        else: #Open to Close
-            precio_usar_apertura = 'open'
-            precio_usar_cierre = 'close'
-            index = 0
-            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            if trade_type == 'Close to Close':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'close'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            elif trade_type == 'Close to Open':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'open'
+                index = 1
+                option_price = round(data_for_date['Close'].iloc[0])
+            else: #Open to Close
+                precio_usar_apertura = 'open'
+                precio_usar_cierre = 'close'
+                index = 0
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            if data_for_date.empty:
+                continue      
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
@@ -260,21 +277,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
 
             
-            df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
+            #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
             
             if not df_option.empty:
                 option_open_price = df_option[precio_usar_apertura].iloc[0]
                 max_contract_value = option_open_price * 100
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                balance += trade_result
-
-                # Obtener el símbolo del ETF del índice (por ejemplo, 'SPY' para el índice S&P 500)
-                #etf_symbol = 'SPY'  # Reemplaza 'SPY' con el símbolo correcto de tu ETF de índice
-                
-                # Usar la nueva función de Alpha Vantage para obtener los datos del ETF
-                #etf_open_price, etf_close_price = get_alpha_vantage_data(ticker, date)
-       
+                balance += trade_result                  
                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                 etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
@@ -282,8 +292,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                 resultados.append({
                     'Fecha': date, 
-                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                    #'Pred': row[column_name],
+                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',                    
                     'toggle_false': row[column_name],
                     'toggle_true': row[column_name],
                     'Fecha Apertura': df_option.index[0],
