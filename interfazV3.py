@@ -216,9 +216,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
 
-
-        #data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        data_for_date = obtener_datos_alpha_vantage(api_key, ticker, date - pd.Timedelta(days=1), date)
+        if periodo == 'Diario':
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        else:
+            #data_for_date = obtener_datos_alpha_vantage(api_key, ticker, start=date, end=date + pd.DateOffset(days=1))
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         if data_for_date.empty:
             continue
 
