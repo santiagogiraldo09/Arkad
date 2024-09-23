@@ -118,7 +118,57 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
-   
+
+def obtener_datos_alpha_vantage(api_key, ticker, fecha_inicio, fecha_fin):
+    base_url = "https://www.alphavantage.co/query"
+    function = "TIME_SERIES_DAILY"
+    
+    params = {
+        "function": function,
+        "symbol": ticker,
+        "apikey": api_key,
+        "outputsize": "full"
+    }
+    
+    try:
+        response = requests.get(base_url, params=params)
+        data = response.json()
+        
+        if "Time Series (Daily)" not in data:
+            print(f"No se recibieron datos para {ticker}")
+            return pd.DataFrame()
+        
+        time_series = data["Time Series (Daily)"]
+        
+        df = pd.DataFrame.from_dict(time_series, orient='index')
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
+        
+        # Renombrar columnas a open, high, low, close y volume
+        df.columns = ['open', 'high', 'low', 'close', 'volume']
+        
+        # Convertir a valores numéricos
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
+        
+        # Filtrar por rango de fechas
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        if not df.empty:
+            print(f"Datos recibidos para {ticker}:")
+            print(f"Número de registros: {len(df)}")
+            print(f"Primer registro: {df.iloc[0]}")
+            print(f"Último registro: {df.iloc[-1]}")
+        else:
+            print(f"No hay datos en el rango de fechas especificado para {ticker}")
+        
+        return df
+    
+    except Exception as e:
+       print(f"Error al obtener datos para {ticker}: {str(e)}")
+       return pd.DataFrame()
+
+    
 def encontrar_opcion_cercana(client, base_date, option_price, column_name, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
@@ -167,7 +217,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #continue
 
 
-        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        #data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        data_for_date = obtener_datos_alpha_vantage(api_key, ticker, date - pd.Timedelta(days=1), date)
         if data_for_date.empty:
             continue
 
