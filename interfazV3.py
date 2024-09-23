@@ -255,9 +255,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     })
             
                 # Calcular el resultado del trade
-                max_contract_value = df_option['open'].iloc[0] * 100
+                max_contract_value = df_option['1. open'].iloc[0] * 100
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
-                trade_result = (df_option['close'].iloc[-1] - df_option['open'].iloc[0]) * 100 * num_contratos
+                trade_result = (df_option['4. close'].iloc[-1] - df_option['1. open'].iloc[0]) * 100 * num_contratos
                 balance += trade_result
 
                 # Agregar el resultado del trade a los resultados
