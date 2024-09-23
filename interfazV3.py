@@ -39,23 +39,6 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
     
-def get_alpha_vantage_data(api_key, ticker):    
-    url = f"https://www.alphavantage.co/query"
-    params = {
-        "function": "TIME_SERIES_DAILY",
-        "symbol": ticker,
-        "apikey": api_key
-    }
-    response = requests.get(url, params=params)
-    
-    if response.status_code == 200:
-        data = response.json()
-        # Alpha Vantage devuelve los datos en un formato que contiene 'Time Series (Daily)'
-        if 'Time Series (Daily)' in data:
-            daily_data = data['Time Series (Daily)']
-            return daily_data
-    return None
-    
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -66,8 +49,35 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    client = RESTClient(api_key)
+    try:
+        # Obtener datos agregados cada 15 minutos
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
+                               from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
+        
+        # Procesar la respuesta para crear el DataFrame
+        datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
+                  'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
+        df = pd.DataFrame(datos)
+        
+        # Establecer la columna 'fecha' como el índice del DataFrame
+        df.set_index('fecha', inplace=True)
+        df.index = pd.to_datetime(df.index)
+        
+        # Filtrar el DataFrame por las fechas de inicio y fin
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        
+        return df
+    
+    except Exception as e:
+        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        return pd.DataFrame()
+
+
+def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    client = RESTClient(api_key)
+    resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
     base_url = "https://www.alphavantage.co/query"
     function = "TIME_SERIES_INTRADAY"
     interval = "15min"
@@ -123,56 +133,6 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
-
-def obtener_datos_alpha_vantage(api_key, ticker, fecha_inicio, fecha_fin):
-    base_url = "https://www.alphavantage.co/query"
-    function = "TIME_SERIES_DAILY"
-    
-    params = {
-        "function": function,
-        "symbol": ticker,
-        "apikey": api_key,
-        "outputsize": "full"
-    }
-    
-    try:
-        response = requests.get(base_url, params=params)
-        data = response.json()
-        
-        if "Time Series (Daily)" not in data:
-            print(f"No se recibieron datos para {ticker}")
-            return pd.DataFrame()
-        
-        time_series = data["Time Series (Daily)"]
-        
-        df = pd.DataFrame.from_dict(time_series, orient='index')
-        df.index = pd.to_datetime(df.index)
-        df = df.sort_index()
-        
-        # Renombrar columnas a open, high, low, close y volume
-        df.columns = ['open', 'high', 'low', 'close', 'volume']
-        
-        # Convertir a valores numéricos
-        for col in df.columns:
-            df[col] = pd.to_numeric(df[col])
-        
-        # Filtrar por rango de fechas
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        
-        if not df.empty:
-            print(f"Datos recibidos para {ticker}:")
-            print(f"Número de registros: {len(df)}")
-            print(f"Primer registro: {df.iloc[0]}")
-            print(f"Último registro: {df.iloc[-1]}")
-        else:
-            print(f"No hay datos en el rango de fechas especificado para {ticker}")
-        
-        return df
-    
-    except Exception as e:
-       print(f"Error al obtener datos para {ticker}: {str(e)}")
-       return pd.DataFrame()
-
     
 def encontrar_opcion_cercana(client, base_date, option_price, column_name, option_days, option_offset, ticker):
     min_days = option_days - option_offset
