@@ -168,10 +168,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if row[column_name] not in [0, 1]:
             continue
 
+        # Inicializar precios de apertura y cierre por defecto
+        etf_open_price = None
+        etf_close_price = None
+
         # Para el caso de periodo diario, se usan los datos de Yahoo Finance
         if periodo == 'Diario':
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             if data_for_date.empty:
+                print(f"No hay datos disponibles para {ticker} en la fecha {date}")
                 continue
             etf_open_price = data_for_date['Open'].iloc[0]
             etf_close_price = data_for_date['Close'].iloc[0]
@@ -180,11 +185,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         elif periodo == '15 Minutos':
             df_intraday = obtener_historico_15min(ticker, api_key, date, date + pd.Timedelta(days=1))
             if df_intraday.empty:
+                print(f"No hay datos intradía disponibles para {ticker} en la fecha {date}")
                 continue
 
             # Obtiene el valor open del primer registro del día y close del último registro
             etf_open_price = df_intraday['open'].iloc[0]
             etf_close_price = df_intraday['close'].iloc[-1]
+
+        # Verificar que los precios open y close han sido correctamente asignados
+        if etf_open_price is None or etf_close_price is None:
+            print(f"Faltan datos de apertura o cierre para {ticker} en la fecha {date}")
+            continue
 
         # Determinación del precio de la opción en función del tipo de operación
         if trade_type == 'Close to Close':
@@ -246,6 +257,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         st.error("No se encontraron resultados válidos para el periodo especificado.")
     
     return resultados_df, balance
+
 
 def graficar_resultados(df, final_balance, balance_inicial):
     if df.empty or 'Resultado' not in df.columns:
