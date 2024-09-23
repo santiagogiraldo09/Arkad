@@ -39,37 +39,24 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
     
-def get_alpha_vantage_data(ticker, date):
-    api_key = 'tXoXD_m9y_wE2kLEILzsSERW3djux3an'
-    function = 'TIME_SERIES_DAILY'
+def get_alpha_vantage_data(api_key, ticker):    
+    url = f"https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_DAILY",
+        "symbol": ticker,
+        "apikey": api_key
+    }
+    response = requests.get(url, params=params)
     
-    # Formatear la fecha para la API de Alpha Vantage
-    date_str = date.strftime('%Y-%m-%d')
+    if response.status_code == 200:
+        data = response.json()
+        # Alpha Vantage devuelve los datos en un formato que contiene 'Time Series (Daily)'
+        if 'Time Series (Daily)' in data:
+            daily_data = data['Time Series (Daily)']
+            return daily_data
+    return None
     
-    url = f'https://www.alphavantage.co/query?function={function}&symbol={ticker}&apikey={api_key}'
     
-    response = requests.get(url)
-    data = response.json()
-    
-    if 'Time Series (Daily)' in data and date_str in data['Time Series (Daily)']:
-        daily_data = data['Time Series (Daily)'][date_str]
-        etf_open_price = float(daily_data['1. open'])
-        etf_close_price = float(daily_data['4. close'])
-    else:
-        etf_open_price = None
-        etf_close_price = None
-    
-    return etf_open_price, etf_close_price
-
-# Uso de la función
-date = datetime.now().date()  # O cualquier otra fecha que necesites
-ticker = 'SPY'  # Reemplaza con el ticker que necesites
-
-etf_open_price, etf_close_price = get_alpha_vantage_data(ticker, date)
-
-print(f"Precio de apertura: {etf_open_price}")
-print(f"Precio de cierre: {etf_close_price}")
-
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="day", from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
@@ -243,7 +230,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 resultados.append({
                     'Fecha': date, 
                     'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                    #'Pred': row[column_name],
                     'toggle_false': row[column_name],
                     'toggle_true': row[column_name],
                     'Fecha Apertura': df_option.index[0],
