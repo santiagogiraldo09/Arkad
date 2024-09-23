@@ -246,10 +246,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
             else:  # '15 Minutos'
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-                # Mostrar los datos de 15 minutos en la interfaz de Streamlit
-                st.write(f"### Datos de 15 minutos para {option_name} desde {date}:")
-                st.dataframe(df_option)  # Mostrar el DataFrame en la interfaz
-                
             if not df_option.empty:
                 if periodo == 'Diario':
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
