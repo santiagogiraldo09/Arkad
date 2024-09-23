@@ -246,7 +246,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
             else:  # '15 Minutos'
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-            
+                # Aquí mostramos en pantalla los datos que se extraen de 15 minutos
+                print(f"Datos de 15 minutos para {option_name} desde {date}:")
+                print(df_option)
+                
             if not df_option.empty:
                 if periodo == 'Diario':
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
