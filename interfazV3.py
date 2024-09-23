@@ -94,7 +94,7 @@ def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     try:
         response = requests.get(base_url, params=params)
         data = response.json()
-        st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
         
         if "Time Series (15min)" not in data:
             print(f"No se recibieron datos para {ticker_opcion}")
