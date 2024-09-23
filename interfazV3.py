@@ -84,6 +84,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     try:
         response = requests.get(base_url, params=params)
         data = response.json()
+        st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
         
         if "Time Series (15min)" not in data:
             print(f"No se recibieron datos para {ticker_opcion}")
@@ -249,11 +250,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                 st.dataframe(df_option)
-                st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+                #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 st.dataframe(df_option)
-                st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+                #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
