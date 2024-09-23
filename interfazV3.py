@@ -92,7 +92,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         time_series = data["Time Series (15min)"]
         
         #st.dataframe(df_option)  # Mostrar el DataFrame en la interfaz
-        st.write(data)
+        st.dataframe(data)
         
         df = pd.DataFrame.from_dict(time_series, orient='index')
         df.index = pd.to_datetime(df.index)
