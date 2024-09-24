@@ -312,6 +312,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write(df_option.iloc[0])
                     st.write(df_option.iloc[-1])
                     st.write(df_option)
+                    st.write(df_option[precio_usar_cierre].iloc[index])
                     option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                     #option_open_price = df.at[date, 'open']
                     #option_close_price = df.at[date, 'close']
