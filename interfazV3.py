@@ -148,8 +148,10 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df.index = pd.to_datetime(df.index)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
-        fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
+        #fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
+        #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
