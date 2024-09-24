@@ -116,12 +116,13 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    #fecha_inicio.strftime('%Y-%m-%d')
     client = RESTClient(api_key)
     api_av = "KCIUEY7RBRKTL8GI"
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
-                               from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
+                               from_=fecha_inicio, to=fecha_fin)
         
         st.write(fecha_inicio)
         st.write(fecha_inicio.strftime('%Y-%m-%d'))
