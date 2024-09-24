@@ -123,13 +123,14 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        
+        st.write(resp)
         st.write(fecha_inicio)
         st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
                   'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
         df = pd.DataFrame(datos)
+        
         
         # Establecer la columna 'fecha' como el índice del DataFrame
         df.set_index('fecha', inplace=True)
@@ -306,9 +307,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
-                st.write(date)
-                st.write(timedelta(days=option_days))
-                st.write(date + timedelta(days=option_days))
+                #st.write(date)
+                #st.write(timedelta(days=option_days))
+                #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
@@ -318,12 +319,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
                 else:  # '15 Minutos'
-                    st.write("Entró por acá")
+                    #st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
-                    st.write(df_option.iloc[0])
-                    st.write(df_option.iloc[-1])
+                    #st.write(df_option.iloc[0])
+                    #st.write(df_option.iloc[-1])
                     st.write(df_option)
-                    st.write(df_option[precio_usar_cierre].iloc[index])
+                    #st.write(df_option[precio_usar_cierre].iloc[index])
                     option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                     #option_open_price = df.at[date, 'open']
                     #option_close_price = df.at[date, 'close']
