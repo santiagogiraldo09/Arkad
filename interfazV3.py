@@ -134,13 +134,16 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
-        st.dataframe(datos)
+        
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
                   #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
         df = pd.DataFrame(datos)
+        # Convertir timestamps aware a naive eliminando la zona horaria
+        df['fecha'] = df['fecha'].dt.tz_localize(None)
+        st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
