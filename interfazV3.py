@@ -29,7 +29,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Realizar la solicitud a la API de Alpha Vantage
     response = requests.get(url, params=params)
     data = response.json()
-    st.write("Respuesta JSON completa:", data)
+    #st.write("Respuesta JSON completa:", data)
     
     # Imprimir la respuesta completa en formato JSON (solo para verificación)
     #print(data)
@@ -39,14 +39,19 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         time_series = data["Time Series (15min)"]
         df = pd.DataFrame.from_dict(time_series, orient='index')
         df.rename(columns=lambda x: x[3:].strip(), inplace=True)
-        df = df[['open', 'close']].apply(pd.to_numeric)
+        df[['open', 'close']] = df[['1. open', '4. close']].apply(pd.to_numeric)
         df.index = pd.to_datetime(df.index)
+        
+        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar por rango de fechas si es necesario
         df = df.loc[fecha_inicio:fecha_fin]
         
         # Imprimir los datos de 'Open' y 'Close'
         print("Valores de Open y Close para el rango de fechas:")
+        st.write(df[['open', 'close']])
         print(df[['open', 'close']])
         
         return df
