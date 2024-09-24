@@ -44,7 +44,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         df.index = pd.to_datetime(df.index)
         df = df.sort_index()
         
-        st.write("DataFrame completo antes de filtrar por fecha:", df)
+        #st.write("DataFrame completo antes de filtrar por fecha:", df)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
         fecha_inicio = pd.to_datetime(fecha_inicio)
@@ -58,7 +58,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         
         # Filtrar por rango de fechas
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.write("DataFrame filtrado por rango de fechas:", df)
+        #st.write("DataFrame filtrado por rango de fechas:", df)
         #st.write("Valores de Open y Close para el rango de fechas:", df_filtered[['open', 'close']])
         
         return df
