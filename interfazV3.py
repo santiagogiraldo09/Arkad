@@ -30,7 +30,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Realizar la solicitud a la API de Alpha Vantage
     response = requests.get(url, params=params)
     data = response.json()
-    st.write("Respuesta JSON completa:", data)
+    #st.write("Respuesta JSON completa:", data)
     
     # Imprimir la respuesta completa en formato JSON (solo para verificación)
     #print(data)
@@ -45,7 +45,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         df.index = pd.to_datetime(df.index)
         df = df.sort_index()
         
-        #st.write("DataFrame completo antes de filtrar por fecha:", df)
+        st.write("DataFrame completo antes de filtrar por fecha:", df)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
         fecha_inicio = pd.to_datetime(fecha_inicio)
