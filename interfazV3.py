@@ -133,7 +133,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         "symbol": ticker_opcion,
         "interval": "15min",
         "apikey": api_av,
-        "outputsize": "full"
+        "outputsize": "full",
+        "extended_hours": "false"
     }
     try:
         response = requests.get(url, params=params)
