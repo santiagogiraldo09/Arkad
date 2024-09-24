@@ -23,13 +23,14 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         "symbol": ticker,
         "interval": "15min",
         "apikey": api_av,
-        "outputsize": "full"
+        "outputsize": "full",
+        "extended_hours": "false"
     }
     
     # Realizar la solicitud a la API de Alpha Vantage
     response = requests.get(url, params=params)
     data = response.json()
-    #st.write("Respuesta JSON completa:", data)
+    st.write("Respuesta JSON completa:", data)
     
     # Imprimir la respuesta completa en formato JSON (solo para verificación)
     #print(data)
