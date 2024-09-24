@@ -18,54 +18,68 @@ import requests
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
-    params = {
-        "function": "TIME_SERIES_INTRADAY",
-        "symbol": ticker,
-        "interval": "15min",
-        "apikey": api_av,
-        "outputsize": "full",
-        "extended_hours": "false"
-    }
+    # Convertir fechas a datetime
+    fecha_inicio = pd.to_datetime(fecha_inicio)
+    fecha_fin = pd.to_datetime(fecha_fin)
     
-    # Realizar la solicitud a la API de Alpha Vantage
-    response = requests.get(url, params=params)
-    data = response.json()
-    #st.write("Respuesta JSON completa:", data)
-    
-    # Imprimir la respuesta completa en formato JSON (solo para verificación)
-    #print(data)
-    
-    # Verificar que la respuesta contiene los datos de series temporales
-    if "Time Series (15min)" in data:
-        time_series = data["Time Series (15min)"]
-        df = pd.DataFrame.from_dict(time_series, orient='index')        
-        df.rename(columns=lambda x: x[3:].strip(), inplace=True)
+    fecha_actual = fecha_inicio
+    df_completo = pd.DataFrame()
+    while fecha_actual <= fecha_fin:
+        ultimo_dia_mes = min(fecha_actual + relativedelta(day=31), fecha_fin)
+        params = {
+            "function": "TIME_SERIES_INTRADAY",
+            "symbol": ticker,
+            "interval": "15min",
+            "apikey": api_av,
+            "outputsize": "full",
+            "extended_hours": "false",
+            "month": fecha_actual.strftime("%Y-%m")
+        }
         
-        df[['open', 'close']] = df[['open', 'close']].apply(pd.to_numeric)
-        df.index = pd.to_datetime(df.index)
-        df = df.sort_index()
+        # Realizar la solicitud a la API de Alpha Vantage
+        response = requests.get(url, params=params)
+        data = response.json()
+        #st.write("Respuesta JSON completa:", data)
         
-        #st.write("DataFrame completo antes de filtrar por fecha:", df)
+        # Imprimir la respuesta completa en formato JSON (solo para verificación)
+        #print(data)
         
-        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        fecha_inicio = pd.to_datetime(fecha_inicio)
-        fecha_fin = pd.to_datetime(fecha_fin)
-        #fecha_inicio = pd.Timestamp(fecha_inicio)
-        #fecha_fin = pd.Timestamp(fecha_fin)
-        
-        # Convertir a valores numéricos
-        for col in df.columns:
-            df[col] = pd.to_numeric(df[col])
-        
-        # Filtrar por rango de fechas
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-       #st.write("DataFrame filtrado por rango de fechas:", df)
-       #st.write("Valores de Open y Close para el rango de fechas:", df[['open', 'close']])
-        
-        return df
-    else:
-        print("No se encontraron datos para el ticker proporcionado.")
-        return pd.DataFrame()
+        # Verificar que la respuesta contiene los datos de series temporales
+        if "Time Series (15min)" in data:
+            time_series = data["Time Series (15min)"]
+            df = pd.DataFrame.from_dict(time_series, orient='index')        
+            df.rename(columns=lambda x: x[3:].strip(), inplace=True)
+            
+            df[['open', 'close']] = df[['open', 'close']].apply(pd.to_numeric)
+            df.index = pd.to_datetime(df.index)
+            df = df.sort_index()
+            
+            #st.write("DataFrame completo antes de filtrar por fecha:", df)
+            
+            # Asegurarse de que las fechas de inicio y fin son de tipo datetime
+            fecha_inicio = pd.to_datetime(fecha_inicio)
+            fecha_fin = pd.to_datetime(fecha_fin)
+            #fecha_inicio = pd.Timestamp(fecha_inicio)
+            #fecha_fin = pd.Timestamp(fecha_fin)
+            
+            # Convertir a valores numéricos
+            for col in df.columns:
+                df[col] = pd.to_numeric(df[col])
+            
+            # Filtrar por rango de fechas
+            df = df[(df.index >= fecha_actual) & (df.index <= ultimo_dia_mes)]
+            
+            #agregar al dataframe completo
+            df_completo = pd.concat([df_completo, df])
+            
+           #st.write("DataFrame filtrado por rango de fechas:", df)
+           #st.write("Valores de Open y Close para el rango de fechas:", df[['open', 'close']])
+            
+            return df
+        else:
+            print("No se encontraron datos para el ticker proporcionado.")
+            return pd.DataFrame()
+        fecha_actual=ultimo_dia_mes + pd.Timedelta(days=1)
     
 api_av = "KCIUEY7RBRKTL8GI"
 
