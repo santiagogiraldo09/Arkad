@@ -15,7 +15,45 @@ import zipfile
 import numpy as np
 import requests
 
-
+def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
+    # Configuración de la URL y los parámetros para la API de Alpha Vantage
+    url = "https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_INTRADAY",
+        "symbol": ticker,
+        "interval": "15min",
+        "apikey": api_av,
+        "outputsize": "full"
+    }
+    
+    # Realizar la solicitud a la API de Alpha Vantage
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    # Imprimir la respuesta completa en formato JSON (solo para verificación)
+    print(data)
+    
+    # Verificar que la respuesta contiene los datos de series temporales
+    if "Time Series (15min)" in data:
+        time_series = data["Time Series (15min)"]
+        df = pd.DataFrame.from_dict(time_series, orient='index')
+        df.rename(columns=lambda x: x[3:].strip(), inplace=True)
+        df = df[['open', 'close']].apply(pd.to_numeric)
+        df.index = pd.to_datetime(df.index)
+        
+        # Filtrar por rango de fechas si es necesario
+        df = df.loc[fecha_inicio:fecha_fin]
+        
+        # Imprimir los datos de 'Open' y 'Close'
+        print("Valores de Open y Close para el rango de fechas:")
+        print(df[['open', 'close']])
+        
+        return df
+    else:
+        print("No se encontraron datos para el ticker proporcionado.")
+        return pd.DataFrame()
+    
+api_av = "KCIUEY7RBRKTL8GI"
 
 def listar_archivos_xlxs(directorio):
     archivos = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.xlsx')]
@@ -232,6 +270,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
