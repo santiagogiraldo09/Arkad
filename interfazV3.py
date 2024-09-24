@@ -73,7 +73,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             df_completo = pd.concat([df_completo, df])
             
            #st.write("DataFrame filtrado por rango de fechas:", df)
-            st.write("Valores de Open y Close para el rango de fechas:", df_completo[['open', 'close']])
+            #st.write("Valores de Open y Close para el rango de fechas:", df_completo[['open', 'close']])
             
             return df
         else:
@@ -307,6 +307,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
                 else:  # '15 Minutos'
+                    st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
                     option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                     #option_open_price = df.at[date, 'open']
