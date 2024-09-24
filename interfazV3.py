@@ -73,7 +73,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             df_completo = pd.concat([df_completo, df])
             
            #st.write("DataFrame filtrado por rango de fechas:", df)
-           #st.write("Valores de Open y Close para el rango de fechas:", df[['open', 'close']])
+            st.write("Valores de Open y Close para el rango de fechas:", df_completo[['open', 'close']])
             
             return df
         else:
