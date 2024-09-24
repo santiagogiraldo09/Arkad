@@ -118,21 +118,28 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
-    client = RESTClient(api_key)
     api_av = "KCIUEY7RBRKTL8GI"
+    client = RESTClient(api_key)
+    local_tz = pytz.timezone('America/Bogota')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        local_tz = pytz.timezone('America/Bogota')
-        datos = []
+        datos = [{
+            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
+            'open': agg.open, 
+            'high': agg.high, 
+            'low': agg.low, 
+            'close': agg.close, 
+            'volume': agg.volume
+        } for agg in resp]
         
-        st.write(resp)
+        st.dataframe(datos)
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
-        datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
-                  'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
+        #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
+                  #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
         df = pd.DataFrame(datos)
         
         
@@ -141,8 +148,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df.index = pd.to_datetime(df.index)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        fecha_inicio = pd.to_datetime(fecha_inicio)
-        fecha_fin = pd.to_datetime(fecha_fin)
+        fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
+        fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
