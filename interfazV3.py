@@ -47,10 +47,10 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         st.write("DataFrame completo antes de filtrar por fecha:", df)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        #fecha_inicio = pd.to_datetime(fecha_inicio)
-        #fecha_fin = pd.to_datetime(fecha_fin)
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
+        #fecha_inicio = pd.Timestamp(fecha_inicio)
+        #fecha_fin = pd.Timestamp(fecha_fin)
         
         # Convertir a valores numéricos
         for col in df.columns:
