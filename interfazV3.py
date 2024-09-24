@@ -87,6 +87,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     try:
         response = requests.get(url, params=params)
         data = response.json()
+        st.write("Respuesta JSON completa:", data)
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
 
