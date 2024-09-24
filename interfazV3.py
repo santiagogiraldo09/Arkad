@@ -49,7 +49,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_historico_15min(ticker_opcion, api_av, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     api_av = "KCIUEY7RBRKTL8GI"
     try:
