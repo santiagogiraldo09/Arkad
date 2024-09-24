@@ -37,31 +37,25 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Verificar que la respuesta contiene los datos de series temporales
     if "Time Series (15min)" in data:
         time_series = data["Time Series (15min)"]
-        df = pd.DataFrame.from_dict(time_series, orient='index')
-        # Revisar las claves disponibles en el DataFrame
-        st.write("Claves disponibles en DataFrame:", df.columns)
-        # Renombrar columnas de forma segura
-        column_mapping = {
-            '1. open': 'open',
-            '4. close': 'close'
-        }
-        df.rename(columns=column_mapping, inplace=True)
+        df = pd.DataFrame.from_dict(time_series, orient='index')        
+        df.rename(columns=lambda x: x[3:].strip(), inplace=True)
+        
         df[['open', 'close']] = df[['open', 'close']].apply(pd.to_numeric)
         df.index = pd.to_datetime(df.index)
+        
+        st.write("DataFrame completo antes de filtrar por fecha:", df)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar por rango de fechas si es necesario
-        df = df.loc[fecha_inicio:fecha_fin]
+        df_filtered = df.loc[fecha_inicio:fecha_fin]
         
-        # Imprimir los datos de 'Open' y 'Close'
-        print("Valores de Open y Close para el rango de fechas:")
-        st.write(df[['open', 'close']])
-        print(df[['open', 'close']])
+        st.write("DataFrame filtrado por rango de fechas:", df_filtered)
+        st.write("Valores de Open y Close para el rango de fechas:", df_filtered[['open', 'close']])
         
-        return df
+        return df_filtered
     else:
         print("No se encontraron datos para el ticker proporcionado.")
         return pd.DataFrame()
