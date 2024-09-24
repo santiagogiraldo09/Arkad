@@ -52,13 +52,16 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
         
-        # Filtrar por rango de fechas si es necesario
-        df_filtered = df.loc[fecha_inicio:fecha_fin]
+        # Convertir a valores numéricos
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col])
         
-        st.write("DataFrame filtrado por rango de fechas:", df_filtered)
+        # Filtrar por rango de fechas
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.write("DataFrame filtrado por rango de fechas:", df)
         #st.write("Valores de Open y Close para el rango de fechas:", df_filtered[['open', 'close']])
         
-        return df_filtered
+        return df
     else:
         print("No se encontraron datos para el ticker proporcionado.")
         return pd.DataFrame()
