@@ -45,7 +45,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         df.index = pd.to_datetime(df.index)
         df = df.sort_index()
         
-        st.write("DataFrame completo antes de filtrar por fecha:", df)
+        #st.write("DataFrame completo antes de filtrar por fecha:", df)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
         fecha_inicio = pd.to_datetime(fecha_inicio)
@@ -59,8 +59,8 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         
         # Filtrar por rango de fechas
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.write("DataFrame filtrado por rango de fechas:", df)
-        st.write("Valores de Open y Close para el rango de fechas:", df[['open', 'close']])
+       #st.write("DataFrame filtrado por rango de fechas:", df)
+       #st.write("Valores de Open y Close para el rango de fechas:", df[['open', 'close']])
         
         return df
     else:
@@ -318,9 +318,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-                if periodo == '15 minutos':
-                    etf_open_price = df.at[date, 'open']
-                    etf_close_price = df.at[date, 'close']
+                #if periodo == '15 minutos':
+                    #etf_open_price = df.at[date, 'open']
+                    #etf_close_price = df.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
