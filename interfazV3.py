@@ -544,15 +544,19 @@ def main():
     #ticker = st.text_input("Ticker Symbol", "SPY")
     balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
+    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
+    if periodo == '15 minutos':
+        Hora_inicio = st.time_input("Hora de apertura", value=time(9, 30))
+        Hora_cierre = st.time_input("Hora de cierre", value=time(16, 0))
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
     #open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
     #close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     
-    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
+    
 
     #if trade_type == 'Close to Close':
        #close_to_close = True
