@@ -14,7 +14,6 @@ import os
 import zipfile
 import numpy as np
 import requests
-import pytz
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -124,27 +123,12 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        local_tz = pytz.timezone('America/Bogota')
-        datos = []
-        
         st.write(resp)
         st.write(fecha_inicio)
         st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
-        for agg in resp:
-            timestamp = agg.timestamp
-            dt_object = datetime.datetime.fromtimestamp(timestamp/1000000, tz=pytz.utc)
-            local_dt = dt_object.astimezone(local_tz)
-            datos.append({
-                'fecha': local_dt,
-                'open': agg.open, 
-                'high': agg.high,
-                'low': agg.low,
-                'close': agg.close,
-                'volume': agg.volume
-            })
-        #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
-                  #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
+        datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
+                  'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
         df = pd.DataFrame(datos)
         
         
