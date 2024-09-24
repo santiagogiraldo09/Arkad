@@ -49,7 +49,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_historico_15min(ticker_opcion, api_key, api_av, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     try:
         # Obtener datos agregados cada 15 minutos
@@ -67,7 +67,17 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        
+        # Consulta a Alpha Vantage para obtener datos del subyacente
+        url = "https://www.alphavantage.co/query"
+        params = {
+               "function": "TIME_SERIES_INTRADAY",
+               "symbol": ticker_opcion,
+               "interval": "15min",
+               "apikey": api_av,
+               "outputsize": "full"
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
         return df
     
     except Exception as e:
@@ -152,7 +162,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+def realizar_backtest(data_filepath, api_key, api_av, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -212,7 +222,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
-                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                df_option = obtener_historico_15min(option_name, api_key, api_av, date, date + timedelta(days=option_days))
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
@@ -440,7 +450,7 @@ def main():
     #KCIUEY7RBRKTL8GI
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an' , 'KCIUEY7RBRKTL8GI', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
