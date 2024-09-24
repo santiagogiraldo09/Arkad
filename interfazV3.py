@@ -300,7 +300,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             else:  # '15 Minutos'
                 st.write(date)
                 #st.wirte(timedelta(days=option_days))
-                st.wirte(date + timedelta(days=option_days))
+                st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
