@@ -38,8 +38,15 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     if "Time Series (15min)" in data:
         time_series = data["Time Series (15min)"]
         df = pd.DataFrame.from_dict(time_series, orient='index')
-        df.rename(columns=lambda x: x[3:].strip(), inplace=True)
-        df[['open', 'close']] = df[['1. open', '4. close']].apply(pd.to_numeric)
+        # Revisar las claves disponibles en el DataFrame
+        st.write("Claves disponibles en DataFrame:", df.columns)
+        # Renombrar columnas de forma segura
+        column_mapping = {
+            '1. open': 'open',
+            '4. close': 'close'
+        }
+        df.rename(columns=column_mapping, inplace=True)
+        df[['open', 'close']] = df[['open', 'close']].apply(pd.to_numeric)
         df.index = pd.to_datetime(df.index)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
