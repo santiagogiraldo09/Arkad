@@ -285,7 +285,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-                get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
@@ -293,15 +293,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_open_price = df_option[precio_usar_apertura].iloc[0]
                     option_close_price = df_option[precio_usar_cierre].iloc[index]
                 else:  # '15 Minutos'
-                    option_open_price = df_option['open'].iloc[0]
-                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
-                    
+                    #option_open_price = df_option['open'].iloc[0]
+                    #option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+                    option_open_price = df.at[date, 'open']
+                    option_close_price = df.at[date, 'close']
 
             
             #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
             
             if not df_option.empty:
-                option_open_price = df_option[precio_usar_apertura].iloc[0]
+                #option_open_price = df_option[precio_usar_apertura].iloc[0]
                 max_contract_value = option_open_price * 100
                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
@@ -327,7 +328,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
-                    'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                    #'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                    'Precio Salida': option_close_price,
                     'Resultado': trade_result,
                     'Contratos': num_contratos,
                     'Opcion': option_name,
