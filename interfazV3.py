@@ -143,7 +143,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        #st.dataframe(df)
+        st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
@@ -158,7 +158,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.write(df)
+        st.write(df)
         
         return df
     
@@ -179,7 +179,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     try:
         response = requests.get(url, params=params)
         data = response.json()
-        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+        st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
         
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
@@ -336,11 +336,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 else:  # '15 Minutos'
                     #st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
-                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                     #st.write(df_option.iloc[0])
                     #st.write(df_option.iloc[-1])
-                    #st.write(df_option)
+                    st.write(df_option)
                     #st.write(df_option[precio_usar_cierre].iloc[index])
+                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                     #option_open_price = df.at[date, 'open']
                     #option_close_price = df.at[date, 'close']
 
