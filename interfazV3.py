@@ -51,6 +51,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
+    api_av = "KCIUEY7RBRKTL8GI"
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
@@ -73,6 +74,22 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
         return pd.DataFrame()
+    
+    # Usar Alpha Vantage para obtener datos del subyacente
+    url = "https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_INTRADAY",
+        "symbol": ticker_opcion,
+        "interval": "15min",
+        "apikey": api_av,
+        "outputsize": "full"
+    }
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
+    except Exception as e:
+        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+
 
 
 def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
