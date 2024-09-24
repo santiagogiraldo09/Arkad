@@ -123,9 +123,9 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        st.write(resp)
-        st.write(fecha_inicio)
-        st.write(fecha_inicio.strftime('%Y-%m-%d'))
+        #st.write(resp)
+        #st.write(fecha_inicio)
+        #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
                   'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
