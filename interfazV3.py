@@ -15,6 +15,7 @@ import zipfile
 import numpy as np
 import requests
 import pytz
+from datetime import time
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -548,8 +549,8 @@ def main():
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
     if periodo == '15 minutos':
-        hora_inicio = st.time_input("Hora de apertura", value=time(9, 30))
-        hora_cierre = st.time_input("Hora de cierre", value=time(16, 0))
+        open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
+        close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
@@ -568,7 +569,7 @@ def main():
     #KCIUEY7RBRKTL8GI
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, hora_inicio, hora_cierre)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, open_time, close_time)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
