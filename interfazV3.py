@@ -42,6 +42,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         
         df[['open', 'close']] = df[['open', 'close']].apply(pd.to_numeric)
         df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
         
         st.write("DataFrame completo antes de filtrar por fecha:", df)
         
