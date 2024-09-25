@@ -551,6 +551,8 @@ def main():
     if periodo == '15 minutos':
         open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
+        fecha_inicio = datetime.combine(fecha_inicio, open_time)
+        fecha_fin = datetime.combine(fecha_fin, close_time)
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
