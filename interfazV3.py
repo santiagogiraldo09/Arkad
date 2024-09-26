@@ -263,19 +263,12 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', open_time=None, close_time=None):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
     client = RESTClient(api_key)
     
-    if open_time is None:
-        open_time = datetime.strptime("09:30", "%H:%M").time()
-    if close_time is None:
-        close_time = datetime.strptime("16:00", "%H:%M").time()
-    # Filtrar el DataFrame de datos entre fecha_inicio y fecha_fin
-    data = data[(data.index >= fecha_inicio) & (data.index <= fecha_fin)]
-
     if periodo == 'Diario':
         fecha_inicio = fecha_inicio.date()
         fecha_fin = fecha_fin.date()
@@ -288,16 +281,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             date = date.date()
         else:
             date = pd.Timestamp(date)
-            fecha_inicio = datetime.combine(date.date(), open_time)
-            fecha_fin = datetime.combine(date.date(), close_time)
             
         if date < fecha_inicio or date > fecha_fin:
             continue
         if row[column_name] not in [0, 1]:
             continue
-        # Convertir date_open y date_close a Timestamp
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
 
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
         #if data_for_date.empty or len(data_for_date) < 2:
@@ -563,15 +551,6 @@ def main():
     if periodo == '15 minutos':
         open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
-    else:
-        # periodo == 'Diario'
-        open_time = datetime.strptime("09:30", "%H:%M").time()
-        close_time = datetime.strptime("16:00", "%H:%M").time()
-        #fecha_inicio = datetime.combine(fecha_inicio, open_time)
-        #fecha_fin = datetime.combine(fecha_fin, close_time)
-        
-    fecha_inicio = datetime.combine(fecha_inicio, open_time)
-    fecha_fin = datetime.combine(fecha_fin, close_time)
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
@@ -590,7 +569,7 @@ def main():
     #KCIUEY7RBRKTL8GI
     
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, open_time=open_time, close_time=close_time)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
