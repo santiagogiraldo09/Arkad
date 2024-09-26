@@ -127,7 +127,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        st.write(resp)
+        #st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
@@ -146,7 +146,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
         #Mostrar dataframe df, se mjuestra dos veces
-        st.dataframe(df)
+        #st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
