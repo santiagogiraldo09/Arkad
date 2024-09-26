@@ -170,22 +170,22 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         return pd.DataFrame()
     
     # Usar Alpha Vantage para obtener datos del subyacente
-    url = "https://www.alphavantage.co/query"
-    params = {
-        "function": "TIME_SERIES_INTRADAY",
-        "symbol": ticker_opcion,
-        "interval": "15min",
-        "apikey": api_av,
-        "outputsize": "full",
-        "extended_hours": "false"
-    }
-    try:
-        response = requests.get(url, params=params)
-        data = response.json()
-        st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+    #url = "https://www.alphavantage.co/query"
+    #params = {
+        #"function": "TIME_SERIES_INTRADAY",
+        #"symbol": ticker_opcion,
+        #"interval": "15min",
+        #"apikey": api_av,
+        #"outputsize": "full",
+        #"extended_hours": "false"
+    #}
+    #try:
+        #response = requests.get(url, params=params)
+        #data = response.json()
+        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
         
-    except Exception as e:
-        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+    #except Exception as e:
+        #print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
 
 
 def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
