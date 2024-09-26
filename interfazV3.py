@@ -73,7 +73,6 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             
             #agregar al dataframe completo
             df_completo = pd.concat([df_completo, df])
-            st.dataframe(df)
             st.dataframe(df_completo)
             
            #st.write("DataFrame filtrado por rango de fechas:", df)
