@@ -263,7 +263,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', open_time=None, close_time=None):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -548,9 +548,13 @@ def main():
     periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
+    open_time = None
+    close_time = None
     if periodo == '15 minutos':
         open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
+    fecha_inicio = datetime.combine(fecha_inicio, open_time)
+    fecha_fin = datetime.combine(fecha_fin, close_time)
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     # Nuevos inputs para la hora de apertura y cierre
