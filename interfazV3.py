@@ -144,7 +144,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        #st.dataframe(df)
+        st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
