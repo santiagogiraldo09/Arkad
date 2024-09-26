@@ -73,6 +73,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             
             #agregar al dataframe completo
             df_completo = pd.concat([df_completo, df])
+            st.dataframe(df_completo)
             
            #st.write("DataFrame filtrado por rango de fechas:", df)
             #st.write("Valores de Open y Close para el rango de fechas:", df_completo[['open', 'close']])
@@ -160,7 +161,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.dataframe(df)
+        #st.dataframe(df)
         
         return df
     
