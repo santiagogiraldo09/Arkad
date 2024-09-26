@@ -73,7 +73,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             
             #agregar al dataframe completo
             df_completo = pd.concat([df_completo, df])
-            st.dataframe(df_completo)
+            #st.dataframe(df_completo)
             
            #st.write("DataFrame filtrado por rango de fechas:", df)
             #st.write("Valores de Open y Close para el rango de fechas:", df_completo[['open', 'close']])
@@ -120,13 +120,14 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
-    api_av = "KCIUEY7RBRKTL8GI"
+    #api_av = "KCIUEY7RBRKTL8GI"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/Bogota')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
+        st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
