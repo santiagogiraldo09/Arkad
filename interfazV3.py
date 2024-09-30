@@ -346,6 +346,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
 
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        st.write(data_for_date)
         if data_for_date.empty:
             continue
 
@@ -391,7 +392,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                st.dataframe(df_option)
+                #st.dataframe(df_option)
                 st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
