@@ -344,9 +344,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
 
-
+        data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         st.write(data_for_date)
+        st.write(data_for_date_pol)
         if data_for_date.empty:
             continue
 
