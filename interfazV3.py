@@ -63,6 +63,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.write("con polygon")
         st.dataframe(df2)
         
         return df2
@@ -217,6 +218,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.write("normal")
         st.dataframe(df)
         
         return df
