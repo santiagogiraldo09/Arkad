@@ -62,8 +62,8 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.dataframe(df2)
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.dataframe(df)
         
         return df
     
