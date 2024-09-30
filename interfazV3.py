@@ -346,7 +346,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
         data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        st.write("Datos descargados de yahoo finance:")
         st.write(data_for_date)
+        st.write("Datos descargados de Polygon:")
         st.write(data_for_date_pol)
         if data_for_date.empty:
             continue
@@ -374,7 +376,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             else: #periodo == '15 minutos'
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                option_price = round(data_for_date_pol['open'].iloc[0]) #Se basa en la apertura del día actual
                 
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
@@ -394,7 +396,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
-                st.dataframe(df_option2)
+                #st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
