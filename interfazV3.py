@@ -382,6 +382,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+        st.write(option_price)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
@@ -399,7 +400,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 df2 = obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
-                st.dataframe(df2)
+                st.write(df2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
