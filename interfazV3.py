@@ -26,7 +26,8 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker="SPY", multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        #st.write(resp)
+        st.write("resp:")
+        st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
