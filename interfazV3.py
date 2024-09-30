@@ -36,7 +36,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
             'volume': agg.volume
         } for agg in resp]
         
-        st.write(fecha_inicio)
+        #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
@@ -44,7 +44,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        st.write(df['fecha'])
+        #st.write(df['fecha'])
         #Mostrar dataframe df, se mjuestra dos veces
         #st.dataframe(df)
         
@@ -189,7 +189,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
-        st.write(fecha_inicio)
+        #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
@@ -197,7 +197,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        st.write(df['fecha'])
+        #st.write(df['fecha'])
         #Mostrar dataframe df, se mjuestra dos veces
         #st.dataframe(df)
         
@@ -346,7 +346,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
 
-        data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
+        #data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         #st.write("Datos descargados de yahoo finance:")
         #st.write(data_for_date)
@@ -385,8 +385,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #option_price2 = round(data_for_date_pol[precio_usar_apertura.capitalize()].iloc[0])
                 
         #option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        st.write("option price:")
-        st.write(option_price)
+        #"st.write("option price:")
+        #st.write(option_price)
         #st.write("option price 2:")
         #st.write(option_price2)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
