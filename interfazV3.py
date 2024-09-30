@@ -62,10 +62,10 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.dataframe(df)
+        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.dataframe(df2)
         
-        return df
+        return df2
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
@@ -176,7 +176,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/Bogota')
+    local_tz = pytz.timezone('America/New_York')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
@@ -190,7 +190,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
-        st.write("Con AV:")
+        #st.write("Con AV:")
         #st.write(datos)
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
