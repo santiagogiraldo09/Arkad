@@ -126,7 +126,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        st.write(resp)
+        #st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
@@ -317,7 +317,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                st.dataframe(df_option)
+                #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
