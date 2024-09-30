@@ -18,7 +18,7 @@ import pytz
 from datetime import time
 
 
-def obtener_data_polygon(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/Bogota')
     try:
@@ -40,16 +40,16 @@ def obtener_data_polygon(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
                   #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
-        df = pd.DataFrame(datos)
+        df_pol = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
-        df['fecha'] = df['fecha'].dt.tz_localize(None)
+        df_pol['fecha'] = df_pol['fecha'].dt.tz_localize(None)
         #Mostrar dataframe df, se mjuestra dos veces
         #st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
-        df.set_index('fecha', inplace=True)
-        df.index = pd.to_datetime(df.index)
+        df_pol.set_index('fecha', inplace=True)
+        df_pol.index = pd.to_datetime(df_pol.index)
         
         # Asegurarse de que las fechas de inicio y fin son de tipo datetime
         #fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
@@ -58,13 +58,13 @@ def obtener_data_polygon(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        df_pol = df_pol[(df_pol.index >= fecha_inicio) & (df_pol.index <= fecha_fin)]
         #st.dataframe(df)
         
-        return df
+        return df_pol
     
     except Exception as e:
-        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
     
 def download_polygon_data(client, ticker, fecha_inicio, fecha_fin):
@@ -398,9 +398,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df2 = obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin)
-                #st.dataframe(df_option)
-                st.write(df2)
+                df_pol = obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin)
+                st.dataframe(df_pol)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
