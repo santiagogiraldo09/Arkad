@@ -213,7 +213,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.dataframe(df)
+        st.dataframe(df)
         
         return df
     
@@ -347,10 +347,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
         data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        st.write("Datos descargados de yahoo finance:")
-        st.write(data_for_date)
-        st.write("Datos descargados de Polygon:")
-        st.write(data_for_date_pol)
+        #st.write("Datos descargados de yahoo finance:")
+        #st.write(data_for_date)
+        #st.write("Datos descargados de Polygon:")
+        #st.write(data_for_date_pol)
         if data_for_date.empty:
             continue
 
