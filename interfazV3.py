@@ -18,13 +18,12 @@ import pytz
 from datetime import time
 
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
-    #fecha_inicio.strftime('%Y-%m-%d')
-    #api_av = "KCIUEY7RBRKTL8GI"
+    ticker_opcion = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/Bogota')
     try:
         # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker="SPY", multiplier=15, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
         st.write("resp:")
         st.write(resp)
@@ -37,7 +36,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
             'volume': agg.volume
         } for agg in resp]
         
-        #st.write(fecha_inicio)
+        st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
