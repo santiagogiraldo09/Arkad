@@ -21,7 +21,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/Bogota')
+    local_tz = pytz.timezone('America/New York')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
@@ -35,6 +35,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
+        st.write("Con Polygon:")
         st.write(datos)
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
@@ -188,7 +189,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
-        
+        st.write("Con AV:")
+        st.write(datos)
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
