@@ -17,6 +17,7 @@ import requests
 import pytz
 from datetime import time
 
+<<<<<<< HEAD
 
 def obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -96,6 +97,8 @@ def download_polygon_data(client, ticker, fecha_inicio, fecha_fin):
         print(f"Error al descargar datos desde Polygon.io para {ticker}: {e}")
         return pd.DataFrame()
 
+=======
+>>>>>>> parent of cc60b83 (Update interfazV3.py)
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -354,10 +357,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
 
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        data_for_date_pol = obtener_data_polygon(client, ticker, date, date + timedelta(days=1))
         if data_for_date.empty:
-            continue
-        if data_for_date_pol.empty:
             continue
 
         if trade_type == 'Close to Close':
@@ -374,12 +374,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
+<<<<<<< HEAD
             if periodo == 'Diario':
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             else: #periodo == '15 minutos'
                 #option_price =round(data_for_date_pol['Open'].iloc[index])
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
 
+=======
+            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+>>>>>>> parent of cc60b83 (Update interfazV3.py)
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         st.write(option_price)
