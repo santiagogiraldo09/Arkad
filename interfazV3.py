@@ -35,7 +35,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
-        
+        st.write(datos)
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
