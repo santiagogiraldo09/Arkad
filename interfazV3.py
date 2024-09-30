@@ -387,7 +387,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         st.write("option price:")
         st.write(option_price)
-        t.write("option price 2:")
+        st.write("option price 2:")
         st.write(option_price2)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
