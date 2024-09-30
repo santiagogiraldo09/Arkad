@@ -60,13 +60,14 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
+        st.write(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         st.write("con polygon")
-        st.dataframe(df2)
+        st.dataframe(df)
         
-        return df2
+        return df
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
@@ -218,8 +219,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.write("normal")
-        st.dataframe(df)
+        #st.dataframe(df)
         
         return df
     
