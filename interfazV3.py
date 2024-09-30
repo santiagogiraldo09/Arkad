@@ -21,7 +21,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/New York')
+    local_tz = pytz.timezone('America/New_York')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
