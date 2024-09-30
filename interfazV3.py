@@ -20,6 +20,7 @@ from datetime import time
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
+    st.write(fecha_inicio)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -47,7 +48,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         df['fecha'] = df['fecha'].dt.tz_localize(None)
         #st.write(df['fecha'])
         #Mostrar dataframe df, se mjuestra dos veces
-        st.dataframe(df)
+        #st.dataframe(df)
         
         
         # Establecer la columna 'fecha' como el índice del DataFrame
@@ -61,8 +62,8 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         fecha_fin = pd.to_datetime(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.dataframe(df)
+        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.dataframe(df2)
         
         return df
     
