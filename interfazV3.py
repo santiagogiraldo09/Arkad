@@ -17,7 +17,6 @@ import requests
 import pytz
 from datetime import time
 
-
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -120,13 +119,15 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    #fecha_inicio.strftime('%Y-%m-%d')
+    #api_av = "KCIUEY7RBRKTL8GI"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/Bogota')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        #st.write(resp)
+        st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
@@ -168,7 +169,25 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
         return pd.DataFrame()
     
-    
+    # Usar Alpha Vantage para obtener datos del subyacente
+    #url = "https://www.alphavantage.co/query"
+    #params = {
+        #"function": "TIME_SERIES_INTRADAY",
+        #"symbol": ticker_opcion,
+        #"interval": "15min",
+        #"apikey": api_av,
+        #"outputsize": "full",
+        #"extended_hours": "false"
+    #}
+    #try:
+        #response = requests.get(url, params=params)
+        #data = response.json()
+        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+        
+    #except Exception as e:
+        #print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+
+
 def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
@@ -293,13 +312,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            else: #periodo == '15 minutos'
-                #option_price =round(data_for_date_pol['Open'].iloc[index])
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-
+            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
