@@ -178,6 +178,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
+    st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
