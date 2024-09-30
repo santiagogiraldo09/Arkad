@@ -17,88 +17,7 @@ import requests
 import pytz
 from datetime import time
 
-<<<<<<< HEAD
 
-def obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin):
-    client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/Bogota')
-    try:
-        # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker="SPY", multiplier=15, timespan="minute", 
-                               from_=fecha_inicio, to=fecha_fin)
-        st.write(resp)
-        datos = [{
-            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
-            'open': agg.open, 
-            'high': agg.high, 
-            'low': agg.low, 
-            'close': agg.close, 
-            'volume': agg.volume
-        } for agg in resp]
-        
-        #st.write(fecha_inicio)
-        #st.write(fecha_inicio.strftime('%Y-%m-%d'))
-        # Procesar la respuesta para crear el DataFrame
-        #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
-                  #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
-        df_pol = pd.DataFrame(datos)
-        # Convertir timestamps aware a naive eliminando la zona horaria
-        df_pol['fecha'] = df_pol['fecha'].dt.tz_localize(None)
-        #Mostrar dataframe df, se mjuestra dos veces
-        #st.dataframe(df)
-        
-        
-        # Establecer la columna 'fecha' como el índice del DataFrame
-        df_pol.set_index('fecha', inplace=True)
-        df_pol.index = pd.to_datetime(df_pol.index)
-        
-        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        #fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
-        #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
-        fecha_inicio = pd.to_datetime(fecha_inicio)
-        fecha_fin = pd.to_datetime(fecha_fin)
-        
-        # Filtrar el DataFrame por las fechas de inicio y fin
-        df_pol = df_pol[(df_pol.index >= fecha_inicio) & (df_pol.index <= fecha_fin)]
-        #st.dataframe(df)
-        
-        return df_pol
-    
-    except Exception as e:
-        print(f"Error al obtener datos para {ticker}: {str(e)}")
-        return pd.DataFrame()
-    
-def download_polygon_data(client, ticker, fecha_inicio, fecha_fin):
-    try:
-        # Obtener agregados cada 15 minutos
-        resp = client.get_aggs(
-            ticker=ticker,
-            multiplier=15,           # 15 minutos
-            timespan="minute",       # Intervalo de minutos
-            from_=fecha_inicio.strftime('%Y-%m-%d'),
-            to=fecha_fin.strftime('%Y-%m-%d'),
-            limit=50000               # Aumentar el límite si es necesario
-        )
-        # Procesar la respuesta en un DataFrame
-        datos = [{
-            'fecha': pd.to_datetime(agg.timestamp, unit='ms'),
-            'open': agg.open,
-            'high': agg.high,
-            'low': agg.low,
-            'close': agg.close,
-            'volume': agg.volume
-        } for agg in resp]
-        
-        df = pd.DataFrame(datos)
-        df.set_index('fecha', inplace=True)
-        df = df.sort_index()
-        return df
-    except Exception as e:
-        print(f"Error al descargar datos desde Polygon.io para {ticker}: {e}")
-        return pd.DataFrame()
-
-=======
->>>>>>> parent of cc60b83 (Update interfazV3.py)
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -374,19 +293,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-<<<<<<< HEAD
             if periodo == 'Diario':
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             else: #periodo == '15 minutos'
                 #option_price =round(data_for_date_pol['Open'].iloc[index])
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
 
-=======
-            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
->>>>>>> parent of cc60b83 (Update interfazV3.py)
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        st.write(option_price)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
@@ -402,8 +317,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df_pol = obtener_data_polygon(ticker, api_key, fecha_inicio, fecha_fin)
-                st.dataframe(df_pol)
+                st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
