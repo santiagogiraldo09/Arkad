@@ -353,18 +353,27 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'close'
             index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Close'].iloc[0])
+            else: #periodo == '15 minutos'
+                option_price = round(data_for_date['Close'].iloc[0])
         elif trade_type == 'Close to Open':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'open'
             index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Close'].iloc[0])
+            else: #periodo == '15 minutos'
+                option_price = round(data_for_date['Close'].iloc[0])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            else: #periodo == '15 minutos'
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
