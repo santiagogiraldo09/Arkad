@@ -375,10 +375,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             index = 0
             if periodo == 'Diario':
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
             else: #periodo == '15 minutos'
-                option_price = round(data_for_date_pol['open'].iloc[0]) #Se basa en la apertura del día actual
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+                #option_price = round(data_for_date_pol['open'].iloc[index]) #Se basa en la apertura del día actual
+                #option_price = round(data_for_date_pol[precio_usar_apertura.capitalize()].iloc[index])
                 
-        option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+        #option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         st.write("option price:")
         st.write(option_price)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
