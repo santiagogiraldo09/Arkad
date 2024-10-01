@@ -165,7 +165,7 @@ def verificar_opcion(client, ticker, start_date, end_date):
 
 def verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin):
     try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=fecha_inicio, to=fecha_fin)
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_= fecha_inicio, to=fecha_fin)
         return len(resp) > 0
     except:
         return False
@@ -407,6 +407,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             else: #periodo == '15 minutos'
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                 option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+                option_price = 543
                 #option_price2 = round(data_for_date_pol['open'].iloc[0]) #Se basa en la apertura del día actual
                 #option_price2 = round(data_for_date_pol[precio_usar_apertura.capitalize()].iloc[0])
                 
