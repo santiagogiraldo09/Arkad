@@ -409,7 +409,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     etf_close_price = df.at[date, 'close']
                     if not df_option2.empty:
                         etf_open_price = df_option2.at[date, 'open']
-                        etf_close_price = df.at[date, 'close']
+                        etf_close_price = df_option2.at[date, 'close']
                     else:
                         etf_open_price = df.at[date, 'open']
                         etf_close_price = df.at[date, 'close']
