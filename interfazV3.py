@@ -416,11 +416,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            option_price2 = round(data_for_date2.loc[date]['open'])
+            option_price2 = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            option_price = round(data_for_date2.loc[date]['open'])
             st.write(option_price2)
             
-        option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+        option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         option_date2 = encontrar_opcion_cercana_15min(client, date, option_price2, row[column_name], option_days, option_offset, ticker)
         if option_date:
@@ -520,6 +520,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Resultado': trade_result,
                     'Contratos': num_contratos,
                     'Opcion': option_name,
+                    'Opcion2': option_name2,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
                     'Close': etf_close_price
