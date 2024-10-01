@@ -348,12 +348,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 continue
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-            fecha_fin = fecha_inicio + timedelta(minutes=15)
-            data_for_date2 = obtener_historico_15min_pol(ticker, api_key,  date, date + timedelta(minutes=15))
             #st.write(start)
             st.write(date)
             st.write(data_for_date)
-            st.write(data_for_date2)
             if data_for_date.empty:
                 continue
 
