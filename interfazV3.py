@@ -399,26 +399,35 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             st.write(data_for_date2)
             if data_for_date.empty:
                 continue
-            #if data_for_date2.empty:
-                #continue
+            if data_for_date2.empty:
+                continue
 
         if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'close'
             index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Close'].iloc[0])
+            else:
+                option_price = round(data_for_date2.loc[date]['close'])
         elif trade_type == 'Close to Open':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'open'
             index = 1
-            option_price = round(data_for_date['Close'].iloc[0])
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Close'].iloc[0])
+            else:
+                option_price = round(data_for_date2.loc[date]['close'])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            option_price2 = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            option_price = round(data_for_date2.loc[date]['open'])
-            st.write(option_price)
+            if periodo == 'Diario':
+                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            else:
+                option_price2 = round(data_for_date['Open'].iloc[0])
+                option_price = round(data_for_date2.loc[date]['open'])
+                st.write(option_price)
             
         option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
