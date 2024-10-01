@@ -354,7 +354,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date2 = obtener_historico_15min_pol(ticker, api_key, date, date)
             #st.write(start)
             st.write(data_for_date)
-            st.write(data_for_date2)
+            #st.write(data_for_date2)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
@@ -398,6 +398,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
+                st.write("df AV")
+                st.dataframe(df)
                 st.write("df_option:")
                 st.dataframe(df_option)
                 st.write("df_option2:")
