@@ -17,13 +17,13 @@ import requests
 import pytz
 from datetime import time
 
-def open_close(ticker_opcion, api_key, fecha_inicio, fecha_fin):
-    ticker_opcion = "SPY"
+def open_close(ticker, api_key, fecha_inicio, fecha_fin):
+    ticker = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
         # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
         #st.write(resp)
         datos = [{
@@ -40,7 +40,7 @@ def open_close(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         return df_OC
     
     except Exception as e:
-        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
@@ -376,10 +376,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             st.write("Fecha date:",date)
-            data_for_date2 = obtener_historico_15min_pol(ticker, api_key, date, date)
+            data_for_date2 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             #st.write(start)
             st.write(data_for_date)
-            #st.write(data_for_date2)
+            st.write(data_for_date2)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
