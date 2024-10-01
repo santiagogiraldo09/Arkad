@@ -67,6 +67,8 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     df_completo = pd.DataFrame()
     while fecha_actual <= fecha_fin:
         ultimo_dia_mes = min(fecha_actual + relativedelta(day=31), fecha_fin)
+        if ultimo_dia_mes > fecha_fin:
+            ultimo_dia_mes = fecha_fin
         params = {
             "function": "TIME_SERIES_INTRADAY",
             "symbol": ticker,
@@ -122,7 +124,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             print("No se encontraron datos para el ticker proporcionado.")
             return pd.DataFrame()
         fecha_actual=ultimo_dia_mes + pd.Timedelta(days=1)
-        return df_completo
+    return df_completo
     
 api_av = "KCIUEY7RBRKTL8GI"
 
