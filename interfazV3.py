@@ -350,9 +350,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 continue
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            data_for_date2 = obtener_historico_15min_pol(ticker, api_key, date, date + pd.DateOffset(minutes=15))
             #st.write(start)
             st.write(date)
             st.write(data_for_date)
+            st.write(data_for_date2)
             if data_for_date.empty:
                 continue
 
@@ -371,7 +373,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_cierre = 'close'
             index = 0
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            st.write(option_price)
+            #st.write(option_price)
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
