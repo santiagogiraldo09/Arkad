@@ -429,6 +429,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_name2 = f'O:{ticker}{option_date}{option_type}00{option_price2}000'
             st.write(option_name2)
             st.write(option_date2)
+            st.write(option_date)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
