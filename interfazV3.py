@@ -21,12 +21,11 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     st.write(fecha_inicio)
-    st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
         # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker= "SPY", multiplier=15, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
         #st.write(resp)
         datos = [{
@@ -37,8 +36,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
-        #st.write("Con Polygon:")
-        #st.write(datos)
+        
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
@@ -47,7 +45,6 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        #st.write(df['fecha'])
         #Mostrar dataframe df, se mjuestra dos veces
         #st.dataframe(df)
         
@@ -61,11 +58,9 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
-        #st.write(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        #st.write("con polygon")
         #st.dataframe(df)
         
         return df
