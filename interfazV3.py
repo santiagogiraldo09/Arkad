@@ -15,63 +15,7 @@ import zipfile
 import numpy as np
 import requests
 import pytz
-
-def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
-    #fecha_inicio.strftime('%Y-%m-%d')
-    #api_av = "KCIUEY7RBRKTL8GI"
-    st.write(fecha_inicio)
-    st.write(fecha_fin)
-    client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/New_York')
-    try:
-        # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker= "SPY", multiplier=15, timespan="minute", 
-                               from_=fecha_inicio, to=fecha_fin)
-        #st.write(resp)
-        datos = [{
-            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
-            'open': agg.open, 
-            'high': agg.high, 
-            'low': agg.low, 
-            'close': agg.close, 
-            'volume': agg.volume
-        } for agg in resp]
-        #st.write("Con Polygon:")
-        #st.write(datos)
-        #st.write(fecha_inicio)
-        #st.write(fecha_inicio.strftime('%Y-%m-%d'))
-        # Procesar la respuesta para crear el DataFrame
-        #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
-                  #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
-        df = pd.DataFrame(datos)
-        # Convertir timestamps aware a naive eliminando la zona horaria
-        df['fecha'] = df['fecha'].dt.tz_localize(None)
-        #st.write(df['fecha'])
-        #Mostrar dataframe df, se mjuestra dos veces
-        #st.dataframe(df)
-        
-        
-        # Establecer la columna 'fecha' como el índice del DataFrame
-        df.set_index('fecha', inplace=True)
-        df.index = pd.to_datetime(df.index)
-        
-        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
-        #fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
-        #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
-        fecha_inicio = pd.to_datetime(fecha_inicio)
-        fecha_fin = pd.to_datetime(fecha_fin)
-        st.write(fecha_fin)
-        
-        # Filtrar el DataFrame por las fechas de inicio y fin
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.write("con polygon")
-        st.dataframe(df)
-        
-        return df
-    
-    except Exception as e:
-        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
-        return pd.DataFrame()
+from datetime import time
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -163,7 +107,7 @@ def verificar_opcion(client, ticker, start_date, end_date):
         return len(resp) > 0
     except:
         return False
-
+    
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -177,14 +121,13 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
-    st.write(fecha_fin)
     client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/New_York')
+    local_tz = pytz.timezone('America/Bogota')
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        #st.write(resp)
+        st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
@@ -193,8 +136,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
-        #st.write("Con AV:")
-        #st.write(datos)
+        
         #st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
@@ -203,7 +145,6 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         df = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df['fecha'] = df['fecha'].dt.tz_localize(None)
-        #st.write(df['fecha'])
         #Mostrar dataframe df, se mjuestra dos veces
         #st.dataframe(df)
         
@@ -352,12 +293,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
 
-        #data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
+
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        #st.write("Datos descargados de yahoo finance:")
-        #st.write(data_for_date)
-        #st.write("Datos descargados de Polygon:")
-        #st.write(data_for_date_pol)
         if data_for_date.empty:
             continue
 
@@ -365,41 +302,23 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'close'
             index = 1
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Close'].iloc[0])
-            else: #periodo == '15 minutos'
-                option_price = round(data_for_date['Close'].iloc[0])
+            option_price = round(data_for_date['Close'].iloc[0])
         elif trade_type == 'Close to Open':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'open'
             index = 1
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Close'].iloc[0])
-            else: #periodo == '15 minutos'
-                option_price = round(data_for_date['Close'].iloc[0])
+            option_price = round(data_for_date['Close'].iloc[0])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
             index = 0
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-                option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-            else: #periodo == '15 minutos'
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-                option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-                #option_price2 = round(data_for_date_pol['open'].iloc[0]) #Se basa en la apertura del día actual
-                #option_price2 = round(data_for_date_pol[precio_usar_apertura.capitalize()].iloc[0])
-                
-        #option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        #"st.write("option price:")
-        #st.write(option_price)
-        #st.write("option price 2:")
-        #st.write(option_price2)
+            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            
+        option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            st.write(option_name)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
@@ -410,11 +329,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(timedelta(days=option_days))
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-                df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
-                #st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
@@ -453,8 +369,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
-                    etf_open_price = df2.at[date, 'open']
-                    etf_close_price = df2.at[date, 'close']
+                    etf_open_price = df.at[date, 'open']
+                    etf_close_price = df.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
@@ -465,7 +381,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Fecha Apertura': df_option.index[0],
                     'Fecha Cierre': df_option.index[index],
                     'Precio Entrada': option_open_price, 
-                    'Precio Salida': df_option[precio_usar_cierre].iloc[index],
+                    'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                     'Resultado': trade_result,
                     'Contratos': num_contratos,
                     'Opcion': option_name,
