@@ -333,6 +333,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
 def encontrar_opcion_cercana_15min(client, base_date, option_price, column_value, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
+    option_price=544
     best_date = None
     for offset in range(min_days, max_days + 1):
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d%h%m%s')
@@ -407,7 +408,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             else: #periodo == '15 minutos'
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                 option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-                option_price = 543
                 #option_price2 = round(data_for_date_pol['open'].iloc[0]) #Se basa en la apertura del día actual
                 #option_price2 = round(data_for_date_pol[precio_usar_apertura.capitalize()].iloc[0])
                 
@@ -421,7 +421,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            st.write(option_name)
+            option_name2 = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+            st.write(option_name2)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
