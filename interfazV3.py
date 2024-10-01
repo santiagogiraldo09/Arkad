@@ -333,7 +333,6 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
 def encontrar_opcion_cercana_15min(client, base_date, option_price, column_value, option_days, option_offset, ticker):
     min_days = option_days - option_offset
     max_days = option_days + option_offset
-    option_price=544
     best_date = None
     for offset in range(min_days, max_days + 1):
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d%h%m%s')
@@ -436,7 +435,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 oc = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
-                st.write(option_date2)
+                st.write(option_date)
                 #st.write(oc)
                 #st.dataframe(df_option)
                 #st.dataframe(df_option2)
