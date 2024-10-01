@@ -35,6 +35,10 @@ def open_close(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
+        df_OC = pd.DataFrame(datos)
+        
+        return df_OC
+    
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
         return pd.DataFrame()
