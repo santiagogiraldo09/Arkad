@@ -389,7 +389,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             st.write("Fecha date:",date)
-            data_for_date2 = open_close(ticker, api_key, date, date + timedelta(days=option_days))
+            data_for_date2 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             #st.write(start)
             st.write(data_for_date)
             st.write(data_for_date2)
