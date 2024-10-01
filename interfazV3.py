@@ -344,6 +344,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
 
         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        st.write(data_for_date)
         if data_for_date.empty:
             continue
 
@@ -362,6 +363,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_cierre = 'close'
             index = 0
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+            st.write(option_price)
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
