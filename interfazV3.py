@@ -413,8 +413,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_cierre = 'close'
             index = 0
             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            option_price2 = round(data_for_date2.loc[date]['open'])
-            st.write(option_price2)
+            #option_price2 = round(data_for_date2.loc[date]['open'])
+            #st.write(option_price2)
             
         option_price = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
