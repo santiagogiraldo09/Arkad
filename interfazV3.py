@@ -19,8 +19,8 @@ import pytz
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
-    #st.write(fecha_inicio)
-    #st.write(fecha_fin)
+    st.write(fecha_inicio)
+    st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -164,13 +164,6 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
 
-# Función replicada para el periodo de '15 minutos'
-def verificar_opcion_15min(client, ticker, start_date, end_date):
-    try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date.isoformat(), to=end_date.isoformat())
-        return len(resp) > 0
-    except:
-        return False
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -331,21 +324,6 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-# Función replicada para el periodo de '15 minutos'
-def encontrar_opcion_cercana_15min(client, base_date, option_price, column_value, option_days, option_offset, ticker):
-    min_days = option_days - option_offset
-    max_days = option_days + option_offset
-    best_date = None
-    for offset in range(min_days, max_days + 1):
-        option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if column_value == 1 else 'P'
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        # Para '15 minutos', verificamos si hay datos en el intervalo de 15 minutos
-        if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
-            best_date = option_date
-            break
-    return best_date
-
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -375,21 +353,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #continue
 
         #data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
-        if periodo == 'Diario':
-            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-            if data_for_date.empty:
-                continue
-        else:
-            #data_for_date = obtener_historico_15min_pol(ticker, api_key, date, date + pd.Timedelta(days=1))
-            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-            if data_for_date.empty:
-                continue
+        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
         #st.write("Datos descargados de yahoo finance:")
         #st.write(data_for_date)
         #st.write("Datos descargados de Polygon:")
         #st.write(data_for_date_pol)
-        #if data_for_date.empty:
-            #continue
+        if data_for_date.empty:
+            continue
 
         if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
@@ -425,10 +395,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #st.write(option_price)
         #st.write("option price 2:")
         #st.write(option_price2)
-        if periodo == 'Diario':
-            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        else: #periodo == '15 minutos'
-            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
