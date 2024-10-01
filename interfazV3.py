@@ -75,6 +75,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Convertir fechas a datetime
     fecha_inicio = pd.to_datetime(fecha_inicio)
     fecha_fin = pd.to_datetime(fecha_fin)
+    st.write(fecha_inicio)
     
     fecha_actual = fecha_inicio
     df_completo = pd.DataFrame()
