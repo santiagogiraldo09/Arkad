@@ -47,6 +47,9 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
         
+        # Filtrar el DataFrame por las fechas de inicio y fin
+        df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
+        
         return df_OC
     
     except Exception as e:
