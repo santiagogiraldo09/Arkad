@@ -164,9 +164,9 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
 
-def verificar_opcion_15min(client, ticker, start_date, end_date):
+def verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin):
     try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date.isoformat(), to=end_date.isoformat())
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=fecha_inicio.isoformat(), to=fecha_fin.isoformat())
         return len(resp) > 0
     except:
         return False
@@ -418,6 +418,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                oc = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
+                st.write(oc)
                 #st.dataframe(df_option)
                 #st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
