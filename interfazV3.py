@@ -427,8 +427,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
-                    etf_open_price = df2.at[date, 'open']
-                    etf_close_price = df2.at[date, 'close']
+                    etf_open_price = df.at[date, 'open']
+                    etf_close_price = df.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
