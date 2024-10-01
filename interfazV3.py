@@ -225,24 +225,6 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
         return pd.DataFrame()
-    
-    # Usar Alpha Vantage para obtener datos del subyacente
-    #url = "https://www.alphavantage.co/query"
-    #params = {
-        #"function": "TIME_SERIES_INTRADAY",
-        #"symbol": ticker_opcion,
-        #"interval": "15min",
-        #"apikey": api_av,
-        #"outputsize": "full",
-        #"extended_hours": "false"
-    #}
-    #try:
-        #response = requests.get(url, params=params)
-        #data = response.json()
-        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
-        
-    #except Exception as e:
-        #print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
 
 
 def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
@@ -316,12 +298,7 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
             best_date = option_date
             break
     return best_date
-
-                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                #etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-
+              
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -387,8 +364,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                st.dataframe(df2)
+                #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
+                #st.dataframe(df2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
