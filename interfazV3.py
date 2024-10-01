@@ -181,6 +181,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     st.write(fecha_inicio)
+    ticker_opcion = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -310,7 +311,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
         option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
         option_type = 'C' if column_name == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
+        if verificar_opcion(client, option_name, base_date, base_date + timedelta(minutes=15)):
             best_date = option_date
             break
     return best_date
