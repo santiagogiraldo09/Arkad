@@ -17,6 +17,27 @@ import requests
 import pytz
 from datetime import time
 
+def open_close(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    ticker_opcion = "SPY"
+    client = RESTClient(api_key)
+    local_tz = pytz.timezone('America/New_York')
+    try:
+        # Obtener datos agregados cada 15 minutos
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
+                               from_=fecha_inicio, to=fecha_fin)
+        #st.write(resp)
+        datos = [{
+            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
+            'open': agg.open, 
+            'high': agg.high, 
+            'low': agg.low, 
+            'close': agg.close, 
+            'volume': agg.volume
+        } for agg in resp]
+        
+    except Exception as e:
+        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        return pd.DataFrame()
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -398,8 +419,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                st.write("df AV")
-                st.dataframe(df)
                 st.write("df_option:")
                 st.dataframe(df_option)
                 st.write("df_option2:")
