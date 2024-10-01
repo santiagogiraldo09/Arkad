@@ -15,7 +15,6 @@ import zipfile
 import numpy as np
 import requests
 import pytz
-from datetime import time
 
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
@@ -165,20 +164,6 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
 
-def verificar_opcion_15min(client, ticker, start_date, end_date):
-    try:
-        resp = client.get_aggs(
-            ticker=ticker,
-            multiplier=15,         # 15 minutos
-            timespan="minute",     # Intervalo de minutos
-            from_=start_date.strftime('%Y-%m-%dT%H:%M:%S'),
-            to_=end_date.strftime('%Y-%m-%dT%H:%M:%S'),
-            limit=50000             # Aumentar el límite si es necesario
-        )
-        return len(resp) > 0
-    except Exception as e:
-        print(f"Error al verificar opción en 15m para {ticker}: {e}")
-        return False
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -339,35 +324,6 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name, option_minutes, option_offset, ticker):
-    # Calcular el rango de búsqueda en minutos
-    min_minutes = option_minutes - option_offset
-    max_minutes = option_minutes + option_offset
-    best_date = None
-    
-    # Iterar sobre cada offset dentro del rango especificado
-    for offset in range(min_minutes, max_minutes + 1, 15):  # Incremento de 15 minutos
-        # Calcular la nueva fecha y hora con el offset
-        option_date = base_date + timedelta(minutes=offset)
-        
-        # Formatear la fecha y hora en el formato deseado (por ejemplo, YYMMDDHHMM)
-        option_date = option_date.strftime('%y%m%d%H%M')
-        
-        # Determinar el tipo de opción
-        option_type = 'C' if column_name == 1 else 'P'
-        
-        # Construir el nombre de la opción con el formato especificado
-        # Asumiendo que el formato es similar al original pero incluye hora y minutos
-        # Por ejemplo: 'O:SPY2309171530C00400000' para una opción Call
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price:05d}000'
-        
-        # Verificar si la opción existe y tiene datos disponibles
-        # Asumiendo que 'verificar_opcion_15m' es una función que verifica la disponibilidad
-        if verificar_opcion_15min(client, option_name, option_date, option_date + timedelta(minutes=15)):
-            best_date = option_date
-            break  # Detener la búsqueda una vez que se encuentra la primera opción válida
-    
-    return best_date
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -440,8 +396,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #st.write("option price 2:")
         #st.write(option_price2)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        option_date2 = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        st.write(option_date2)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
