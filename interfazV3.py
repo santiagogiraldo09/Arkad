@@ -75,7 +75,6 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Convertir fechas a datetime
     fecha_inicio = pd.to_datetime(fecha_inicio)
     fecha_fin = pd.to_datetime(fecha_fin)
-    st.write(fecha_inicio)
     
     fecha_actual = fecha_inicio
     df_completo = pd.DataFrame()
@@ -361,7 +360,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df_option2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
+                #df_option2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
+                df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 st.write("df_option:")
                 st.dataframe(df_option)
