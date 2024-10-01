@@ -342,11 +342,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
 
-
-        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-        st.write(data_for_date)
-        if data_for_date.empty:
-            continue
+        if periodo == 'Diario':
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            if data_for_date.empty:
+                continue
+        else: #periodo == '15 minutos'
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            #st.write(start)
+            st.write(date)
+            st.write(data_for_date)
+            if data_for_date.empty:
+                continue
 
         if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
