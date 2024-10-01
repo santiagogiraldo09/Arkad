@@ -20,7 +20,6 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     st.write(fecha_inicio)
-    st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -166,7 +165,7 @@ def verificar_opcion(client, ticker, start_date, end_date):
 
 def verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin):
     try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=fecha_inicio.strftime('%Y-%m-%d-%H-%M'), to=fecha_fin.strftime('%Y-%m-%d-%H-%M'))
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=fecha_inicio, to=fecha_fin)
         return len(resp) > 0
     except:
         return False
@@ -436,7 +435,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 oc = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 st.write(option_date2)
-                st.write(oc)
+                #st.write(oc)
                 #st.dataframe(df_option)
                 #st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
