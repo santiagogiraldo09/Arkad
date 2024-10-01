@@ -407,8 +407,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if periodo == '15 minutos':
                     etf_open_price = df.at[date, 'open']
                     etf_close_price = df.at[date, 'close']
-                    etf_open_price = df_option2[date, 'open']
+                    #etf_open_price = df_option2[date, 'open']
                     st.write(df_option2.at[date, 'open'])
+                    st.write(df.at[date, 'open'])
 
                 resultados.append({
                     'Fecha': date, 
