@@ -19,8 +19,8 @@ import pytz
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
-    st.write(fecha_inicio)
-    st.write(fecha_fin)
+    #st.write(fecha_inicio)
+    #st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -375,13 +375,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #continue
 
         #data_for_date_pol = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
-        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+        if periodo == 'Diario':
+            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            if data_for_date.empty:
+                continue
+        else:
+            data_for_date = obtener_historico_15min_pol(ticker, api_key, date, date + pd.Timedelta(days=1))
+            if data_for_date.empty:
+                continue
         #st.write("Datos descargados de yahoo finance:")
         #st.write(data_for_date)
         #st.write("Datos descargados de Polygon:")
         #st.write(data_for_date_pol)
-        if data_for_date.empty:
-            continue
+        #if data_for_date.empty:
+            #continue
 
         if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
