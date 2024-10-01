@@ -389,14 +389,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             st.write("Fecha date:",date)
-            data_for_date2 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+            #data_for_date2 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             #st.write(start)
             st.write(data_for_date)
-            st.write(data_for_date2)
+            #st.write(data_for_date2)
             if data_for_date.empty:
                 continue
-            if data_for_date2.empty:
-                continue
+            #if data_for_date2.empty:
+                #continue
 
         if trade_type == 'Close to Close':
             precio_usar_apertura = 'close'
@@ -432,7 +432,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
+                df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
@@ -483,12 +483,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if periodo == '15 minutos':
                     etf_open_price = df.at[date, 'open']
                     etf_close_price = df.at[date, 'close']
-                    if not data_for_date2.empty:
-                    #if not df_option2.empty:
-                        #etf_open_price = df_option2.at[date, 'open']
-                        #etf_close_price = df_option2.at[date, 'close']
-                        etf_open_price = data_for_date2.at[date, 'open']
-                        etf_close_price = data_for_date2.at[date, 'close']
+                    #if not data_for_date2.empty:
+                    if not df_option2.empty:
+                        etf_open_price = df_option2.at[date, 'open']
+                        etf_close_price = df_option2.at[date, 'close']
+                        #etf_open_price = data_for_date2.at[date, 'open']
+                        #etf_close_price = data_for_date2.at[date, 'close']
                     else:
                         etf_open_price = df.at[date, 'open']
                         etf_close_price = df.at[date, 'close']
