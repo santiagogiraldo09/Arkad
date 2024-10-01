@@ -20,6 +20,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     st.write(fecha_inicio)
+    st.write(fecha_fin)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -62,11 +63,11 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         st.write(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         st.write("con polygon")
-        st.dataframe(df2)
+        st.dataframe(df)
         
-        return df2
+        return df
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
@@ -163,12 +164,6 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
 
-def verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin):
-    try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_= fecha_inicio, to=fecha_fin)
-        return len(resp) > 0
-    except:
-        return False
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -329,21 +324,6 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
                 #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
 
-# Función replicada para el periodo de '15 minutos'
-def encontrar_opcion_cercana_15min(client, base_date, option_price, column_value, option_days, option_offset, ticker):
-    min_days = option_days - option_offset
-    max_days = option_days + option_offset
-    best_date = None
-    for offset in range(min_days, max_days + 1):
-        option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d%h%m%s')
-        option_type = 'C' if column_value == 1 else 'P'
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        # Para '15 minutos', verificamos si hay datos en el intervalo de 15 minutos
-        if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
-            best_date = option_date
-            break
-    return best_date
-
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
@@ -416,12 +396,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #st.write("option price 2:")
         #st.write(option_price2)
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        option_date2 = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            option_name2 = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            st.write(option_name2)
+            st.write(option_name)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
@@ -435,9 +413,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 df2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
-                oc = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
-                st.write(option_date)
-                #st.write(oc)
                 #st.dataframe(df_option)
                 #st.dataframe(df_option2)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
