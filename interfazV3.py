@@ -36,6 +36,16 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         } for agg in resp]
         
         df_OC = pd.DataFrame(datos)
+        # Convertir timestamps aware a naive eliminando la zona horaria
+        df_OC['fecha'] = df_OC['fecha'].dt.tz_localize(None)
+        
+        # Establecer la columna 'fecha' como el índice del DataFrame
+        df_OC.set_index('fecha', inplace=True)
+        df_OC.index = pd.to_datetime(df_OC.index)
+        
+        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
         
         return df_OC
     
