@@ -17,6 +17,63 @@ import requests
 import pytz
 from datetime import time
 
+def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    #fecha_inicio.strftime('%Y-%m-%d')
+    #api_av = "KCIUEY7RBRKTL8GI"
+    st.write(fecha_inicio)
+    st.write(fecha_fin)
+    client = RESTClient(api_key)
+    local_tz = pytz.timezone('America/New_York')
+    try:
+        # Obtener datos agregados cada 15 minutos
+        resp = client.get_aggs(ticker= "SPY", multiplier=15, timespan="minute", 
+                               from_=fecha_inicio, to=fecha_fin)
+        #st.write(resp)
+        datos = [{
+            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
+            'open': agg.open, 
+            'high': agg.high, 
+            'low': agg.low, 
+            'close': agg.close, 
+            'volume': agg.volume
+        } for agg in resp]
+        #st.write("Con Polygon:")
+        #st.write(datos)
+        #st.write(fecha_inicio)
+        #st.write(fecha_inicio.strftime('%Y-%m-%d'))
+        # Procesar la respuesta para crear el DataFrame
+        #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
+                  #'low': agg.low, 'close': agg.close, 'volume': agg.volume} for agg in resp]
+        df = pd.DataFrame(datos)
+        # Convertir timestamps aware a naive eliminando la zona horaria
+        df['fecha'] = df['fecha'].dt.tz_localize(None)
+        #st.write(df['fecha'])
+        #Mostrar dataframe df, se mjuestra dos veces
+        #st.dataframe(df)
+        
+        
+        # Establecer la columna 'fecha' como el índice del DataFrame
+        df.set_index('fecha', inplace=True)
+        df.index = pd.to_datetime(df.index)
+        
+        # Asegurarse de que las fechas de inicio y fin son de tipo datetime
+        #fecha_inicio = local_tz.localize(pd.to_datetime(fecha_inicio))
+        #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
+        st.write(fecha_fin)
+        
+        # Filtrar el DataFrame por las fechas de inicio y fin
+        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        st.write("con polygon")
+        st.dataframe(df)
+        
+        return df
+    
+    except Exception as e:
+        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        return pd.DataFrame()
+
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -127,7 +184,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
-        st.write(resp)
+        #st.write(resp)
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open, 
@@ -330,6 +387,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                df2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
@@ -369,8 +427,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
-                    etf_open_price = df.at[date, 'open']
-                    etf_close_price = df.at[date, 'close']
+                    etf_open_price = df2.at[date, 'open']
+                    etf_close_price = df2.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
