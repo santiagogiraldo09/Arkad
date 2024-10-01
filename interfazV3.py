@@ -439,6 +439,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 st.write("df_option:")
                 st.dataframe(df_option)
+                st.write("función get_open_and_close:")
+                st.dataframe(df)
                 #st.write("df_option2:")
                 #st.dataframe(df_option2)
                 #st.write("verificar opción 15min:")
