@@ -451,7 +451,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write("función get_open_and_close:")
                 st.dataframe(df)
                 st.write("df_option2:")
-                #st.dataframe(df_option2)
+                st.dataframe(df_option2)
                 #st.write("verificar opción 15min:")
                 #st.write(vo)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
