@@ -160,6 +160,12 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
     
+def verificar_opcion_15min(client, ticker, start_date, end_date):
+    try:
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date, to=end_date)
+        return len(resp) > 0
+    except:
+        return False
     
 def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
