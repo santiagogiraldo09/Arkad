@@ -62,11 +62,11 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         st.write(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
-        df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        df2 = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         st.write("con polygon")
-        st.dataframe(df)
+        st.dataframe(df2)
         
-        return df
+        return df2
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
@@ -434,6 +434,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                df2 = obtener_historico_15min_pol(ticker, api_key, fecha_inicio, fecha_fin)
                 oc = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 st.write(option_date)
                 #st.write(oc)
@@ -477,8 +478,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
-                    etf_open_price = df.at[date, 'open']
-                    etf_close_price = df.at[date, 'close']
+                    etf_open_price = df2.at[date, 'open']
+                    etf_close_price = df2.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
