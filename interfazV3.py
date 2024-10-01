@@ -61,7 +61,7 @@ def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin)
         #fecha_fin = local_tz.localize(pd.to_datetime(fecha_fin))
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
-        st.write(fecha_fin)
+        #st.write(fecha_fin)
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
@@ -427,8 +427,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
-                    etf_open_price = df2.at[date, 'open']
-                    etf_close_price = df2.at[date, 'close']
+                    etf_open_price = df.at[date, 'open']
+                    etf_close_price = df.at[date, 'close']
 
                 resultados.append({
                     'Fecha': date, 
