@@ -169,7 +169,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
-    st.write(fecha_inicio)
+    #st.write(fecha_inicio)
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     try:
@@ -221,7 +221,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 def obtener_historico_15min_pol(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
-    st.write(fecha_inicio)
+    #st.write(fecha_inicio)
     ticker_opcion = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
@@ -291,7 +291,7 @@ def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     try:
         response = requests.get(base_url, params=params)
         data = response.json()
-        st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+        #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
         
         if "Time Series (15min)" not in data:
             print(f"No se recibieron datos para {ticker_opcion}")
@@ -355,9 +355,9 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
         option_date = (base_date + timedelta(minutes=offset_minutes)).strftime('%y%m%d')
         option_type = 'C' if column_name == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        st.write("Dentro de la función 15min")
-        st.write(option_date)
-        st.write(option_name)
+        #st.write("Dentro de la función 15min")
+        #st.write(option_date)
+        #st.write(option_name)
         if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
             best_date = option_date
             break
@@ -400,14 +400,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 continue
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-            st.write("Fecha date:",date)
-            st.write("Fecha inicio:",fecha_inicio)
-            st.write("Fecha fin:",fecha_fin)
+            #st.write("Fecha date:",date)
+            #st.write("Fecha inicio:",fecha_inicio)
+            #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             #data_for_date2 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             #st.write(start)
-            st.write(data_for_date)
-            st.write(data_for_date2)
+            #st.write(data_for_date)
+            #st.write(data_for_date2)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
@@ -438,7 +438,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             else:
                 #option_price2 = round(data_for_date['Open'].iloc[0])
                 option_price = round(data_for_date2.loc[date]['open'])
-                st.write(option_price)
+                #st.write(option_price)
             
         #option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         if periodo == 'Diario':
@@ -449,11 +449,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             #option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
-            st.write(option_name)
+            #st.write(option_name)
             #st.write("option date2 - Diario")
             #st.write(option_date2)
-            st.write("option date - 15 min")
-            st.write(option_date)
+            #st.write("option date - 15 min")
+            #st.write(option_date)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
@@ -471,10 +471,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                st.write("df_option:")
-                st.dataframe(df_option)
-                st.write("función get_open_and_close:")
-                st.dataframe(df)
+                #st.write("df_option:")
+                #st.dataframe(df_option)
+                #st.write("función get_open_and_close:")
+                #st.dataframe(df)
                 #st.write("df_option2:")
                 #st.dataframe(df_option2)
                 #st.write("verificar opción:")
@@ -487,8 +487,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 else:  # '15 Minutos'
                     #st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
-                    st.write(open_hour)
-                    st.write(close_hour)
+                    #st.write(open_hour)
+                    #st.write(close_hour)
                     #st.write(option_open_price)
                     #st.write(df_option[precio_usar_cierre].iloc[index])
                     #st.write(df_option.iloc[0])
