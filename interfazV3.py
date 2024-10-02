@@ -152,7 +152,7 @@ def verificar_opcion(client, ticker, start_date, end_date):
     
 def verificar_opcion_15min(client, ticker, start_date, end_date):
     try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date, to=end_date)
+        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date.strftime('%Y-%m-%d %H:%M'), to=end_date.strftime('%Y-%m-%d %H:%M'))
         return len(resp) > 0
     except:
         return False
@@ -344,14 +344,17 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
             break
     return best_date
 
-def encontrar_opcion_cercana_15min(client, base_date, option_price2, column_name, option_days, option_offset, ticker):
-    min_days = option_days - option_offset
-    max_days = option_days + option_offset
+def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name, option_hours, option_offset_minutes, ticker):
+    #Convierte las horas en minutos para poder ajustar los cálculos a velas de 15 min
+    min_minutes = option_hours * 60 - option_offset_minutes
+    max_minutes = option_hours * 60 + option_offset_minutes
+    #min_days = option_days - option_offset
+    #max_days = option_days + option_offset
     best_date = None
-    for offset in range(min_days, max_days + 1):
-        option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
+    for offset_minutes in range(min_minutes, max_minutes + 1, 15):  # Incrementamos de 15 en 15 minutos
+        option_date = (base_date + timedelta(minutes=offset_minutes)).strftime('%y%m%d%H%M')
         option_type = 'C' if column_name == 1 else 'P'
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price2}000'
+        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
         if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
             best_date = option_date
             break
@@ -431,13 +434,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
         option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
         option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        #option_date2 = encontrar_opcion_cercana_15min(client, date, option_price2, row[column_name], option_days, option_offset, ticker)
+        option_date2 = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             option_name2 = f'O:{ticker}{option_date}{option_type}00{option_price2}000'
             st.write(option_name)
-            #st.write(option_date2)
+            st.write("option date2")
+            st.write(option_date2)
             st.write(option_date)
             
             if periodo == 'Diario':
