@@ -449,9 +449,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)
-                st.write("verificar opción:")
-                st.write(vo)
+                vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
@@ -462,7 +460,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
-                vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)
+                #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
                 #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
                 st.write("df_option:")
@@ -471,8 +469,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.dataframe(df)
                 #st.write("df_option2:")
                 #st.dataframe(df_option2)
-                st.write("verificar opción:")
-                st.write(vo)
+                #st.write("verificar opción:")
+                #st.write(vo)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             if not df_option.empty:
                 if periodo == 'Diario':
