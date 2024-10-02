@@ -449,6 +449,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)
+                st.write("verificar opción:")
+                st.write(vo)
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
