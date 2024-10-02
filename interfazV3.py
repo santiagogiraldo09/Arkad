@@ -436,20 +436,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
             else:
-                option_price2 = round(data_for_date['Open'].iloc[0])
+                #option_price2 = round(data_for_date['Open'].iloc[0])
                 option_price = round(data_for_date2.loc[date]['open'])
                 st.write(option_price)
             
-        option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date2 = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_hours, option_offset_minutes, ticker)
+        #option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
+        if periodo == 'Diario':
+            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+        else:
+            option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_hours, option_offset_minutes, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
+            #option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
             st.write(option_name)
-            st.write("option date2 - Diario")
-            st.write(option_date2)
+            #st.write("option date2 - Diario")
+            #st.write(option_date2)
             st.write("option date - 15 min")
             st.write(option_date)
             
@@ -485,6 +487,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 else:  # '15 Minutos'
                     #st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
+                    st.write(option_open_price)
+                    st.write(df_option[precio_usar_cierre].iloc[index])
                     #st.write(df_option.iloc[0])
                     #st.write(df_option.iloc[-1])
                     #st.write(df_option)
@@ -543,7 +547,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Resultado': trade_result,
                     'Contratos': num_contratos,
                     'Opcion': option_name,
-                    'Opcion2': option_name2,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
                     'Close': etf_close_price
