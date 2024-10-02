@@ -355,6 +355,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
         option_date = (base_date + timedelta(minutes=offset_minutes)).strftime('%y%m%d%H%M')
         option_type = 'C' if column_name == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+        st.write("Dentro de la función 15min")
         st.write(option_date)
         st.write(option_name)
         if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
