@@ -150,9 +150,9 @@ def verificar_opcion(client, ticker, start_date, end_date):
     except:
         return False
     
-def verificar_opcion_15min(client, ticker, start_date, end_date):
+def verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin):
     try:
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", from_=start_date.strftime('%Y-%m-%d %H:%M'), to=end_date.strftime('%Y-%m-%d %H:%M'))
+        resp = client.get_aggs(ticker="SPY", multiplier=15, timespan="minute", from_=fecha_inicio.strftime('%Y-%m-%d %H:%M'), to=fecha_fin.strftime('%Y-%m-%d %H:%M'))
         return len(resp) > 0
     except:
         return False
