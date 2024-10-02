@@ -487,8 +487,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 else:  # '15 Minutos'
                     #st.write("Entró por acá")
                     option_open_price = df_option['open'].iloc[0]
-                    st.write(option_open_price)
-                    st.write(df_option[precio_usar_cierre].iloc[index])
+                    #st.write(option_open_price)
+                    #st.write(df_option[precio_usar_cierre].iloc[index])
                     #st.write(df_option.iloc[0])
                     #st.write(df_option.iloc[-1])
                     #st.write(df_option)
