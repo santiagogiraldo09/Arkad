@@ -441,21 +441,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write(option_price)
             
         option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        option_date2 = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_hours, option_offset_minutes, ticker)
+        option_date2 = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+        option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_hours, option_offset_minutes, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
             option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
             st.write(option_name)
-            st.write("option date2")
+            st.write("option date2 - Diario")
             st.write(option_date2)
-            st.write("option date")
+            st.write("option date - 15 min")
             st.write(option_date)
             
             if periodo == 'Diario':
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
+                #vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
                 #st.dataframe(df_option)
                 #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
             else:  # '15 Minutos'
