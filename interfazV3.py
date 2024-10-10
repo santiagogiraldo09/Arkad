@@ -593,7 +593,7 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 def main():
 
-    st.title("Backtesting ARKADDDDD")
+    st.title("Backtesting ARKAD")
 
     
     tooltip_style = """
