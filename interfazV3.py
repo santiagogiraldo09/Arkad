@@ -592,7 +592,7 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.show()
 
 def main():
-    st.title("Backtesting ARKADD")
+    st.title("Backtesting ARKAD")
     
     tooltip_style = """
     <style>
@@ -663,7 +663,7 @@ def main():
     info_placeholder = st.empty()
     
     #Toogle
-    toggle_activated = st.toggle("Se opera si se supera el Threshold :/")
+    toggle_activated = st.toggle("Se opera si se supera el Threshold")
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     
     # Opción de selección del archivo .xlsx
