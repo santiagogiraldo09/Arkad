@@ -592,7 +592,9 @@ def graficar_resultados(df, final_balance, balance_inicial):
     plt.show()
 
 def main():
-    st.title("Backtesting ARKAD")
+
+    st.title("Backtesting ARKADDDDD")
+
     
     tooltip_style = """
     <style>
