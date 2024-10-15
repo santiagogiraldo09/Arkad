@@ -63,6 +63,13 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
 
+# Mostrar el DataFrame global de la función open_close
+def mostrar_datos_globales_open_close():
+    if not df_global.empty:
+        print(df_global)
+    else:
+        print("No se han obtenido datos exitosos de la función open_close.")
+
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
