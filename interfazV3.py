@@ -18,7 +18,7 @@ import pytz
 from datetime import time
 
 # DataFrame global para almacenar todos los datos obtenidos con éxito
-df_global = pd.DataFrame()
+df_global = None
 
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
     global df_global  # Para acceder y modificar el DataFrame global
@@ -54,8 +54,9 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         # Filtrar el DataFrame por las fechas de inicio y fin
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
-        # Concatenar el DataFrame obtenido con el DataFrame global
-        df_global = pd.concat([df_global, df_OC])
+        # Guardar el primer DataFrame obtenido con éxito
+        if df_global is None:
+            df_global = df_OC
         
         return df_OC
     
@@ -65,7 +66,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
 
 # Mostrar el DataFrame global de la función open_close
 def mostrar_datos_globales_open_close():
-    if not df_global.empty:
+    if df_global is not None:
         print(df_global)
     else:
         print("No se han obtenido datos exitosos de la función open_close.")
