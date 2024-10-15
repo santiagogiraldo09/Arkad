@@ -17,7 +17,11 @@ import requests
 import pytz
 from datetime import time
 
+# DataFrame global para almacenar todos los datos obtenidos con éxito
+df_global = pd.DataFrame()
+
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
+    global df_global  # Para acceder y modificar el DataFrame global
     ticker = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
@@ -49,6 +53,9 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
+        
+        # Concatenar el DataFrame obtenido con el DataFrame global
+        df_global = pd.concat([df_global, df_OC])
         
         return df_OC
     
