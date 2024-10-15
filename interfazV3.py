@@ -419,10 +419,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+            data_for_date4 = mostrar_datos_globales_open_close()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
             st.write(data_for_date3)
+            st.write ("función mostrar datos globales")
+            st.write(data_for_date4)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
