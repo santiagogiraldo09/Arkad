@@ -17,14 +17,13 @@ import requests
 import pytz
 from datetime import time
 
-# Variable para almacenar los datos obtenidos con éxito del primer llamado
-primer_datos_exitosos = None
 
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
     global primer_datos_exitosos # Para acceder y modificar el DataFrame global
     ticker = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
+    i = 1
     try:
         # Obtener datos agregados cada 15 minutos
         resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", 
@@ -38,6 +37,15 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
+        
+        # Crear variables dinámicas datos1 y datos2
+        if datos:
+            if i == 1:
+                datos1 = pd.DataFrame(datos)
+                i += 1
+            elif i == 2:
+                datos2 = pd.DataFrame(datos)
+                i += 1
         
         # Guardar los datos si no están vacíos y si aún no se ha guardado un valor exitoso
         if datos and primer_datos_exitosos is None:
@@ -59,7 +67,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
         
-        return df_OC
+        return df_OC, datos1
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker}: {str(e)}")
@@ -422,13 +430,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            data_for_date4 = mostrar_primer_datos_exitosos()
+            #data_for_date4 = mostrar_primer_datos_exitosos()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
             st.write(data_for_date3)
-            st.write ("función mostrar datos globales")
-            st.write(data_for_date4)
+            #st.write ("función mostrar datos globales")
+            #st.write(data_for_date4)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
