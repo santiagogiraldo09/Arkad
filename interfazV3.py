@@ -387,21 +387,22 @@ def encontrar_opcion_cercana(client, base_date, option_price, column_name, optio
             break
     return best_date
 
-def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name, option_hours, option_offset_minutes, ticker):
+def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,option_days, option_offset, ticker):
     #Convierte las horas en minutos para poder ajustar los cálculos a velas de 15 min
-    min_minutes = option_hours * 60 - option_offset_minutes
-    max_minutes = option_hours * 60 + option_offset_minutes
+    min_days = option_days - option_offset #23
+    max_days = option_days + option_offset #37
     #min_days = option_days - option_offset
     #max_days = option_days + option_offset
     best_date = None
-    for offset_minutes in range(min_minutes, max_minutes + 1, 15):  # Incrementamos de 15 en 15 minutos
-        option_date = (base_date + timedelta(minutes=offset_minutes)).strftime('%y%m%d')
+    for offset in range(min_days, max_days + 1):
+    #for offset_minutes in range(min_minutes, max_minutes + 1, 15):  # Incrementamos de 15 en 15 minutos
+        option_date = (base_date + timedelta(minutes=offset)).strftime('%y%m%d')
         option_type = 'C' if column_name == 1 else 'P'
         option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
         #st.write("Dentro de la función 15min")
         #st.write(option_date)
         #st.write(option_name)
-        if verificar_opcion_15min(client, option_name, base_date, base_date + timedelta(minutes=15)):
+        if verificar_opcion(client, option_name, base_date, base_date + timedelta(minutes=15)):
             best_date = option_date
             break
     return best_date
