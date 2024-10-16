@@ -17,9 +17,6 @@ import requests
 import pytz
 from datetime import time
 
-# DataFrame global para almacenar todos los datos obtenidos con éxito
-df_global = None
-
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
     global df_global  # Para acceder y modificar el DataFrame global
     ticker = "SPY"
@@ -39,6 +36,9 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
+        if not datos.empty:
+            df_global = pd.DataFrame(datos)
+            
         df_OC = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df_OC['fecha'] = df_OC['fecha'].dt.tz_localize(None)
@@ -54,9 +54,6 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         # Filtrar el DataFrame por las fechas de inicio y fin
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
-        # Guardar el primer DataFrame obtenido con éxito
-        if df_global is None:
-            df_global = df_OC
         
         return df_OC
     
@@ -64,12 +61,6 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
 
-# Mostrar el DataFrame global de la función open_close
-def mostrar_datos_globales_open_close():
-    if df_global is not None:
-        print(df_global)
-    else:
-        print("No se han obtenido datos exitosos de la función open_close.")
 
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
