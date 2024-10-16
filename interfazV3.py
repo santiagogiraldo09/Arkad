@@ -41,16 +41,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
-        # Crear variables dinámicas datos1 y datos2
-        if datos:
-            if i == 1:
-                datos1 = pd.DataFrame(datos)
-                i += 1
-                #st.dataframe(datos1)
-            elif i == 2:
-                datos2 = pd.DataFrame(datos)
-                i += 1
-        
+   
         df_OC = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df_OC['fecha'] = df_OC['fecha'].dt.tz_localize(None)
@@ -65,6 +56,16 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
+        
+        # Crear variables dinámicas datos1 y datos2
+        if df_OC:
+            if i == 1:
+                datos1 = pd.DataFrame(df_OC)
+                i += 1
+                st.dataframe(datos1)
+            elif i == 2:
+                datos2 = pd.DataFrame(df_OC)
+                i += 1
         
         
         return df_OC
@@ -92,6 +93,8 @@ def mostrar_datos():
         
     st.write("datos completos:")
     st.dataframe(datos_final)
+    
+    return datos_final
     
              
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
@@ -443,11 +446,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            data_for_date4 = mostrar_datos()
+            #data_for_date4 = mostrar_datos()
             #st.write(start)
             #st.write(data_for_date)
-            st.write ("función open_close (Polygon)")
-            st.write(data_for_date3)
+            #st.write ("función open_close (Polygon)")
+            #st.write(data_for_date3)
             #st.write ("función mostrar datos globales")
             #st.write(data_for_date4)
             if data_for_date.empty:
@@ -508,6 +511,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(date + timedelta(days=option_days))
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                df_glo = mostrar_datos()
                 #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
@@ -569,6 +573,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #if not df_option2.empty:
                         #etf_open_price = df_option2.at[date, 'open']
                         #etf_close_price = df_option2.at[date, 'close']
+                        etf_open_price2= df_glo.at[date, 'open']
+                        etf_close_price2= df_glo.at[date, 'close']
                         etf_open_price = data_for_date2.at[date, 'open']
                         etf_close_price = data_for_date2.at[date, 'close']
                     else:
