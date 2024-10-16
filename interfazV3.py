@@ -17,8 +17,11 @@ import requests
 import pytz
 from datetime import time
 
+# Variable para almacenar los datos obtenidos con éxito del primer llamado
+primer_datos_exitosos = None
+
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
-    global df_global  # Para acceder y modificar el DataFrame global
+    global primer_datos_exitosos # Para acceder y modificar el DataFrame global
     ticker = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
@@ -35,6 +38,10 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             'close': agg.close, 
             'volume': agg.volume
         } for agg in resp]
+        
+        # Guardar los datos si no están vacíos y si aún no se ha guardado un valor exitoso
+        if datos and primer_datos_exitosos is None:
+            primer_datos_exitosos = pd.DataFrame(datos)
         
         df_OC = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
@@ -58,7 +65,14 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
 
-
+# Mostrar los datos del primer llamado exitoso de la función open_close
+def mostrar_primer_datos_exitosos():
+    global primer_datos_exitosos
+    if primer_datos_exitosos is not None:
+        print(primer_datos_exitosos)
+    else:
+        print("No se han obtenido datos exitosos de la función open_close.")
+        
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -408,13 +422,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            #data_for_date4 = mostrar_datos_globales_open_close()
+            data_for_date4 = mostrar_primer_datos_exitosos()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
             st.write(data_for_date3)
-            #st.write ("función mostrar datos globales")
-            #st.write(data_for_date4)
+            st.write ("función mostrar datos globales")
+            st.write(data_for_date4)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
