@@ -46,7 +46,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             if i == 1:
                 datos1 = pd.DataFrame(datos)
                 i += 1
-                st.dataframe(datos1)
+                #st.dataframe(datos1)
             elif i == 2:
                 datos2 = pd.DataFrame(datos)
                 i += 1
@@ -76,9 +76,11 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
 # Mostrar los datos almacenados en datos1 y datos2
 def mostrar_datos():
     global datos1, datos2
+    datos_final = None
     if datos1 is not None:
         print("Datos1:")
         print(datos1)
+        datos_final =  pd.concat([datos_final, datos1])
     else:
         print("No se han obtenido datos para datos1.")
     
@@ -88,6 +90,10 @@ def mostrar_datos():
     else:
         print("No se han obtenido datos para datos2.")
         
+    st.write("datos completos:")
+    st.dataframe(datos_final)
+    
+             
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
@@ -437,7 +443,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            #data_for_date4 = mostrar_datos()
+            data_for_date4 = mostrar_datos()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
