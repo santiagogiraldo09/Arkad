@@ -17,9 +17,12 @@ import requests
 import pytz
 from datetime import time
 
+# Variables globales para almacenar datos1 y datos2
+datos1 = None
+datos2 = None
 
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
-    global primer_datos_exitosos # Para acceder y modificar el DataFrame global
+    global datos1, datos2
     ticker = "SPY"
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
@@ -47,10 +50,6 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
                 datos2 = pd.DataFrame(datos)
                 i += 1
         
-        # Guardar los datos si no están vacíos y si aún no se ha guardado un valor exitoso
-        if datos and primer_datos_exitosos is None:
-            primer_datos_exitosos = pd.DataFrame(datos)
-        
         df_OC = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df_OC['fecha'] = df_OC['fecha'].dt.tz_localize(None)
@@ -73,13 +72,20 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
 
-# Mostrar los datos del primer llamado exitoso de la función open_close
-def mostrar_primer_datos_exitosos():
-    global primer_datos_exitosos
-    if primer_datos_exitosos is not None:
-        print(primer_datos_exitosos)
+# Mostrar los datos almacenados en datos1 y datos2
+def mostrar_datos():
+    global datos1, datos2
+    if datos1 is not None:
+        print("Datos1:")
+        print(datos1)
     else:
-        print("No se han obtenido datos exitosos de la función open_close.")
+        print("No se han obtenido datos para datos1.")
+    
+    if datos2 is not None:
+        print("Datos2:")
+        print(datos2)
+    else:
+        print("No se han obtenido datos para datos2.")
         
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -430,13 +436,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            #data_for_date4 = mostrar_primer_datos_exitosos()
+            data_for_date4 = mostrar_datos()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
             st.write(data_for_date3)
-            #st.write ("función mostrar datos globales")
-            #st.write(data_for_date4)
+            st.write ("función mostrar datos globales")
+            st.write(data_for_date4)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
