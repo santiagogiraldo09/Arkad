@@ -402,7 +402,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
         #st.write("Dentro de la función 15min")
         #st.write(option_date)
         #st.write(option_name)
-        if verificar_opcion(client, option_name, base_date, base_date + timedelta(minutes=15)):
+        if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
             best_date = option_date
             break
     return best_date
