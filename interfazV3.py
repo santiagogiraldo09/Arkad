@@ -396,15 +396,16 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
     best_date = None
     for offset in range(min_days, max_days + 1):
     #for offset_minutes in range(min_minutes, max_minutes + 1, 15):  # Incrementamos de 15 en 15 minutos
-        option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if column_name == 1 else 'P'
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        #st.write("Dentro de la función 15min")
-        #st.write(option_date)
-        #st.write(option_name)
-        if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
-            best_date = option_date
-            break
+        for hour_offset in range(0, 24 * 60, 15):  # Iterar cada 15 minutos
+            option_date = (base_date + timedelta(days=offset, minutes=hour_offset)).strftime('%y%m%d %H:%M')       
+            option_type = 'C' if column_name == 1 else 'P'
+            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+            #st.write("Dentro de la función 15min")
+            #st.write(option_date)
+            #st.write(option_name)
+            if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
+                best_date = option_date
+                break
     return best_date
 
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
