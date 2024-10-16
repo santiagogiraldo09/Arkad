@@ -36,9 +36,6 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
-        if not datos.empty:
-            df_global = pd.DataFrame(datos)
-            
         df_OC = pd.DataFrame(datos)
         # Convertir timestamps aware a naive eliminando la zona horaria
         df_OC['fecha'] = df_OC['fecha'].dt.tz_localize(None)
@@ -55,7 +52,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
         
-        return df_OC, df_global
+        return df_OC
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker}: {str(e)}")
