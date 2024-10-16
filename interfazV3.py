@@ -46,6 +46,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             if i == 1:
                 datos1 = pd.DataFrame(datos)
                 i += 1
+                st.dataframe(datos1)
             elif i == 2:
                 datos2 = pd.DataFrame(datos)
                 i += 1
@@ -66,7 +67,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
         
-        return df_OC, datos1
+        return df_OC
     
     except Exception as e:
         print(f"Error al obtener datos para {ticker}: {str(e)}")
@@ -436,13 +437,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha fin:",fecha_fin)
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-            data_for_date4 = mostrar_datos()
+            #data_for_date4 = mostrar_datos()
             #st.write(start)
             #st.write(data_for_date)
             st.write ("función open_close (Polygon)")
             st.write(data_for_date3)
-            st.write ("función mostrar datos globales")
-            st.write(data_for_date4)
+            #st.write ("función mostrar datos globales")
+            #st.write(data_for_date4)
             if data_for_date.empty:
                 continue
             if data_for_date2.empty:
