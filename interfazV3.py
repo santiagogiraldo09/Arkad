@@ -54,11 +54,8 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         fecha_inicio = pd.to_datetime(fecha_inicio)
         fecha_fin = pd.to_datetime(fecha_fin)
         
-        # Filtrar el DataFrame por las fechas de inicio y fin
-        df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
-        
         # Crear variables dinámicas datos1 y datos2
-        if df_OC:
+        if datos:
             if i == 1:
                 datos1 = pd.DataFrame(df_OC)
                 i += 1
@@ -66,6 +63,11 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             elif i == 2:
                 datos2 = pd.DataFrame(df_OC)
                 i += 1
+        
+        # Filtrar el DataFrame por las fechas de inicio y fin
+        df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
+        
+        
         
         
         return df_OC
