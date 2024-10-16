@@ -493,7 +493,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if periodo == 'Diario':
             option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         else:
-            option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_hours, option_offset_minutes, ticker)
+            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
         if option_date:
             option_type = 'C' if row[column_name] == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
