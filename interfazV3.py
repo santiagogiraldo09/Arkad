@@ -59,7 +59,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
             if i == 1:
                 datos1 = pd.DataFrame(df_OC)
                 i += 1
-                st.dataframe(datos1)
+                #st.dataframe(datos1)
             elif i == 2:
                 datos2 = pd.DataFrame(df_OC)
                 i += 1
@@ -93,8 +93,8 @@ def mostrar_datos():
     else:
         print("No se han obtenido datos para datos2.")
         
-    #st.write("datos completos:")
-    #st.dataframe(datos_final)
+    st.write("datos completos:")
+    st.dataframe(datos_final)
     
     return datos_final
     
