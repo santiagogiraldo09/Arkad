@@ -749,23 +749,17 @@ def main():
            </div>
             """
        info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
-    
-    #archivo_seleccionado = st.selectbox("Selecciona el archivo de datos:", archivos_disponibles)
-    #archivo_seleccionado_path = os.path.join(directorio_datos, archivo_seleccionado)
-    
+        
     # Option Days input
-    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
+    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=20, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
+    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=5, step=1)
     
     # Additional inputs for the backtest function
-    #data_filepath = 'datos_8.xlsx'
-    #api_key = st.text_input("API Key", "tXoXD_m9y_wE2kLEILzsSERW3djux3an")
-    #ticker = st.text_input("Ticker Symbol", "SPY")
     balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
-    periodo = st.radio("*Selecionar periodo de datos*", ('Diario','15 minutos'))
+    periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
     if periodo == '15 minutos':
@@ -773,21 +767,7 @@ def main():
         close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
-    # Nuevos inputs para la hora de apertura y cierre
-    #open_time = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
-    #close_time = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
-    
-    
-
-    #if trade_type == 'Close to Close':
-       #close_to_close = True
-    #else:
-        #close_to_close = False
-
-    #API KEY que se tenía
-    #tXoXD_m9y_wE2kLEILzsSERW3djux3an
-    #KCIUEY7RBRKTL8GI
-    
+        
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
         st.success("Backtest ejecutado correctamente!")
@@ -885,13 +865,9 @@ def main():
         f1_score = 2 * (precision * recall) / (precision + recall)
         datos['f1_score'] = f1_score
 
-        #the above code adds up the frequencies of the tps,tns,fps,fns and a matrix is formed
         
         datos.to_excel(excel_buffer, index=False)
-        
-        # datos[(datos['Fecha'] >= fecha_inicio)
-        #               & (datos['Fecha'] <= fecha_fin)]
-        
+                
         # Crear archivo zip con ambos archivos
         with zipfile.ZipFile("resultados.zip", "w") as zf:
             zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
@@ -912,3 +888,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
+#API KEY que se tenía
+#tXoXD_m9y_wE2kLEILzsSERW3djux3an
+#KCIUEY7RBRKTL8GI
