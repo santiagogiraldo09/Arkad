@@ -764,9 +764,10 @@ def main():
     # Checkbox "Escenario 1" con ícono de información y texto condicional
     if periodo == 'Diario':
         # Checkbox con tooltip usando el diseño flex
-        col1 = st.columns([1])
+        col1, col2 = st.columns([1, 2])
         with col1:
             esce1 = st.checkbox("Escenario 1")
+        with col2:
             st.markdown("""
             <div class="tooltip" style="display: inline;">
                 &#9432;
