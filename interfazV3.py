@@ -766,6 +766,8 @@ def main():
         open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
+    if periodo == 'Diario':
+        esce1 = st.radio("*Trabajar con escenario 1*")
     
         
     if st.button("Run Backtest"):
