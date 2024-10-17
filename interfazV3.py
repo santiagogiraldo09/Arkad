@@ -766,8 +766,10 @@ def main():
         with col1:
             esce1 = st.checkbox("Escenario 1")
         with col2:
+            st.write(" ")
             st.markdown("""
-            <div class="tooltip">&#9432;
+            <div class="tooltip" style="display: inline; vertical-align: middle; margin-left: 10px;">
+                &#9432;
                 <span class="tooltiptext">En construcción...</span>
             </div>
             """, unsafe_allow_html=True)
