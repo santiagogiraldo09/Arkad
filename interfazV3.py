@@ -465,7 +465,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 option_price = round(data_for_date['Close'].iloc[0])
             else:
-                option_price = round(data_for_date2.loc[date]['close'])
+                #option_price = round(data_for_date2.loc[date]['close'])
+                option_price2= round(data_for_date2.loc[date]['open'])
+                option_price= round(data_for_date4.loc[date]['open'])
         elif trade_type == 'Close to Open':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'open'
@@ -473,7 +475,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 option_price = round(data_for_date['Close'].iloc[0])
             else:
-                option_price = round(data_for_date2.loc[date]['close'])
+                #option_price = round(data_for_date2.loc[date]['close'])
+                option_price2= round(data_for_date2.loc[date]['open'])
+                option_price= round(data_for_date4.loc[date]['open'])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
