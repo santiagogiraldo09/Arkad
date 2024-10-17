@@ -769,9 +769,9 @@ def main():
         with col2:
             st.write(" ")
             st.markdown("""
-            <div class="tooltip" style="display: inline; vertical-align: middle; margin-left: 10px;">
+            <div class="tooltip" style="display: inline; vertical-align: middle; margin-left: 20px;">
                 &#9432;
-                <span class="tooltiptext">En construcción...</span>
+                <span class="tooltiptext">Opción actualmente en construcción...</span>
             </div>
             """, unsafe_allow_html=True)
 
