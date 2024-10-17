@@ -760,8 +760,18 @@ def main():
     balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
+    
     if periodo == 'Diario':
-        esce1 = st.checkbox("Escenario 1")
+        col1, col2 = st.columns([1, 8])
+        with col1:
+            esce1 = st.checkbox("Escenario 1")
+        with col2:
+            st.markdown("""
+            <div class="tooltip">&#9432;
+                <span class="tooltiptext">En construcción...</span>
+            </div>
+            """, unsafe_allow_html=True)
+
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
     if periodo == '15 minutos':
