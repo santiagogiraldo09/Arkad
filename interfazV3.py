@@ -763,15 +763,17 @@ def main():
     
     # Checkbox "Escenario 1" con el nuevo ícono de información en la misma línea
     if periodo == 'Diario':
-        esce1 = st.checkbox("Escenario 1", key="escenario_1")
-        st.markdown("""
-        <div style="display: inline-block; vertical-align: middle; margin-left: 10px;">
-            <div class="tooltip" style="display: inline;">
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            esce1 = st.checkbox("Escenario 1")
+        with col2:
+            st.write(" ")
+            st.markdown("""
+            <div class="tooltip" style="display: inline; vertical-align: middle; margin-left: 10px;">
                 &#9432;
                 <span class="tooltiptext">En construcción...</span>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
