@@ -761,18 +761,19 @@ def main():
     pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
     
-    # Checkbox "Escenario 1" con el nuevo ícono de información en la misma línea
+    # Checkbox "Escenario 1" con ícono de información y texto condicional
     if periodo == 'Diario':
-        st.markdown("""
-        <div style="display: flex; align-items: center;">
-            <input type="checkbox" id="escenario1" style="margin-right: 10px;">
-            <label for="escenario1" style="margin-right: 10px;">Escenario 1</label>
+        # Checkbox con tooltip usando el diseño flex
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            esce1 = st.checkbox("Escenario 1")
+        with col2:
+            st.markdown("""
             <div class="tooltip" style="display: inline;">
                 &#9432;
                 <span class="tooltiptext">Opción actualmente en construcción...</span>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
