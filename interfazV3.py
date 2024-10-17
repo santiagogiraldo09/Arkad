@@ -760,14 +760,15 @@ def main():
     balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
     pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
+    if periodo == 'Diario':
+        esce1 = st.checkbox("Escenario 1")
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
     if periodo == '15 minutos':
         open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
-    if periodo == 'Diario':
-        esce1 = st.checkbox("Escenario 1")
+    
     
         
     if st.button("Run Backtest"):
