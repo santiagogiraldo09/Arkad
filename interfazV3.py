@@ -506,7 +506,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(option_date)
             
             if periodo == 'Diario':
-                st.write("Entró acá:")
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
                 #st.dataframe(df_option)
@@ -571,8 +570,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
        
                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                 etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                st.write("datos de Yahoo")
-                st.write(etf_data)
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
