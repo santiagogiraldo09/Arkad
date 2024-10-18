@@ -407,7 +407,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false'):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -778,6 +778,8 @@ def main():
                 <span class="tooltiptext">Opción actualmente en construcción...</span>
             </div>
             """, unsafe_allow_html=True)
+    else:
+        esce1 = False
         
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
@@ -789,7 +791,7 @@ def main():
     
         
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
