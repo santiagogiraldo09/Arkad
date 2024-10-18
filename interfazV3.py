@@ -499,31 +499,46 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                            # La señal es la misma, mantenemos la posición abierta
                            pass  # No hacemos nada, mantenemos la posición
                        else:
-                            # La señal ha cambiado, cerramos la posición
-                            trade_result = trade_result_temporal
-                            balance += trade_result
-                            # Registramos el resultado
-                            resultados.append({
-                                'Fecha Entrada': fecha_entrada,
-                                'Fecha Salida': date,
-                                'Fecha': date,
-                                'Tipo': tipo_posicion,
-                                'toggle_false': row[column_name],
-                                'toggle_true': row[column_name],
-                                'Precio Entrada': precio_entrada,
-                                'Precio Salida': option_close_price,
-                                'Resultado': trade_result,
-                                'Contratos': num_contratos,
-                                'Opcion': option_name,
-                                'Balance': balance
-                            })
-                            # Resetear variables de posición
-                            posicion_abierta = False
-                            tipo_posicion = None
-                            precio_entrada = 0
-                            fecha_entrada = None
-                            num_contratos = 0
-                            option_name = '' 
+                            # La señal ha cambiado, cerramos la posición inmediatamente al precio de apertura del día
+                            # Obtener el precio de apertura de la opción en la fecha actual
+                            df_option_actual = obtener_historico(option_name, api_key, date, date)
+                            if not df_option_actual.empty:
+                                option_close_price = df_option_actual['open'].iloc[0]
+                                trade_result = (option_close_price - precio_entrada) * 100 * num_contratos
+                                balance += trade_result
+                            
+                                # Registramos el resultado
+                                resultados.append({
+                                    'Fecha Entrada': fecha_entrada,
+                                    'Fecha Salida': date,
+                                    'Fecha': date,
+                                    'Tipo': tipo_posicion,
+                                    'toggle_false': row[column_name],
+                                    'toggle_true': row[column_name],
+                                    'Precio Entrada': precio_entrada,
+                                    'Precio Salida': option_close_price,
+                                    'Resultado': trade_result,
+                                    'Contratos': num_contratos,
+                                    'Opcion': option_name,
+                                    'Balance': balance
+                                })
+                                # Resetear variables de posición
+                                posicion_abierta = False
+                                tipo_posicion = None
+                                precio_entrada = 0
+                                fecha_entrada = None
+                                num_contratos = 0
+                                option_name = '' 
+                            else:
+                                # No se pudieron obtener datos de la opción, manejamos este caso
+                                print(f"No se pudieron obtener datos de apertura de la opción {option_name} para la fecha {date}")
+                                # Decidimos cerrar la posición por seguridad
+                                posicion_abierta = False
+                                tipo_posicion = None
+                                precio_entrada = 0
+                                fecha_entrada = None
+                                num_contratos = 0
+                                option_name = ''
                     else:
                         # La posición está en ganancia, la cerramos al final del día
                         trade_result = trade_result_temporal
@@ -736,6 +751,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #'Close2': etf_close_price2
                 })
                 print(trade_result)
+        señal_anterior = señal_actual
 
     resultados_df = pd.DataFrame(resultados)
     if not resultados_df.empty and 'Resultado' in resultados_df.columns:
