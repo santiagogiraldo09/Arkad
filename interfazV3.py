@@ -413,6 +413,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     resultados = []
     client = RESTClient(api_key)
     
+    # Variables para rastrear posiciones abiertas
+    posicion_abierta = False
+    tipo_posicion = None
+    precio_entrada = 0
+    fecha_entrada = None
+    num_contratos = 0
+    option_name = ''
+    señal_anterior = None  # Para comparar señales entre días
+    
     if periodo == 'Diario':
         fecha_inicio = fecha_inicio.date()
         fecha_fin = fecha_fin.date()
@@ -430,11 +439,30 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         if row[column_name] not in [0, 1]:
             continue
-
+        
+        señal_actual = row[column_name]
         #data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
-
+        # Nueva estrategia cuando el checkbox está seleccionado y el periodo es 'Diario'
+        if esce1 and periodo == 'Diario':
+            # No hay posición abierta, evaluamos si abrimos una nueva
+            if not posicion_abierta:
+                # Obtener los datos necesarios para abrir la posición
+                if señal_actual in [0, 1]:
+                    # (Código existente para obtener option_price, option_date, option_name, df_option, etc.)
+                    data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
+                    if data_for_date.empty or len(data_for_date) < 2:
+                        continue
+                    
+                    if trade_type == 'Close to Close':
+                        option_price = round(data_for_date['Close'].iloc[0])
+                    elif trade_type == 'Close to Open':
+                        option_price = round(data_for_date['Close'].iloc[0])
+                    else:  # Open to Close
+                        option_price = round(data_for_date['Open'].iloc[0])
+                
+                
         if periodo == 'Diario':
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             if data_for_date.empty:
