@@ -576,10 +576,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     num_contratos = 0
                     option_name = ''            
                 
-        if periodo == 'Diario' and esce1 == False:
-            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-            if data_for_date.empty:
-                continue
+        if periodo == 'Diario':
+            if esce1 == False:
+                data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+                if data_for_date.empty:
+                    continue
         else: #periodo == '15 minutos'
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             #st.write("Fecha date:",date)
