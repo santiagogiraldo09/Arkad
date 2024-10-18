@@ -455,7 +455,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(data_for_date4)
             if data_for_date.empty:
                 continue
-            if data_for_date2.empty:
+            if data_for_date4.empty:
                 continue
 
         if trade_type == 'Close to Close':
@@ -506,6 +506,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(option_date)
             
             if periodo == 'Diario':
+                st.write("Entró acá:")
                 df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                 #vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
                 #st.dataframe(df_option)
@@ -577,7 +578,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if periodo == '15 minutos':
                     etf_open_price = df.at[date, 'open']
                     etf_close_price = df.at[date, 'close']
-                    if not data_for_date2.empty:
+                    if not data_for_date4.empty:
                     #if not df_option2.empty:
                         #etf_open_price = df_option2.at[date, 'open']
                         #etf_close_price = df_option2.at[date, 'close']
@@ -607,9 +608,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
-                    'Close': etf_close_price,
-                    'Open2': etf_open_price2,
-                    'Close2': etf_close_price2
+                    'Close': etf_close_price
+                    #'Open2': etf_open_price2,
+                    #'Close2': etf_close_price2
                 })
                 print(trade_result)
 
