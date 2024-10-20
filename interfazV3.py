@@ -97,7 +97,30 @@ def mostrar_datos():
     st.dataframe(datos_final)
     
     return datos_final
+
+def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
+    API_KEY = "dXm5M61pLypaHuujU7K4ULqol9IEWNp3"
+ 
+    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/15min/SPY'
+    params = {
+        'from': fecha_inicio,
+        'to': fecha_fin,
+        'apikey': API_KEY
+    }
+ 
+    response = requests.get(base_url, params=params)
+    if response.status_code != 200:
+        print('Failed to retrieve data')
+        return None
     
+    data = response.json()
+    df_fm = pd.DataFrame(data)
+ 
+    df_fm.columns = ['date', 'Open', 'High', 'Low', 'Close', 'Volume']
+    df_fm['date'] = pd.to_datetime(df_fm['date'])
+    df_fm = df_fm.set_index('date')
+    
+    return df_fm
              
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -589,8 +612,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             data_for_date4 = mostrar_datos()
+            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
             #st.write(start)
-            #st.write(data_for_date)
+            st.write("Datos con fm:")
+            st.write(data_for_date_fm)
             #st.write ("función open_close (Polygon)")
             #st.write(data_for_date3)
             #st.write ("función mostrar datos globales")
