@@ -120,6 +120,9 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     df_fm['date'] = pd.to_datetime(df_fm['date'])
     df_fm = df_fm.set_index('date')
     
+    # Ordenar el DataFrame por fecha ascendente
+    df_fm.sort_index(inplace=True)
+    
     return df_fm
              
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
