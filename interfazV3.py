@@ -531,7 +531,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         continue
                 else:
                     continue
-
+            else: #Hay posición abierta, es decir el día anterior estuvo en pérdida
+                st.write("Hay posiciones abiertas...")
+                st.write(señal_anterior)
+                st.write(señal_actual)
+                
 
                         
 
