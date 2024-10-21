@@ -123,6 +123,9 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     df_fm['date'] = pd.to_datetime(df_fm['date'])
     df_fm = df_fm.set_index('date')
     
+    # Filtrar por rango de fechas
+    df_fm = df_fm[(df_fm.index >= fecha_inicio) & (df_fm.index <= fecha_fin)]
+    
     # Ordenar el DataFrame por fecha ascendente
     df_fm.sort_index(inplace=True)
     
