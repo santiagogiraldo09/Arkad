@@ -537,6 +537,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write("Hay posiciones abiertas...")
                 st.write(señal_anterior)
                 st.write(señal_actual)
+                posicion_abierta=False
                 
 
                         
