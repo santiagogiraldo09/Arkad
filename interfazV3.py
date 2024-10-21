@@ -519,13 +519,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             st.write(trade_result)
                             balance += trade_result
-                            # Abrimos la posición
-                            posicion_abierta = True
-                            tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
-                            precio_entrada = option_open_price
-                            fecha_entrada = date
-                            # Guardamos la señal actual para la siguiente iteración
-                            señal_anterior = señal_actual
+                            if trade_result < 0:
+                                # Abrimos la posición
+                                posicion_abierta = True
+                                tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
+                                precio_entrada = option_open_price
+                                fecha_entrada = date
+                                # Guardamos la señal actual para la siguiente iteración
+                                señal_anterior = señal_actual
                         else:
                             continue
                     else:
