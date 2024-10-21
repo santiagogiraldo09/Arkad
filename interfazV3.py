@@ -104,7 +104,7 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     fecha_fin = pd.to_datetime(fecha_fin)
     API_KEY = "dXm5M61pLypaHuujU7K4ULqol9IEWNp3"
  
-    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/15min/SPY'
+    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/15min/SPY?from={fecha_inicio}&to={fecha_fin}'
     params = {
         'from': fecha_inicio,
         'to': fecha_fin,
