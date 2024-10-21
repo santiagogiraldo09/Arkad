@@ -119,7 +119,7 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     data = response.json()
     df_fm = pd.DataFrame(data)
  
-    df_fm.columns = ['date', 'Open', 'High', 'Low', 'Close', 'Volume']
+    df_fm.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
     df_fm['date'] = pd.to_datetime(df_fm['date'])
     df_fm = df_fm.set_index('date')
     
@@ -661,6 +661,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #option_price = round(data_for_date2.loc[date]['close'])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
+                option_price3= round(data_for_date_fm.loc[date]['open'])
         elif trade_type == 'Close to Open':
             precio_usar_apertura = 'close'
             precio_usar_cierre = 'open'
@@ -671,6 +672,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #option_price = round(data_for_date2.loc[date]['close'])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
+                option_price3= round(data_for_date_fm.loc[date]['open'])
         else: #Open to Close
             precio_usar_apertura = 'open'
             precio_usar_cierre = 'close'
@@ -681,6 +683,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #option_price2 = round(data_for_date['Open'].iloc[0])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
+                option_price3= round(data_for_date_fm.loc[date]['open'])
                 #st.write(option_price)
             
         #option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
@@ -776,6 +779,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         etf_close_price= data_for_date4.at[date, 'close']
                         etf_open_price2= data_for_date2.at[date, 'open']
                         etf_close_price2= data_for_date2.at[date, 'close']
+                        etf_open_price3= data_for_date_fm.at[date, 'open']
+                        etf_close_price3= data_for_date_fm.at[date, 'close']
                     else:
                         etf_open_price = df.at[date, 'open']
                         etf_close_price = df.at[date, 'close']
@@ -798,9 +803,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
-                    'Close': etf_close_price
-                    #'Open2': etf_open_price2,
-                    #'Close2': etf_close_price2
+                    'Close': etf_close_price,
+                    'Open_fm': etf_open_price3,
+                    'Close_fm': etf_close_price3
                 })
                 print(trade_result)
         señal_anterior = señal_actual
