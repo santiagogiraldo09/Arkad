@@ -1,4 +1,4 @@
-yfinance==0.1.74
+yfinance==0.2.44
 pandas
 matplotlib
 polygon-api-client
