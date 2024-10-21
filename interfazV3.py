@@ -519,7 +519,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             st.write(trade_result)
                             balance += trade_result
-                            if trade_result < 0:
+                            if trade_result < 0: #Si hay pérdida
                                 # Abrimos la posición
                                 posicion_abierta = True
                                 tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
@@ -537,6 +537,58 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write("Hay posiciones abiertas...")
                 st.write(señal_anterior)
                 st.write(señal_actual)
+                
+                if señal_actual == señal_anterior:
+                    # Registramos el resultado al final del día
+                    resultados.append({
+                        'Fecha Entrada': fecha_entrada,
+                        'Fecha Salida': date,
+                        'Fecha': date,
+                        'Tipo': tipo_posicion,
+                        'toggle_false': row[column_name],
+                        'toggle_true': row[column_name],
+                        'Precio Entrada': precio_entrada,
+                        'Precio Salida': option_close_price,
+                        'Resultado': trade_result,
+                        'Contratos': num_contratos,
+                        'Opcion': option_name,
+                        'Balance': balance
+                    })
+                    # Resetear variables de posición
+                    posicion_abierta = False
+                    tipo_posicion = None
+                    precio_entrada = 0
+                    fecha_entrada = None
+                    num_contratos = 0
+                    option_name = ''
+
+                else: #señal_actual != señal_anterior (estaríamos incrementando la pérdida)
+                    # Registramos el resultado
+                    resultados.append({
+                        'Fecha': date,
+                        'Fecha Entrada': fecha_entrada,
+                        'Fecha Salida': date,
+                        'Tipo': tipo_posicion,
+                        'toggle_false': row[column_name],
+                        'toggle_true': row[column_name],
+                        'Precio Entrada': precio_entrada,
+                        'Precio Salida': option_close_price,
+                        'Resultado': trade_result,
+                        'Contratos': num_contratos,
+                        'Opcion': option_name,
+                        'Balance': balance
+                    })
+                    # Resetear variables de posición
+                    posicion_abierta = False
+                    tipo_posicion = None
+                    precio_entrada = 0
+                    fecha_entrada = None
+                    num_contratos = 0
+                    option_name = ''
+
+                    
+                
+                
                 posicion_abierta=False
                 
 
