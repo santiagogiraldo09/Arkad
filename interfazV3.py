@@ -517,6 +517,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             max_contract_value = option_open_price * 100
                             num_contratos = int((balance * pct_allocation) / max_contract_value)
                             trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                            st.write(trade_result)
                             balance += trade_result
                             # Abrimos la posición
                             posicion_abierta = True
