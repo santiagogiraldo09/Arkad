@@ -507,6 +507,32 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write(option_price)
                         
                     option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                    if option_date:
+                        option_type = 'C' if señal_actual == 1 else 'P'
+                        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                        df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                        if not df_option.empty:
+                            option_open_price = df_option[precio_usar_apertura].iloc[0]
+                            option_close_price = df_option[precio_usar_cierre].iloc[index]
+                            max_contract_value = option_open_price * 100
+                            num_contratos = int((balance * pct_allocation) / max_contract_value)
+                            trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                            balance += trade_result
+                            # Abrimos la posición
+                            posicion_abierta = True
+                            tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
+                            precio_entrada = option_open_price
+                            fecha_entrada = date
+                            # Guardamos la señal actual para la siguiente iteración
+                            señal_anterior = señal_actual
+                        else:
+                            continue
+                    else:
+                        continue
+                else:
+                    continue
+
+
                         
 
             
