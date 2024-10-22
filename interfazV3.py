@@ -596,7 +596,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                         if trade_result > 0:
                             balance += trade_result
-                            st.write(trade_result)
+                            #st.write(trade_result)
                             
                             # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                             etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
