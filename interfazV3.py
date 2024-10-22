@@ -539,6 +539,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             })
                             print(trade_result)
                         else:
+                            st.write(trade_result)
                             # Abrimos la posición
                             posicion_abierta = True
                             tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
