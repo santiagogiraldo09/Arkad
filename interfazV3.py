@@ -516,21 +516,49 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 max_contract_value = option_open_price * 100
                                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                balance += trade_result
+                                st.write(trade_result)
+                                #balance += trade_result
                                 
                                 if trade_result < 0:
                                     posicion_abierta = True
+                                else:
+                                    balance += trade_result
                                 
-                                # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                                    # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
+                                    etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                                    etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                                    etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                                    
+                                    resultados.append({
+                                        'Fecha': date, 
+                                        'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                        #'Pred': row[column_name],
+                                        'toggle_false': row[column_name],
+                                        'toggle_true': row[column_name],
+                                        'Fecha Apertura': df_option.index[0],
+                                        'Fecha Cierre': df_option.index[index],
+                                        'Precio Entrada': option_open_price, 
+                                        'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                                        'Resultado': trade_result,
+                                        'Contratos': num_contratos,
+                                        'Opcion': option_name,
+                                        #'Open': df_option[['open']]
+                                        'Open': etf_open_price,
+                                        'Close': etf_close_price,
+                                        #'Open2': etf_open_price3,
+                                        #'Close2': etf_close_price3
+                                    })
+                                    print(trade_result)
+                                    
                             else:
                                 continue
                         else:
                             continue
                     else:
                         continue
+                    
+                    señal_anterior = señal_actual
+                    
                 else:# Hay una posición abierta, evaluamos si mantenerla o cerrarla (es decir, hubo pérdida en el día anterior)
                     data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                     st.write("Posición abierta")
