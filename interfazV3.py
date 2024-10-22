@@ -644,26 +644,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             fecha_entrada = date
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
-                            señal_anterior = señal_actual
-                            
-                            """
-                            resultados.append({
-                                'Fecha': fecha_entrada, 
-                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                                'toggle_false': row[column_name],
-                                'toggle_true': row[column_name],
-                                'Fecha Apertura': fecha_entrada,
-                                'Fecha Cierre': df_option.index[index],
-                                'Precio Entrada': option_open_price, 
-                                'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
-                                'Resultado': trade_result_anterior,
-                                'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior,
-                                'Open': etf_open_price_anterior,
-                                'Close': etf_close_price_anterior                                
-                            })
-                            """
-                        
+                            señal_anterior = señal_actual                      
                     
                     posicion_anterior_abierta = False
                     
@@ -1046,7 +1027,10 @@ def main():
             st.markdown("""
             <div class="tooltip" style="display: inline;">
                 &#9432;
-                <span class="tooltiptext">Opción actualmente en construcción...</span>
+                <span class="tooltiptext">1. Si la opción es rentable, se cierra normalmente al final del día.
+                                         2. Si hay pérdidas, mantenemos la posición y al día siguiente: 
+                                             a. Si la señal sigue igual, dejamos la posición abierta hasta el final del día. 
+                                             b. Si la señal cambia, cerramos la posición inmediatamente.</span>
             </div>
             """, unsafe_allow_html=True)
     else:
