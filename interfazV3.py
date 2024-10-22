@@ -571,6 +571,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         continue
                 else:
                     # Hay una posición abierta, evaluamos si mantenerla o cerrarla
+                    st.write("Hay una posicion abierta")
                     # Obtener el precio de cierre de la opción al final del día actual
                     df_option = obtener_historico(option_name, api_key, fecha_entrada, date)
                     if not df_option.empty:
