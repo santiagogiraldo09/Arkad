@@ -620,8 +620,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             data_for_date4 = mostrar_datos()
+            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
             #st.write(start)
             #st.write(data_for_date)
+            st.write ("dataframe fm")
+            st.write(data_for_date_fm)
             #st.write ("función open_close (Polygon)")
             #st.write(data_for_date3)
             #st.write ("función mostrar datos globales")
@@ -756,6 +759,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         etf_close_price= data_for_date4.at[date, 'close']
                         etf_open_price2= data_for_date2.at[date, 'open']
                         etf_close_price2= data_for_date2.at[date, 'close']
+                        etf_open_price3= data_for_date_fm.at[date, 'open']
+                        etf_close_price3= data_for_date_fm.at[date, 'close']
                     else:
                         etf_open_price = df.at[date, 'open']
                         etf_close_price = df.at[date, 'close']
@@ -778,9 +783,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
-                    'Close': etf_close_price
-                    #'Open2': etf_open_price2,
-                    #'Close2': etf_close_price2
+                    'Close': etf_close_price,
+                    'Open2': etf_open_price3,
+                    'Close2': etf_close_price3
                 })
                 print(trade_result)
 
