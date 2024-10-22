@@ -642,9 +642,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                             precio_entrada = option_open_price
                             fecha_entrada = date
+                            trade_result_anterior = trade_result
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
-                            señal_anterior = señal_actual                      
+                            señal_anterior = señal_actual    
+                            resultados.append({
+                                'Fecha': date, 
+                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                #'Pred': row[column_name],
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': df_option.index[0],
+                                'Fecha Cierre': df_option.index[index],
+                                'Precio Entrada': option_open_price, 
+                                'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                                'Resultado': trade_result_anterior,
+                            })
                     
                     posicion_anterior_abierta = False
                     
