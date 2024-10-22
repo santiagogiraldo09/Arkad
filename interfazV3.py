@@ -652,7 +652,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior,
+                                #'Opcion': option_name_anterior,
                                 'Open': etf_open_price,
                                 'Close': etf_close_price                                
                             })
