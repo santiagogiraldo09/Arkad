@@ -448,6 +448,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     # Variables para rastrear posiciones abiertas
     posicion_actual_abierta = False
     posicion_anterior_abierta = False
+    posiciones_abiertas = []  # Lista para almacenar las posiciones abiertas
     tipo_posicion = None
     precio_entrada = 0
     fecha_entrada = None
@@ -519,6 +520,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         if trade_result > 0:
                             balance += trade_result
                             st.write(trade_result)
+                            st.write(señal_actual)
                             
                             # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                             etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
@@ -547,30 +549,59 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                             posicion_actual_abierta = True
                         else: #trade_result < 0
-                            st.write(trade_result)
-                            # Abrimos la posición
-                            posicion_anterior_abierta = True
-                            tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
-                            precio_entrada = option_open_price
-                            fecha_entrada = date
-                            # No registramos el resultado aún
-                            # Guardamos la señal actual para la siguiente iteración
-                            señal_anterior = señal_actual
-                else:
-                    st.write("Hay posiciones abiertas...")
-                    st.write(tipo_posicion)
-                    st.write(fecha_entrada)
+                            # Si la señal va en la misma dirección que el día anterior, mantener la posición abierta
+                            if señal_anterior is None or señal_actual == señal_anterior:
+                                print(f"Resultado negativo el {date}: {trade_result}, manteniendo la posición abierta hasta el final del día")
+                                st.write(f"Manteniendo posición abierta con Option Name: {option_name}")
+                                posiciones_abiertas.append({
+                                    'Fecha Entrada': date,
+                                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                    'Precio Entrada': option_open_price,
+                                    'Contratos': num_contratos,
+                                    'Opcion': option_name
+                                })
+                            else:
+                                # Si la señal va en contra, cerrar la posición inmediatamente
+                                print(f"Resultado negativo el {date}: {trade_result}, cerrando posición debido a cambio de señal")
+                                st.write(f"Cerrando posición inmediatamente con Option Name: {option_name}")
+                                trade_result_cierre_inmediato = (option_close_price - option_open_price) * 100 * num_contratos
+                                balance += trade_result_cierre_inmediato
+                                resultados.append({
+                                    'Fecha Entrada': date,
+                                    'Fecha Cierre': date,
+                                    'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                    'Precio Entrada': option_open_price,
+                                    'Precio Salida': option_close_price,
+                                    'Resultado': trade_result_cierre_inmediato,
+                                    'Contratos': num_contratos,
+                                    'Opcion': option_name,
+                                    'Balance': balance
+                                })
                     
-                    st.write(señal_anterior)
-                    st.write(señal_actual)
+                    # Cerrar las posiciones abiertas del día anterior
+                    for posicion in posiciones_abiertas:
+                        df_option_anterior = obtener_historico(posicion['Opcion'], api_key, posicion['Fecha Entrada'], date)
+                        if not df_option_anterior.empty:
+                            option_close_price_anterior = df_option_anterior['close'].iloc[-1]
+                            trade_result_anterior = (option_close_price_anterior - posicion['Precio Entrada']) * 100 * posicion['Contratos']
+                            balance += trade_result_anterior
+                            resultados.append({
+                                'Fecha Entrada': posicion['Fecha Entrada'],
+                                'Fecha Cierre': date,
+                                'Tipo': posicion['Tipo'],
+                                'Precio Entrada': posicion['Precio Entrada'],
+                                'Precio Salida': option_close_price_anterior,
+                                'Resultado': trade_result_anterior,
+                                'Contratos': posicion['Contratos'],
+                                'Opcion': posicion['Opcion'],
+                                'Balance': balance
+                            })
+                            print(f"Cerrando posición del día anterior: {posicion['Opcion']} con resultado {trade_result_anterior}")
+                            st.write(f"Cerrando posición del día anterior con Option Name: {posicion['Opcion']}")
+                    posiciones_abiertas = []  # Limpiar la lista de posiciones abiertas después de cerrar
                     
-                    if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
-                        st.write("Dejar abierta hasta el final del día")
-                    else:
-                        st.write("Cerrar posición de inmediato")
-                        
-                    
-                    posicion_anterior_abierta = False
+                    # Actualizar la señal anterior para la siguiente iteración
+                    señal_anterior = señal_actual
                     
 
             
