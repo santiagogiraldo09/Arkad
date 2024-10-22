@@ -778,9 +778,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
-                    'Close': etf_close_price,
-                    'Open2': etf_open_price2,
-                    'Close2': etf_close_price2
+                    'Close': etf_close_price
+                    #'Open2': etf_open_price2,
+                    #'Close2': etf_close_price2
                 })
                 print(trade_result)
 
