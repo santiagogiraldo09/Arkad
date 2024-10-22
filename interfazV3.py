@@ -751,16 +751,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if periodo == '15 minutos':
                     etf_open_price = df.at[date, 'open']
                     etf_close_price = df.at[date, 'close']
-                    if not data_for_date2.empty:
+                    if not data_for_date_fm.empty:
                     #if not df_option2.empty:
                         #etf_open_price = df_option2.at[date, 'open']
                         #etf_close_price = df_option2.at[date, 'close']
-                        etf_open_price= data_for_date4.at[date, 'open']
-                        etf_close_price= data_for_date4.at[date, 'close']
+                        etf_open_price= data_for_date_fm.at[date, 'open']
+                        etf_close_price= data_for_date_fm.at[date, 'close']
                         etf_open_price2= data_for_date2.at[date, 'open']
                         etf_close_price2= data_for_date2.at[date, 'close']
-                        etf_open_price3= data_for_date_fm.at[date, 'open']
-                        etf_close_price3= data_for_date_fm.at[date, 'close']
+                        etf_open_price3= data_for_date4.at[date, 'open']
+                        etf_close_price3= data_for_date4.at[date, 'close']
                     else:
                         etf_open_price = df.at[date, 'open']
                         etf_close_price = df.at[date, 'close']
@@ -784,8 +784,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
                     'Close': etf_close_price,
-                    'Open2': etf_open_price3,
-                    'Close2': etf_close_price3
+                    #'Open2': etf_open_price3,
+                    #'Close2': etf_close_price3
                 })
                 print(trade_result)
 
