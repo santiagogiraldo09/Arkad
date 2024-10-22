@@ -480,18 +480,35 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 # No hay posición abierta, evaluamos si abrimos una nueva
                 if not posicion_abierta:
                     # Obtener los datos necesarios para abrir la posición
+                    st.write("No hay posiciones abiertas...")
                     if señal_actual in [0, 1]:
+                        st.write(señal_anterior)
+                        st.write(señal_actual)
                         # (Código existente para obtener option_price, option_date, option_name, df_option, etc.)
                         data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
+                        st.dataframe(data_for_date)
                         if data_for_date.empty:
                             continue
                         
                         if trade_type == 'Close to Close':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'close'
+                            index = 1
                             option_price = round(data_for_date['Close'].iloc[0])
+                            
                         elif trade_type == 'Close to Open':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'open'
+                            index = 1                   
                             option_price = round(data_for_date['Close'].iloc[0])
-                        else:  # Open to Close
-                            option_price = round(data_for_date['Open'].iloc[0])
+                            
+                        else: #Open to Close
+                            precio_usar_apertura = 'open'
+                            precio_usar_cierre = 'close'
+                            index = 0
+                            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                            st.write("option price:")
+                            st.write(option_price)
                     
                         option_date = encontrar_opcion_cercana(client, date, option_price, señal_actual, option_days, option_offset, ticker)
                         if option_date:
