@@ -656,7 +656,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Fecha Cierre': df_option.index[index],
                                 'Precio Entrada': option_open_price, 
                                 'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
-                                'Resultado': trade_result_anterior,
+                                'Resultado': trade_result_anterior
                             })
                     
                     posicion_anterior_abierta = False
