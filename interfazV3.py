@@ -548,7 +548,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else: #trade_result < 0
                             st.write(trade_result)
                             # Abrimos la posición
-                            posicion_abierta = True
+                            posicion_anterior_abierta = True
                             tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                             precio_entrada = option_open_price
                             fecha_entrada = date
@@ -559,7 +559,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write("Hay posiciones abiertas...")
                     st.write(tipo_posicion)
                     st.write(fecha_entrada)
-                    posicion_abierta = False
+                    posicion_anterior_abierta = False
                     
 
             
