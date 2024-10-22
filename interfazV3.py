@@ -540,7 +540,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
-                                    posicion_abierta=True
                                 else:
                                     resultados.append({
                                         'Fecha': date, 
