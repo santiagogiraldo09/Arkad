@@ -557,7 +557,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_entrada = option_open_price
                             fecha_entrada = date
                             option_name_anterior = option_name
-                            trade_result_anterior = trade_result
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
@@ -582,8 +581,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("Dejar abierta hasta el final del día")
                     else: #señal_actual != señal_anterior
                         st.write("Cerrar posición de inmediato")
-                        #df_option = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
-                        #trade_result = trade_result_anterior
+                        df_option = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
                         posicion_anterior_abierta=False
                     
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
@@ -601,10 +599,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                             etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                             etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-                            
-                            #trade_result = trade_result + trade_result_anterior
-                            balance += trade_result
-                            balance += trade_result_anterior
                             
                             posicion_actual_abierta = True
                             
