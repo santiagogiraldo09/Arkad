@@ -526,6 +526,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                             etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                             
+                            posicion_actual_abierta = True
+                            
                             resultados.append({
                                 'Fecha': date, 
                                 'Tipo': 'Call' if row[column_name] == 1 else 'Put',
@@ -546,7 +548,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Close2': etf_close_price3
                             })
                             print(trade_result)
-                            posicion_actual_abierta = True
+                            posicion_actual_abierta = False
                         else: #trade_result < 0
                             st.write(trade_result)
                             # Abrimos la posición
@@ -554,6 +556,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                             precio_entrada = option_open_price
                             fecha_entrada = date
+                            option_name_anterior = option_name
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
@@ -576,8 +579,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     
                     if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
                         st.write("Dejar abierta hasta el final del día")
-                    else: #señal_Actual != señal_anterior
+                    else: #señal_actual != señal_anterior
                         st.write("Cerrar posición de inmediato")
+                        df_option = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
+                        posicion_anterior_abierta=False
                     
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                     if not df_option.empty:
@@ -594,6 +599,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                             etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                             etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                            
+                            posicion_actual_abierta = True
                             
                             resultados.append({
                                 'Fecha': date, 
@@ -614,8 +621,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Open2': etf_open_price3,
                                 #'Close2': etf_close_price3
                             })
-                            posicion_actual_abierta = True
-                        else: #trade_result < 0
+                            posicion_actual_abierta = False
+                        else: #trade_result < 0 (genera pérdidas)
                             st.write(trade_result)
                             # Abrimos la posición
                             posicion_anterior_abierta = True
