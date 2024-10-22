@@ -503,6 +503,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                    
+                        
+                if not posicion_abierta: # No hay posición abierta, evaluamos si abrimos una nueva
+                    st.write("No hay posiciones abiertas...")
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                     if not df_option.empty:
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
@@ -512,6 +516,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                         if trade_result > 0:
                             balance += trade_result
+                            st.write(trade_result)
                             
                             # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                             etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
@@ -538,7 +543,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Close2': etf_close_price3
                             })
                             print(trade_result)
-                        else:
+                        else: #trade_result < 0
                             st.write(trade_result)
                             # Abrimos la posición
                             posicion_abierta = True
@@ -548,10 +553,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
-                if not posicion_abierta: # No hay posición abierta, evaluamos si abrimos una nueva
-                    st.write("No hay posiciones abiertas...")
                 else:
                     st.write("Hay posiciones abiertas...")
+                    st.write(tipo_posicion)
+                    st.write(fecha_entrada)
 
             
             else: #esce1 = False  
