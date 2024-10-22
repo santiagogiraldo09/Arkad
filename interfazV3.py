@@ -554,7 +554,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
             
             else: #esce1 = False  
-                st.write("Botón de esce1 desactivado")
                 data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                 if data_for_date.empty:
                     continue
