@@ -449,10 +449,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     posiciones_abiertas = []  # Lista para almacenar las posiciones abiertas
     posicion_actual_abierta = False
     posicion_anterior_abierta = False
+    etf_open_price_anterior = None
+    etf_open_price_anterior = None
+    option_name_anterior = None
     tipo_posicion = None
     precio_entrada = 0
     fecha_entrada = None
-    num_contratos = 0
+    num_contratos_anterior = 0
     option_name = ''
     señal_anterior = None  # Para comparar señales entre días
     
@@ -654,7 +657,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                #'Opcion': option_name_anterior,
+                                'Opcion': option_name_anterior,
                                 'Open': etf_open_price_anterior,
                                 'Close': etf_close_price_anterior                                
                             })
