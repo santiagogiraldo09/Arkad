@@ -545,6 +545,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Close2': etf_close_price3
                             })
                             print(trade_result)
+                            posicion_actual_abierta = True
                         else: #trade_result < 0
                             st.write(trade_result)
                             # Abrimos la posición
