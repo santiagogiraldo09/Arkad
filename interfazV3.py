@@ -446,6 +446,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     client = RESTClient(api_key)
     
     # Variables para rastrear posiciones abiertas
+    posiciones_abiertas = []  # Lista para almacenar las posiciones abiertas
     posicion_actual_abierta = False
     posicion_anterior_abierta = False
     tipo_posicion = None
@@ -556,6 +557,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
+                            posiciones_abiertas.append({
+                                'Fecha': date,
+                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                'Precio Entrada': option_open_price,
+                                'Contratos': num_contratos,
+                                'Opcion': option_name
+                            })
                 else:
                     st.write("Hay posiciones abiertas...")
                     st.write(tipo_posicion)
