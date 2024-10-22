@@ -484,7 +484,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if señal_actual in [0, 1]:
                     # (Código existente para obtener option_price, option_date, option_name, df_option, etc.)
                     data_for_date = yf.download(ticker, start=date - pd.DateOffset(days=1), end=date + pd.DateOffset(days=1))
-                    if data_for_date.empty or len(data_for_date) < 2:
+                    if data_for_date.empty:
                         continue
                     
                     if trade_type == 'Close to Close':
