@@ -564,11 +564,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Contratos': num_contratos,
                                 'Opcion': option_name
                             })
-                else:
+                else: #Hay posiciones abiertas
                     st.write("Hay posiciones abiertas...")
                     st.write(tipo_posicion)
                     st.write(fecha_entrada)
-                    st.write(posiciones_abiertas['Fecha'])
+                    #st.write(posiciones_abiertas['Fecha'])
                     st.write(date)
                     
                     st.write(señal_anterior)
@@ -576,8 +576,62 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     
                     if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
                         st.write("Dejar abierta hasta el final del día")
-                    else:
+                    else: #señal_Actual != señal_anterior
                         st.write("Cerrar posición de inmediato")
+                    
+                    df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                    if not df_option.empty:
+                        option_open_price = df_option[precio_usar_apertura].iloc[0]
+                        option_close_price = df_option[precio_usar_cierre].iloc[index]
+                        max_contract_value = option_open_price * 100
+                        num_contratos = int((balance * pct_allocation) / max_contract_value)
+                        trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                        if trade_result > 0:
+                            balance += trade_result
+                            st.write(trade_result)
+                            
+                            # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
+                            etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                            etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                            etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                            
+                            resultados.append({
+                                'Fecha': date, 
+                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                #'Pred': row[column_name],
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': df_option.index[0],
+                                'Fecha Cierre': df_option.index[index],
+                                'Precio Entrada': option_open_price, 
+                                'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                                'Resultado': trade_result,
+                                'Contratos': num_contratos,
+                                'Opcion': option_name,
+                                #'Open': df_option[['open']]
+                                'Open': etf_open_price,
+                                'Close': etf_close_price,
+                                #'Open2': etf_open_price3,
+                                #'Close2': etf_close_price3
+                            })
+                            posicion_actual_abierta = True
+                        else: #trade_result < 0
+                            st.write(trade_result)
+                            # Abrimos la posición
+                            posicion_anterior_abierta = True
+                            tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
+                            precio_entrada = option_open_price
+                            fecha_entrada = date
+                            # No registramos el resultado aún
+                            # Guardamos la señal actual para la siguiente iteración
+                            señal_anterior = señal_actual
+                            posiciones_abiertas.append({
+                                'Fecha': date,
+                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                'Precio Entrada': option_open_price,
+                                'Contratos': num_contratos,
+                                'Opcion': option_name
+                            })
                         
                     
                     posicion_anterior_abierta = False
