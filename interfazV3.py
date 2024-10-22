@@ -583,8 +583,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     else: #señal_actual != señal_anterior
                         st.write("Cerrar posición de inmediato")
                         #df_option = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
-                        st.wrtite("trade_result_anterior")
-                        st.wrtite(trade_result_anterior)
+                        st.wrrite("trade_result_anterior")
+                        st.write(trade_result_anterior)
                         posicion_anterior_abierta=False
                     
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
