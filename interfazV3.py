@@ -563,6 +563,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write(señal_anterior)
                     st.write(señal_actual)
                     
+                    if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
+                        st.write("Dejar abierta hasta el final del día")
+                    else:
+                        st.write("Cerrar posición de inmediato")
+                        
+                    
                     posicion_anterior_abierta = False
                     
 
