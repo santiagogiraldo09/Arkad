@@ -97,39 +97,7 @@ def mostrar_datos():
     st.dataframe(datos_final)
     
     return datos_final
-
-def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
-    # Convertir fechas a datetime
-    fecha_inicio = pd.to_datetime(fecha_inicio)
-    fecha_fin = pd.to_datetime(fecha_fin)
-    API_KEY = "dXm5M61pLypaHuujU7K4ULqol9IEWNp3"
- 
-    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/15min/SPY'
-    params = {
-        'from': fecha_inicio,
-        'to': fecha_fin,
-        'apikey': API_KEY
-    }
- 
-    response = requests.get(base_url, params=params)
-    if response.status_code != 200:
-        print('Failed to retrieve data')
-        return None
     
-    data = response.json()
-    df_fm = pd.DataFrame(data)
- 
-    df_fm.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-    df_fm['date'] = pd.to_datetime(df_fm['date'])
-    df_fm = df_fm.set_index('date')
-    
-    # Filtrar por rango de fechas
-    df_fm = df_fm[(df_fm.index >= fecha_inicio) & (df_fm.index <= fecha_fin)]
-    
-    # Ordenar el DataFrame por fecha ascendente
-    df_fm.sort_index(inplace=True)
-    
-    return df_fm
              
 def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
@@ -477,7 +445,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if data_for_date.empty or len(data_for_date) < 2:
             #continue
         # Nueva estrategia cuando el checkbox está seleccionado y el periodo es 'Diario'
-        if esce1:
+        if esce1 and periodo == 'Diario':
             # No hay posición abierta, evaluamos si abrimos una nueva
             if not posicion_abierta:
                 # Obtener los datos necesarios para abrir la posición
@@ -606,9 +574,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     precio_entrada = 0
                     fecha_entrada = None
                     num_contratos = 0
-                    option_name = ''
-
-        if periodo == 'Diario':
+                    option_name = ''            
+                
+        if esce1 == False:
             data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
             if data_for_date.empty:
                 continue
@@ -628,7 +596,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(data_for_date4)
             if data_for_date.empty:
                 continue
-            if data_for_date2.empty:
+            if data_for_date4.empty:
                 continue
 
         if trade_type == 'Close to Close':
@@ -748,7 +716,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if periodo == '15 minutos':
                     etf_open_price = df.at[date, 'open']
                     etf_close_price = df.at[date, 'close']
-                    if not data_for_date2.empty:
+                    if not data_for_date4.empty:
                     #if not df_option2.empty:
                         #etf_open_price = df_option2.at[date, 'open']
                         #etf_close_price = df_option2.at[date, 'close']
@@ -778,11 +746,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     'Opcion': option_name,
                     #'Open': df_option[['open']]
                     'Open': etf_open_price,
-                    'Close': etf_close_price,
-                    'Open2': etf_open_price2,
-                    'Close2': etf_close_price2
+                    'Close': etf_close_price
+                    #'Open2': etf_open_price2,
+                    #'Close2': etf_close_price2
                 })
                 print(trade_result)
+        señal_anterior = señal_actual
 
     resultados_df = pd.DataFrame(resultados)
     if not resultados_df.empty and 'Resultado' in resultados_df.columns:
@@ -941,9 +910,9 @@ def main():
     # Checkbox "Escenario 1" con ícono de información y texto condicional
     if periodo == 'Diario':
         # Checkbox con tooltip usando el diseño flex
-        col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns([1, 3])
         with col1:
-            esce1 = st.checkbox("Aplicar estrategia para manejo de pérdida de ganancias")
+            esce1 = st.checkbox("Escenario 1")
         with col2:
             st.markdown("""
             <div class="tooltip" style="display: inline;">
