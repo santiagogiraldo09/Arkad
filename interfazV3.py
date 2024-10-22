@@ -691,99 +691,75 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if data_for_date2.empty:
                 continue
 
-        if trade_type == 'Close to Close':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'close'
-            index = 1
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Close'].iloc[0])
-            else:
+            if trade_type == 'Close to Close':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'close'
+                index = 1
                 #option_price = round(data_for_date2.loc[date]['close'])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
-        elif trade_type == 'Close to Open':
-            precio_usar_apertura = 'close'
-            precio_usar_cierre = 'open'
-            index = 1
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Close'].iloc[0])
-            else:
+            elif trade_type == 'Close to Open':
+                precio_usar_apertura = 'close'
+                precio_usar_cierre = 'open'
+                index = 1               
                 #option_price = round(data_for_date2.loc[date]['close'])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
-        else: #Open to Close
-            precio_usar_apertura = 'open'
-            precio_usar_cierre = 'close'
-            index = 0
-            if periodo == 'Diario':
-                option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-            else:
+            else: #Open to Close
+                precio_usar_apertura = 'open'
+                precio_usar_cierre = 'close'
+                index = 0                
                 #option_price2 = round(data_for_date['Open'].iloc[0])
                 option_price2= round(data_for_date2.loc[date]['open'])
                 option_price= round(data_for_date4.loc[date]['open'])
                 #st.write(option_price)
-            
-        #option_price2 = round(data_for_date[precio_usar_apertura.capitalize()].iloc[0])
-        if periodo == 'Diario':
-            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        else:
+        
             option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-        if option_date:
-            option_type = 'C' if row[column_name] == 1 else 'P'
-            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-            #option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
-            #st.write(option_name)
-            #st.write("option date2 - Diario")
-            #st.write(option_date2)
-            #st.write("option date - 15 min")
-            #st.write(option_date)
-            
-            if periodo == 'Diario':
-                df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                #vo = verificar_opcion(client, ticker, fecha_inicio, fecha_fin)               
-                #st.dataframe(df_option)
-                #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
-            else:  # '15 Minutos'
-                #st.write(date)
-                #st.write(timedelta(days=option_days))
-                #st.write(date + timedelta(days=option_days))
-                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-                #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                df_glo = mostrar_datos()
-                #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
-                #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
-                #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
-                #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-                st.write("df_option:")
-                st.dataframe(df_option)
-                st.write("función get_open_and_close:")
-                st.dataframe(df)
-                #st.write("df_option2:")
-                #st.dataframe(df_option2)
-                #st.write("verificar opción:")
-                #st.write(vo)
-                #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
-            if not df_option.empty:
-                if periodo == 'Diario':
-                    option_open_price = df_option[precio_usar_apertura].iloc[0]
-                    option_close_price = df_option[precio_usar_cierre].iloc[index]
-                else:  # '15 Minutos'
-                    #st.write("Entró por acá")
-                    option_open_price = df_option['open'].iloc[0]
-                    #st.write(open_hour)
-                    #st.write(close_hour)
-                    #st.write(option_open_price)
-                    #st.write(df_option[precio_usar_cierre].iloc[index])
-                    #st.write(df_option.iloc[0])
-                    #st.write(df_option.iloc[-1])
-                    #st.write(df_option)
-                    
-                    #st.write(df_option[precio_usar_cierre].iloc[index])
-                    option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
-                    #option_open_price = df.at[date, 'open']
-                    #option_close_price = df.at[date, 'close']
+            if option_date:
+                option_type = 'C' if row[column_name] == 1 else 'P'
+                option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                #option_name2 = f'O:{ticker}{option_date2}{option_type}00{option_price2}000'
+                #st.write(option_name)
+                #st.write("option date2 - Diario")
+                #st.write(option_date2)
+                #st.write("option date - 15 min")
+                #st.write(option_date)
+            #st.write(date)
+            #st.write(timedelta(days=option_days))
+            #st.write(date + timedelta(days=option_days))
+            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+            #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
+            df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+            df_glo = mostrar_datos()
+            #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
+            #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
+            #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
+            #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
+            #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
+            st.write("df_option:")
+            st.dataframe(df_option)
+            st.write("función get_open_and_close:")
+            st.dataframe(df)
+            #st.write("df_option2:")
+            #st.dataframe(df_option2)
+            #st.write("verificar opción:")
+            #st.write(vo)
+            #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
+            if not df_option.empty:   
+                #st.write("Entró por acá")
+                option_open_price = df_option['open'].iloc[0]
+                #st.write(open_hour)
+                #st.write(close_hour)
+                #st.write(option_open_price)
+                #st.write(df_option[precio_usar_cierre].iloc[index])
+                #st.write(df_option.iloc[0])
+                #st.write(df_option.iloc[-1])
+                #st.write(df_option)
+                
+                #st.write(df_option[precio_usar_cierre].iloc[index])
+                option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+                #option_open_price = df.at[date, 'open']
+                #option_close_price = df.at[date, 'close']
 
             
             #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))    
