@@ -568,6 +568,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write("Hay posiciones abiertas...")
                     st.write(tipo_posicion)
                     st.write(fecha_entrada)
+                    st.write(posiciones_abiertas['Fecha'])
+                    st.write(date)
                     
                     st.write(señal_anterior)
                     st.write(señal_actual)
