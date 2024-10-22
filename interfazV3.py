@@ -479,6 +479,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if esce1:
                 # No hay posición abierta, evaluamos si abrimos una nueva
                 if not posicion_abierta:
+                    st.write(señal_anterior)
+                    st.write(señal_actual)
                     # Obtener los datos necesarios para abrir la posición
                     if señal_actual in [0, 1]:
                         # (Código existente para obtener option_price, option_date, option_name, df_option, etc.)
@@ -562,6 +564,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 else:# Hay una posición abierta, evaluamos si mantenerla o cerrarla (es decir, hubo pérdida en el día anterior)
                     data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                     st.write("Posición abierta")
+                    st.write(señal_anterior)
+                    st.write(señal_actual)
                     if data_for_date.empty:
                         continue
                     if trade_type == 'Close to Close':
