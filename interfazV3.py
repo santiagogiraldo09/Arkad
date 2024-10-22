@@ -562,8 +562,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             option_name_anterior = option_name
                             trade_result_anterior = trade_result
                             #num_contratos_anterior = num_contratos
-                            etf_open_price_anterior = etf_open_price
-                            etf_close_price_anterior = etf_close_price
+                            #etf_open_price_anterior = etf_open_price
+                            #etf_close_price_anterior = etf_close_price
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
