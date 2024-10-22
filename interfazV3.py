@@ -446,7 +446,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     client = RESTClient(api_key)
     
     # Variables para rastrear posiciones abiertas
-    posicion_abierta = False
+    posicion_actual_abierta = False
+    posicion_anterior_abierta = False
     tipo_posicion = None
     precio_entrada = 0
     fecha_entrada = None
@@ -501,12 +502,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write(option_price)
                 option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                 if option_date:
-                    st.write(option_date)
+                    #st.write(option_date)
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     
                         
-                if not posicion_abierta: # No hay posición abierta, evaluamos si abrimos una nueva
+                if not posicion_anterior_abierta: # No hay posición abierta, evaluamos si abrimos una nueva
                     st.write("No hay posiciones abiertas...")
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                     if not df_option.empty:
@@ -547,7 +548,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else: #trade_result < 0
                             st.write(trade_result)
                             # Abrimos la posición
-                            posicion_abierta = True
+                            posicion_anterior_abierta = True
                             tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                             precio_entrada = option_open_price
                             fecha_entrada = date
@@ -558,7 +559,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write("Hay posiciones abiertas...")
                     st.write(tipo_posicion)
                     st.write(fecha_entrada)
-                    posicion_abierta = False
+                    
+                    st.write(señal_anterior)
+                    st.write(señal_actual)
+                    
+                    posicion_anterior_abierta = False
                     
 
             
