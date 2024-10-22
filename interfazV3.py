@@ -646,6 +646,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
                             
+                            """
                             resultados.append({
                                 'Fecha': fecha_entrada, 
                                 'Tipo': 'Call' if row[column_name] == 1 else 'Put',
@@ -661,6 +662,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Open': etf_open_price_anterior,
                                 'Close': etf_close_price_anterior                                
                             })
+                            """
                         
                     
                     posicion_anterior_abierta = False
