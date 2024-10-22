@@ -558,6 +558,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             fecha_entrada = date
                             option_name_anterior = option_name
                             trade_result_anterior = trade_result
+                            num_contratos_anterior = num_contratos
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
@@ -650,8 +651,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Entrada': option_open_price, 
                                 'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                                 'Resultado': trade_result_anterior,
-                                'Contratos': num_contratos,
-                                'Opcion': option_name,
+                                'Contratos': num_contratos_anterior,
+                                'Opcion': option_name_anterior,
                                 'Open': etf_open_price,
                                 'Close': etf_close_price                                
                             })
