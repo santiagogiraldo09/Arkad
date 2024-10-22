@@ -528,6 +528,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                                 
+                                st.write("Ganancias:")
+                                st.write(trade_result)
+                                
                                 if trade_result < 0:
                                     # Abrimos la posición
                                     posicion_abierta = True
