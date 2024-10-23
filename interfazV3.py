@@ -629,6 +629,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write(precio_entrada_anterior)
                                 st.write(num_contratos_anterior)
                                 st.write(trade_result_anterior)
+                                st.write("Precio usar cierre anterior:")
                                 st.write(precio_usar_cierre_anterior)
                                 st.write(option_name_anterior)
                                 # No registramos el resultado aún
