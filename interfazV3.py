@@ -556,6 +556,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                             posicion_actual_abierta = False
                         else: #trade_result < 0
+                            num_contratos_anterior = None
                             st.write(trade_result)
                             # Abrimos la posición
                             posicion_anterior_abierta = True
@@ -564,7 +565,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             fecha_entrada = date
                             #option_name_anterior = option_name
                             #trade_result_anterior = trade_result
-                            #num_contratos_anterior = num_contratos
+                            num_contratos_anterior = num_contratos
                             #etf_open_price_anterior = etf_open_price
                             #etf_close_price_anterior = etf_close_price
                             # No registramos el resultado aún
