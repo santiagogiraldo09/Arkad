@@ -455,7 +455,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     etf_open_price_anterior = None
     option_name_anterior = None
     tipo_posicion = None
-    precio_entrada = 0
+    precio_entrada_anterior = 0
     fecha_entrada = None
     num_contratos_anterior = 0
     option_name = ''
@@ -557,7 +557,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     #Dejamos la posición anterior abierta
                                     posicion_anterior_abierta = True
                                     tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
-                                    precio_entrada = option_open_price
+                                    precio_entrada_anterior = option_open_price
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
                                     # No registramos el resultado aún
