@@ -557,6 +557,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     #Dejamos la posición anterior abierta
                                     posicion_anterior_abierta = True
                                     tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
+                                    num_contratos_anterior = num_contratos
                                     precio_entrada_anterior = option_open_price
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
