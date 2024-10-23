@@ -562,6 +562,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
                                     st.write(precio_entrada_anterior)
+                                    st.write(num_contratos_anterior)
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
