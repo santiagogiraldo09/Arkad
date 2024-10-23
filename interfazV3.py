@@ -490,12 +490,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         if señal_actual == señal_anterior: #Tenemos posibilidad de recuperar ganancia
                             st.write("Señales iguales")
                             st.write("Manteniendo señal hasta el final del día...")
+                            st.write("Resultado día anterior")
+                            st.write(trade_result_anterior)
+                            posicion_anterior_abierta = False
                         else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida
                             st.write("Señales no iguales")
                             st.write("Cerrando posición...")
                             posicion_anterior_abierta = False
        
-                        #Abrimos una nueva posición
+                        #Abrimos una nueva posición del día actual
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                         if data_for_date.empty:
                             continue
@@ -563,6 +566,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 # No registramos el resultado aún
                                 # Guardamos la señal actual para la siguiente iteración
                                 señal_anterior = señal_actual
+                                
                     else: #posicion_anterior_abierta = False
                         st.write("No hay posiciones abiertas...")
                         #Abrimos una nueva posición
