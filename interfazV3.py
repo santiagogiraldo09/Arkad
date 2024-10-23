@@ -449,6 +449,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     posiciones_abiertas = []  # Lista para almacenar las posiciones abiertas
     posicion_actual_abierta = False
     posicion_anterior_abierta = False
+    trade_result_anterior = 0
     etf_open_price_anterior = None
     etf_open_price_anterior = None
     option_name_anterior = None
