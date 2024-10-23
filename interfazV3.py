@@ -488,6 +488,32 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if señal_actual in [0, 1]:
                     if posicion_anterior_abierta:  #posicion_anterior_abierta = True
                         st.write("Hay posiciones abiertas...")
+                        #Abrimos una nueva posición del día actual
+                        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+                        if data_for_date.empty:
+                            continue
+                        if trade_type == 'Close to Close':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'close'
+                            index = 1
+                            option_price = round(data_for_date['Close'].iloc[0])
+                            
+                        elif trade_type == 'Close to Open':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'open'
+                            index = 1                   
+                            option_price = round(data_for_date['Close'].iloc[0])
+                            
+                        else: #Open to Close
+                            precio_usar_apertura = 'open'
+                            precio_usar_cierre = 'close'
+                            index = 0
+                            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                            #st.write(option_price)
+                        df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                        
+                            
+                        
                         if señal_actual == señal_anterior: #Tenemos posibilidad de recuperar ganancia
                             st.write("Señales iguales")
                             st.write("Manteniendo señal hasta el final del día...")
@@ -498,7 +524,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("option name día anterior")
                             st.write(option_name_anterior)
                             
-                            df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                            if not df_option.empty:
+                                option_close_price = df_option[precio_usar_cierre].iloc[index]
+                            trade_result_anterior = (df_option[precio_usar_cierre].iloc[index] - precio_entrada_anterior) * 100 * num_contratos_anterior
+                            st.write("Nuevo trade result anterior calculado:")
+                            st.write(trade_result_anterior)
+                            
+                            #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                            #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             
                             balance += trade_result_anterior
                             
@@ -533,6 +566,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(trade_result_anterior)
                             st.write("option name día anterior")
                             st.write(option_name_anterior)
+                            st.write("Precio usar cierre anterior:")
+                            st.write(precio_usar_cierre_anterior)
                             
                             
                             balance += trade_result_anterior
@@ -559,30 +594,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             option_name_anterior = None
                             num_contratos_anterior = 0
        
-                        #Abrimos una nueva posición del día actual
-                        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
-                        if data_for_date.empty:
-                            continue
-                        if trade_type == 'Close to Close':
-                            precio_usar_apertura = 'close'
-                            precio_usar_cierre = 'close'
-                            index = 1
-                            option_price = round(data_for_date['Close'].iloc[0])
                             
-                        elif trade_type == 'Close to Open':
-                            precio_usar_apertura = 'close'
-                            precio_usar_cierre = 'open'
-                            index = 1                   
-                            option_price = round(data_for_date['Close'].iloc[0])
-                            
-                        else: #Open to Close
-                            precio_usar_apertura = 'open'
-                            precio_usar_cierre = 'close'
-                            index = 0
-                            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-                            #st.write(option_price)
-                            
-                        df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                        
                         if not df_option.empty:
                             posicion_actual_abierta = True
                             option_open_price = df_option[precio_usar_apertura].iloc[0]
@@ -629,8 +642,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write(precio_entrada_anterior)
                                 st.write(num_contratos_anterior)
                                 st.write(trade_result_anterior)
-                                st.write("Precio usar cierre anterior:")
-                                st.write(precio_usar_cierre_anterior)
+                                
                                 st.write(option_name_anterior)
                                 # No registramos el resultado aún
                                 # Guardamos la señal actual para la siguiente iteración
