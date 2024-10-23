@@ -456,6 +456,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     option_name_anterior = None
     tipo_posicion = None
     precio_entrada_anterior = 0
+    precio_salida_anterior = 0
     fecha_entrada = None
     num_contratos_anterior = 0
     option_name = ''
@@ -590,6 +591,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 num_contratos_anterior = num_contratos
                                 option_name_anterior = option_name
                                 precio_entrada_anterior = option_open_price
+                                precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
                                 st.write(fecha_entrada)
@@ -674,6 +676,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     num_contratos_anterior = num_contratos
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
+                                    precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
                                     trade_result_anterior = trade_result
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
