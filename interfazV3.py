@@ -439,7 +439,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False, open_hour=None, close_hour=None):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -800,9 +800,29 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("verificar opción:")
             #st.write(vo)
             #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
-            if not df_option.empty:   
+            if not df_option.empty:  
+                
+                # Filtro por las horas seleccionadas por el usuario
+                open_hour_str = open_hour.strftime("%H:%M:%S")
+                close_hour_str = close_hour.strftime("%H:%M:%S")
+                
+                # Filtrar para la hora de apertura seleccionada (ej. 09:30)
+                df_option_open = df_option.between_time(open_hour_str, open_hour_str)
+                
+                # Filtrar para la hora de cierre seleccionada (ej. 16:00)
+                df_option_close = df_option.between_time(close_hour_str, close_hour_str)
+                
+                # Verificar si hay datos para las horas seleccionadas
+                if not df_option_open.empty and not df_option_close.empty:
+                    # Tomar el primer precio de apertura y el último precio de cierre en ese rango de tiempo
+                    option_open_price = df_option_open['open'].iloc[0]
+                    option_close_price = df_option_close['close'].iloc[-1]
+                else:
+                    st.warning(f"No se encontraron datos para las horas seleccionadas: {open_hour_str} a {close_hour_str}")
+                    continue  # Si no hay datos, pasa al siguiente día
+                
                 #st.write("Entró por acá")
-                option_open_price = df_option['open'].iloc[0]
+                #option_open_price = df_option['open'].iloc[0]
                 #st.write(open_hour)
                 #st.write(close_hour)
                 #st.write(option_open_price)
@@ -812,7 +832,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(df_option)
                 
                 #st.write(df_option[precio_usar_cierre].iloc[index])
-                option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+                #option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                 #option_open_price = df.at[date, 'open']
                 #option_close_price = df.at[date, 'close']
 
@@ -1059,7 +1079,10 @@ def main():
     
         
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        if periodo == 'Diario':
+            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        else:
+            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1, open_hour=open_hour, close_hour=close_hour)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
