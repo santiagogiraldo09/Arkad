@@ -561,10 +561,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                                 num_contratos_anterior = num_contratos
                                 precio_entrada_anterior = option_open_price
+                                trade_result_anterior = trade_result
                                 fecha_entrada = date
                                 st.write(fecha_entrada)
                                 st.write(precio_entrada_anterior)
                                 st.write(num_contratos_anterior)
+                                st.write(trade_result_anterior)
                                 # No registramos el resultado aún
                                 # Guardamos la señal actual para la siguiente iteración
                                 señal_anterior = señal_actual
@@ -642,9 +644,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     num_contratos_anterior = num_contratos
                                     precio_entrada_anterior = option_open_price
                                     fecha_entrada = date
+                                    trade_result_anterior = trade_result
                                     st.write(fecha_entrada)
                                     st.write(precio_entrada_anterior)
                                     st.write(num_contratos_anterior)
+                                    st.write(trade_result_anterior)
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
