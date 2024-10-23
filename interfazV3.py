@@ -553,12 +553,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     posicion_actual_abierta = False
                                     print(trade_result)
                                     
-                                else:
+                                else: #trade_result < 0
                                     #Dejamos la posición anterior abierta
                                     posicion_anterior_abierta = True
                                     tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                                     precio_entrada = option_open_price
                                     fecha_entrada = date
+                                    st.write(fecha_entrada)
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
