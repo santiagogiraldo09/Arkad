@@ -452,7 +452,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     trade_result_anterior = 0
     option_name_anterior = None
     etf_open_price_anterior = None
-    etf_close_price_anterior = None
+    etf_open_price_anterior = None
     option_name_anterior = None
     tipo_posicion = None
     precio_entrada_anterior = 0
@@ -524,8 +524,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Salida': precio_salida_anterior, 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior,
-                                'Open': etf_open_price_anterior
+                                'Opcion': option_name_anterior
+                                #'Open': etf_open_price,
                                 #'Close': etf_close_price
                             })
        
@@ -592,7 +592,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 option_name_anterior = option_name
                                 precio_entrada_anterior = option_open_price
                                 precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
-                                etf_open_price_anterior = etf_open_price
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
                                 st.write(fecha_entrada)
@@ -678,7 +677,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
                                     precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
-                                    etf_open_price_anterior = etf_open_price
                                     trade_result_anterior = trade_result
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
