@@ -587,32 +587,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
                         st.write("La señal no cambió, cerramos la posición anterior al final del día")
                         
-                        # Cerrar la posición abierta del día anterior al final del día actual
-                        df_option_anterior = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
                         
-                        if not df_option_anterior.empty:
-                            option_close_price_anterior = df_option_anterior[precio_usar_cierre].iloc[index]  # Precio de cierre para cerrar la posición
-                            trade_result_anterior = (option_close_price_anterior - precio_entrada) * 100 * num_contratos_anterior
-                            balance += trade_result_anterior  # Actualizamos el balance con el resultado de la operación
-                            
-                            # Registrar los resultados de la operación cerrada
-                            resultados.append({
-                                'Fecha': date,  # Fecha actual del cierre
-                                'Tipo': tipo_posicion,
-                                'toggle_false': row[column_name],
-                                'toggle_true': row[column_name],
-                                'Fecha Apertura': df_option_anterior.index[0],  # Fecha de apertura de la posición
-                                'Fecha Cierre': df_option_anterior.index[index],  # Fecha de cierre (final del día actual)
-                                'Precio Entrada': precio_entrada,
-                                'Precio Salida': option_close_price_anterior,
-                                'Resultado': trade_result_anterior,
-                                'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior,
-                                'Open': etf_open_price_anterior,
-                                'Close': etf_close_price_anterior,
-                            })
-                            
-                            st.write(f"Posición cerrada con resultado: {trade_result_anterior}")
                             
                         # Resetear la posición anterior
                         posicion_anterior_abierta = False
