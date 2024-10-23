@@ -496,6 +496,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida
                             st.write("Señales no iguales")
                             st.write("Cerrando posición...")
+                            st.write(trade_result_anterior)
                             posicion_anterior_abierta = False
        
                         #Abrimos una nueva posición del día actual
