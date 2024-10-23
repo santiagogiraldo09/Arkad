@@ -555,7 +555,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             posicion_anterior_abierta = False
                             tipo_posicion = None
                             option_name_anterior = None
-                            num_contratos_anterior = 0                         
+                            num_contratos_anterior = 0   
+                            trade_result_anterior = 0
                             
                         else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
                             st.write("Señales no iguales")
