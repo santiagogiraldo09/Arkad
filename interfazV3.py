@@ -21,7 +21,7 @@ from datetime import time
 datos1 = None
 datos2 = None
 
-def open_close(ticker, api_key, fecha_inicio, fecha_fin):
+def open_close(ticker, api_key, fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     global datos1, datos2
     ticker = "SPY"
     client = RESTClient(api_key)
@@ -67,9 +67,10 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
         # Filtrar el DataFrame por las fechas de inicio y fin
         df_OC = df_OC[(df_OC.index >= fecha_inicio) & (df_OC.index <= fecha_fin)]
         
-        
-        
-        
+        # Filtrar por hora si `open_hour` y `close_hour` están definidos
+        if open_hour and close_hour:
+            df_OC = df_OC.between_time(open_hour, close_hour)
+    
         return df_OC
     
     except Exception as e:
@@ -98,7 +99,7 @@ def mostrar_datos():
     
     return datos_final
 
-def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
+def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     # Convertir fechas a datetime
     fecha_inicio = pd.to_datetime(fecha_inicio)
     fecha_fin = pd.to_datetime(fecha_fin)
@@ -122,6 +123,8 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     df_fm.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
     df_fm['date'] = pd.to_datetime(df_fm['date'])
     df_fm = df_fm.set_index('date')
+    # Asegúrate de que el índice es de tipo datetime
+    df_fm.index = pd.to_datetime(df_fm.index)
     
     # Filtrar por rango de fechas
     df_fm = df_fm[(df_fm.index >= fecha_inicio) & (df_fm.index <= fecha_fin)]
@@ -129,9 +132,13 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     # Ordenar el DataFrame por fecha ascendente
     df_fm.sort_index(inplace=True)
     
+    # Filtrar por hora si `open_hour` y `close_hour` están definidos
+    if open_hour and close_hour:
+        df_fm = df_fm.between_time(open_hour, close_hour)
+    
     return df_fm
              
-def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
+def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     # Configuración de la URL y los parámetros para la API de Alpha Vantage
     url = "https://www.alphavantage.co/query"
     # Convertir fechas a datetime
@@ -187,6 +194,10 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
             # Filtrar por rango de fechas
             df = df[(df.index >= fecha_actual) & (df.index <= ultimo_dia_mes)]
             
+            # Filtrar por hora si `open_hour` y `close_hour` están definidos
+            if open_hour and close_hour:
+                df = df.between_time(open_hour, close_hour)
+            
             #agregar al dataframe completo
             df_completo = pd.concat([df_completo, df])
             #st.dataframe(df_completo)
@@ -241,7 +252,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     #st.write(fecha_inicio)
@@ -285,6 +296,8 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
+        if open_hour and close_hour:
+            df = df.between_time(open_hour, close_hour)
         #st.dataframe(df)
         
         return df
@@ -439,7 +452,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False, open_hour=None, close_hour=None):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -465,8 +478,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = fecha_inicio.date()
         fecha_fin = fecha_fin.date()
     else:
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
+        fecha_inicio = pd.Timestamp(datetime.combine(fecha_inicio, open_hour))
+        fecha_fin = pd.Timestamp(datetime.combine(fecha_fin, close_hour))
 
     for date, row in data.iterrows():
         if periodo == 'Diario':
@@ -783,10 +796,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("Fecha date:",date)
             #st.write("Fecha inicio:",fecha_inicio)
             #st.write("Fecha fin:",fecha_fin)
-            data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-            data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+            data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin, open_hour, close_hour)
+            data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin, open_hour, close_hour)
             data_for_date4 = mostrar_datos()
-            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
+            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour, close_hour)
             #st.write(start)
             #st.write(data_for_date)
             st.write ("dataframe fm")
@@ -836,9 +849,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(date)
             #st.write(timedelta(days=option_days))
             #st.write(date + timedelta(days=option_days))
-            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days), open_hour, close_hour)
             #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-            df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+            df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin, open_hour, close_hour)
             df_glo = mostrar_datos()
             #df_option2 = obtener_historico_15min_pol(ticker, api_key, date, date + timedelta(days=option_days))
             #vo = verificar_opcion_15min(client, ticker, date, date + timedelta(days=option_days))
@@ -1113,7 +1126,10 @@ def main():
     
         
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        if periodo == 'Diario':
+            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        else: #periodo == '15 minutos'
+            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial,pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1, open_hour=open_hour, close_hour=close_hour)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
