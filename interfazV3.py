@@ -563,7 +563,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             trade_result_anterior = trade_result
                             #num_contratos_anterior = num_contratos
                             #etf_open_price_anterior = etf_open_price
-                            #etf_close_price_anterior = etf_close_price
+                            etf_close_price_anterior = etf_close_price
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual
@@ -585,13 +585,38 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write(señal_actual)
                     
                     if señal_actual == señal_anterior: #Hay posibilidad de recuperar ganancia
-                        st.write("Dejar abierta hasta el final del día")
+                        st.write("Dejar abierta hasta el final del día, pero la lógica aún no se ha implementado")
                     else: #señal_actual != señal_anterior
-                        st.write("Cerrar posición de inmediato")
-                        #df_option = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
+                        st.write("Cerrando posición anterior...")
+                        df_option_anterior = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
+                        
+                        if not df_option_anterior.empty:
+                            option_close_price_anterior = df_option_anterior[precio_usar_cierre].iloc[index]  # Precio de cierre para cerrar la posición
+                            trade_result_anterior = (option_close_price_anterior - precio_entrada) * 100 * num_contratos_anterior
+                            balance += trade_result_anterior  # Actualizamos el balance con el resultado de la operación    
+                        
+                            # Registrar los resultados de la operación cerrada
+                            resultados.append({
+                                'Fecha': date, 
+                                'Tipo': tipo_posicion,
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': df_option_anterior.index[0],
+                                'Fecha Cierre': df_option_anterior.index[index],
+                                'Precio Entrada': precio_entrada, 
+                                'Precio Salida': option_close_price_anterior, 
+                                'Resultado': trade_result_anterior,
+                                'Contratos': num_contratos_anterior,
+                                'Opcion': option_name_anterior,
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_close_price_anterior,
+                            })
                         st.write("trade_result_anterior")
                         st.write(trade_result_anterior)
                         posicion_anterior_abierta=False
+                        tipo_posicion = None
+                        option_name_anterior = None
+                        num_contratos_anterior = 0
                     
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                     if not df_option.empty:
@@ -643,6 +668,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_entrada = option_open_price
                             fecha_entrada = date
                             trade_result_anterior = trade_result
+                            num_contratos_anterior = num_contratos
+                            etf_open_price_anterior = etf_open_price
+                            etf_close_price_anterior = etf_close_price
                             # No registramos el resultado aún
                             # Guardamos la señal actual para la siguiente iteración
                             señal_anterior = señal_actual    
@@ -659,7 +687,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Resultado': trade_result_anterior
                             })
                     
-                    posicion_anterior_abierta = False
+                    #posicion_anterior_abierta = False
                     
 
             
