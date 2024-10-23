@@ -496,19 +496,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(trade_result_anterior)
                             st.write("option name día anterior")
                             st.write(option_name_anterior)
-                            posicion_anterior_abierta = False
-                            
-                            
-                        else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
-                            st.write("Señales no iguales")
-                            st.write("Cerrando posición...")
-                            st.write("Fecha día anterior")
-                            st.write(fecha_entrada)
-                            st.write("trade result día anterior")
-                            st.write(trade_result_anterior)
-                            st.write("option name día anterior")
-                            st.write(option_name_anterior)
-                            posicion_anterior_abierta = False
                             
                             balance += trade_result_anterior
                             
@@ -527,6 +514,47 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Open': etf_open_price,
                                 #'Close': etf_close_price
                             })
+                            
+                            # La posición anterior ya está cerrada
+                            posicion_anterior_abierta = False
+                            tipo_posicion = None
+                            option_name_anterior = None
+                            num_contratos_anterior = 0                         
+                            
+                        else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
+                            st.write("Señales no iguales")
+                            st.write("Cerrando posición...")
+                            st.write("Fecha día anterior")
+                            st.write(fecha_entrada)
+                            st.write("trade result día anterior")
+                            st.write(trade_result_anterior)
+                            st.write("option name día anterior")
+                            st.write(option_name_anterior)
+                            
+                            
+                            balance += trade_result_anterior
+                            
+                            resultados.append({
+                                'Fecha': date, 
+                                'Tipo': 'Call' if señal_actual == 1 else 'Put',
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': fecha_entrada,
+                                'Fecha Cierre': date,
+                                'Precio Entrada': precio_entrada_anterior, 
+                                'Precio Salida': precio_salida_anterior, 
+                                'Resultado': trade_result_anterior,
+                                'Contratos': num_contratos_anterior,
+                                'Opcion': option_name_anterior
+                                #'Open': etf_open_price,
+                                #'Close': etf_close_price
+                            })
+                            
+                            # La posición anterior ya está cerrada
+                            posicion_anterior_abierta = False
+                            tipo_posicion = None
+                            option_name_anterior = None
+                            num_contratos_anterior = 0
        
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
