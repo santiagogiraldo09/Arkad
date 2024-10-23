@@ -484,7 +484,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             señal_actual = row[column_name]
             # Nueva estrategia cuando el checkbox está seleccionado y el periodo es 'Diario'
             if esce1:
-                if not posicion_anterior_abierta:  #posicion_anterior_abierta = True
+                if posicion_anterior_abierta:  #posicion_anterior_abierta = True
                     st.write("Hay posiciones abiertas...")
                 else: #posicion_anterior_abierta = False
                     st.write("No hay posiciones abiertas...")
