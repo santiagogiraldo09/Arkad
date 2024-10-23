@@ -510,8 +510,23 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(option_name_anterior)
                             posicion_anterior_abierta = False
                             
-                            # Obtener el histórico de la opción anterior para calcular el cierre
-                            df_option_anterior = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
+                            balance += trade_result_anterior
+                            
+                            resultados.append({
+                                'Fecha': date, 
+                                'Tipo': 'Call' if señal_actual == 1 else 'Put',
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': fecha_entrada,
+                                'Fecha Cierre': date,
+                                'Precio Entrada': precio_entrada_anterior, 
+                                #'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                                'Resultado': trade_result_anterior,
+                                'Contratos': num_contratos_anterior,
+                                'Opcion': option_name_anterior
+                                #'Open': etf_open_price,
+                                #'Close': etf_close_price
+                            })
        
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
