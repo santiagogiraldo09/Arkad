@@ -624,7 +624,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
-                                precio_usar_cierre_anterior = precio_usar_cierre
+                                precio_usar_cierre_anterior = option_close_price
                                 st.write(fecha_entrada)
                                 st.write(precio_entrada_anterior)
                                 st.write(num_contratos_anterior)
