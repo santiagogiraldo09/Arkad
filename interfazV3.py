@@ -450,6 +450,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     posicion_actual_abierta = False
     posicion_anterior_abierta = False
     trade_result_anterior = 0
+    option_name_anterior = None
     etf_open_price_anterior = None
     etf_open_price_anterior = None
     option_name_anterior = None
@@ -562,7 +563,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_entrada = option_open_price
                             fecha_entrada = date
                             option_name_anterior = option_name
-                            #trade_result_anterior = trade_result
+                            trade_result_anterior = trade_result
                             #num_contratos_anterior = num_contratos
                             #etf_open_price_anterior = etf_open_price
                             etf_close_price_anterior = etf_close_price
