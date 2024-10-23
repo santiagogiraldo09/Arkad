@@ -98,7 +98,7 @@ def mostrar_datos():
     
     return datos_final
 
-def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
+def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     # Convertir fechas a datetime
     fecha_inicio = pd.to_datetime(fecha_inicio)
     fecha_fin = pd.to_datetime(fecha_fin)
@@ -125,14 +125,6 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=None,
     
     # Filtrar por rango de fechas
     df_fm = df_fm[(df_fm.index >= fecha_inicio) & (df_fm.index <= fecha_fin)]
-    
-    # Si se definen horas de apertura y cierre, filtramos el rango de horas
-    if open_hour and close_hour:
-        open_hour_str = open_hour.strftime("%H:%M:%S")
-        close_hour_str = close_hour.strftime("%H:%M:%S")
-        
-        # Filtrar por las horas seleccionadas por el usuario
-        df_fm = df_fm.between_time(open_hour_str, close_hour_str)
     
     # Ordenar el DataFrame por fecha ascendente
     df_fm.sort_index(inplace=True)
@@ -249,7 +241,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     #st.write(fecha_inicio)
@@ -294,14 +286,6 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin, ope
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         #st.dataframe(df)
-        
-        # Si se definen horas de apertura y cierre, filtramos el rango de horas
-        if open_hour and close_hour:
-            open_hour_str = open_hour.strftime("%H:%M:%S")
-            close_hour_str = close_hour.strftime("%H:%M:%S")
-            
-            # Filtrar los datos solo entre la hora de apertura y cierre
-            df = df.between_time(open_hour_str, close_hour_str)
         
         return df
     
@@ -455,7 +439,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False, open_hour=None, close_hour=None):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -748,7 +732,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             data_for_date4 = mostrar_datos()
-            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=open_hour, close_hour=close_hour)
+            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
             #st.write(start)
             #st.write(data_for_date)
             st.write ("dataframe fm")
@@ -798,7 +782,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(date)
             #st.write(timedelta(days=option_days))
             #st.write(date + timedelta(days=option_days))
-            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days), open_hour=open_hour, close_hour=close_hour)
+            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
             #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
             df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             df_glo = mostrar_datos()
@@ -816,29 +800,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write("verificar opción:")
             #st.write(vo)
             #st.write("Respuesta JSON completa:", data)  # También se muestra en Streamlit
-            if not df_option.empty:  
-                
-                # Filtro por las horas seleccionadas por el usuario
-                open_hour_str = open_hour.strftime("%H:%M:%S")
-                close_hour_str = close_hour.strftime("%H:%M:%S")
-                
-                # Filtrar para la hora de apertura seleccionada (ej. 09:30)
-                df_option_open = df_option.between_time(open_hour_str, open_hour_str)
-                
-                # Filtrar para la hora de cierre seleccionada (ej. 16:00)
-                df_option_close = df_option.between_time(close_hour_str, close_hour_str)
-                
-                # Verificar si hay datos para las horas seleccionadas
-                if not df_option_open.empty and not df_option_close.empty:
-                    # Tomar el primer precio de apertura y el último precio de cierre en ese rango de tiempo
-                    option_open_price = df_option_open['open'].iloc[0]
-                    option_close_price = df_option_close['close'].iloc[-1]
-                else:
-                    st.warning(f"No se encontraron datos para las horas seleccionadas: {open_hour_str} a {close_hour_str}")
-                    continue  # Si no hay datos, pasa al siguiente día
-                
+            if not df_option.empty:   
                 #st.write("Entró por acá")
-                #option_open_price = df_option['open'].iloc[0]
+                option_open_price = df_option['open'].iloc[0]
                 #st.write(open_hour)
                 #st.write(close_hour)
                 #st.write(option_open_price)
@@ -848,7 +812,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write(df_option)
                 
                 #st.write(df_option[precio_usar_cierre].iloc[index])
-                #option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
+                option_close_price = df_option['close'].iloc[-1]  # Último cierre del día
                 #option_open_price = df.at[date, 'open']
                 #option_close_price = df.at[date, 'close']
 
@@ -1095,10 +1059,7 @@ def main():
     
         
     if st.button("Run Backtest"):
-        if periodo == 'Diario':
-            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
-        else:
-            resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1, open_hour=open_hour, close_hour=close_hour)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
