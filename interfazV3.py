@@ -98,7 +98,7 @@ def mostrar_datos():
     
     return datos_final
 
-def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
+def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     # Convertir fechas a datetime
     fecha_inicio = pd.to_datetime(fecha_inicio)
     fecha_fin = pd.to_datetime(fecha_fin)
@@ -125,6 +125,14 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     
     # Filtrar por rango de fechas
     df_fm = df_fm[(df_fm.index >= fecha_inicio) & (df_fm.index <= fecha_fin)]
+    
+    # Si se definen horas de apertura y cierre, filtramos el rango de horas
+    if open_hour and close_hour:
+        open_hour_str = open_hour.strftime("%H:%M:%S")
+        close_hour_str = close_hour.strftime("%H:%M:%S")
+        
+        # Filtrar por las horas seleccionadas por el usuario
+        df_fm = df_fm.between_time(open_hour_str, close_hour_str)
     
     # Ordenar el DataFrame por fecha ascendente
     df_fm.sort_index(inplace=True)
@@ -241,7 +249,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
-def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin, open_hour=None, close_hour=None):
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     #st.write(fecha_inicio)
@@ -286,6 +294,14 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
         #st.dataframe(df)
+        
+        # Si se definen horas de apertura y cierre, filtramos el rango de horas
+        if open_hour and close_hour:
+            open_hour_str = open_hour.strftime("%H:%M:%S")
+            close_hour_str = close_hour.strftime("%H:%M:%S")
+            
+            # Filtrar los datos solo entre la hora de apertura y cierre
+            df = df.between_time(open_hour_str, close_hour_str)
         
         return df
     
@@ -732,7 +748,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
             data_for_date4 = mostrar_datos()
-            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
+            data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin, open_hour=open_hour, close_hour=close_hour)
             #st.write(start)
             #st.write(data_for_date)
             st.write ("dataframe fm")
@@ -782,7 +798,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(date)
             #st.write(timedelta(days=option_days))
             #st.write(date + timedelta(days=option_days))
-            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+            df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days), open_hour=open_hour, close_hour=close_hour)
             #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
             df = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
             df_glo = mostrar_datos()
