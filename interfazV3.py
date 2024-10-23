@@ -494,15 +494,24 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(fecha_entrada)
                             st.write("trade result día anterior")
                             st.write(trade_result_anterior)
+                            st.write("option name día anterior")
+                            st.write(option_name_anterior)
                             posicion_anterior_abierta = False
-                        else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida
+                            
+                            
+                        else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
                             st.write("Señales no iguales")
                             st.write("Cerrando posición...")
                             st.write("Fecha día anterior")
                             st.write(fecha_entrada)
                             st.write("trade result día anterior")
                             st.write(trade_result_anterior)
+                            st.write("option name día anterior")
+                            st.write(option_name_anterior)
                             posicion_anterior_abierta = False
+                            
+                            # Obtener el histórico de la opción anterior para calcular el cierre
+                            df_option_anterior = obtener_historico(option_name_anterior, api_key, fecha_entrada, fecha_entrada + timedelta(days=option_days))
        
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
@@ -564,6 +573,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 posicion_anterior_abierta = True
                                 tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                                 num_contratos_anterior = num_contratos
+                                option_name_anterior = option_name
                                 precio_entrada_anterior = option_open_price
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
@@ -571,6 +581,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write(precio_entrada_anterior)
                                 st.write(num_contratos_anterior)
                                 st.write(trade_result_anterior)
+                                st.write(option_name_anterior)
                                 # No registramos el resultado aún
                                 # Guardamos la señal actual para la siguiente iteración
                                 señal_anterior = señal_actual
@@ -646,13 +657,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     posicion_anterior_abierta = True
                                     tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
                                     num_contratos_anterior = num_contratos
+                                    option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
-                                    fecha_entrada = date
                                     trade_result_anterior = trade_result
+                                    fecha_entrada = date
                                     st.write(fecha_entrada)
                                     st.write(precio_entrada_anterior)
                                     st.write(num_contratos_anterior)
                                     st.write(trade_result_anterior)
+                                    st.write(option_name_anterior)
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
