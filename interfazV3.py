@@ -452,10 +452,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     trade_result_anterior = 0
     option_name_anterior = None
     etf_open_price_anterior = None
-    etf_open_price_anterior = None
+    etf_close_price_anterior = None
     option_name_anterior = None
     tipo_posicion = None
     precio_entrada_anterior = 0
+    precio_salida_anterior = 0
     fecha_entrada = None
     num_contratos_anterior = 0
     option_name = ''
@@ -520,12 +521,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Fecha Apertura': fecha_entrada,
                                 'Fecha Cierre': date,
                                 'Precio Entrada': precio_entrada_anterior, 
-                                #'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
+                                'Precio Salida': precio_salida_anterior, 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior
-                                #'Open': etf_open_price,
-                                #'Close': etf_close_price
+                                'Opcion': option_name_anterior,
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_close_price_anterior
                             })
        
                         #Abrimos una nueva posición del día actual
@@ -590,7 +591,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 num_contratos_anterior = num_contratos
                                 option_name_anterior = option_name
                                 precio_entrada_anterior = option_open_price
+                                precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
                                 trade_result_anterior = trade_result
+                                etf_open_price_anterior = etf_open_price
+                                etf_close_price_anterior = etf_close_price
                                 fecha_entrada = date
                                 st.write(fecha_entrada)
                                 st.write(precio_entrada_anterior)
@@ -674,7 +678,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     num_contratos_anterior = num_contratos
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
+                                    precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
                                     trade_result_anterior = trade_result
+                                    etf_open_price_anterior = etf_open_price
+                                    etf_close_price_anterior = etf_close_price
                                     fecha_entrada = date
                                     st.write(fecha_entrada)
                                     st.write(precio_entrada_anterior)
