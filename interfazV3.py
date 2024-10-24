@@ -745,7 +745,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                                 if trade_result >= 0:
                                     balance += trade_result
-                                    
+                                    st.write("trade result actual positivo:")
+                                    st.write(trade_result)
                                     # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                                     etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
@@ -785,15 +786,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
                                     precio_salida_anterior = option_close_price
+                                    st.write("trade result negativo que se convertirá en mi anterior:")
                                     trade_result_anterior = trade_result
                                     precio_usar_cierre_anterior = precio_usar_cierre
                                     fecha_entrada = date
-                                    st.write(fecha_entrada)
-                                    st.write(precio_entrada_anterior)
-                                    st.write(num_contratos_anterior)
-                                    st.write(trade_result_anterior)
-                                    st.write(option_name_anterior)
-                                    st.write(precio_usar_cierre_anterior)
+                                    #st.write(fecha_entrada)
+                                    #st.write(precio_entrada_anterior)
+                                    #st.write(num_contratos_anterior)
+                                    #st.write(trade_result_anterior)
+                                    #st.write(option_name_anterior)
+                                    #st.write(precio_usar_cierre_anterior)
                                     # No registramos el resultado aún
                                     # Guardamos la señal actual para la siguiente iteración
                                     señal_anterior = señal_actual
