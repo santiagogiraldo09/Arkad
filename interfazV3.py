@@ -488,6 +488,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if señal_actual in [0, 1]:
                     if posicion_anterior_abierta:  #posicion_anterior_abierta = True
                         st.write("Hay posiciones abiertas...")
+                        st.write("date actual:")
+                        st.write(date)
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                         if data_for_date.empty:
@@ -510,6 +512,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             index = 0
                             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                             #st.write(option_price)
+                        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        if option_date:
+                            option_type = 'C' if row[column_name] == 1 else 'P'
+                            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                         df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                         
                             
@@ -640,6 +646,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             fecha_entrada = None
        
                             
+                        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         
                         if not df_option.empty:
                             posicion_actual_abierta = True
@@ -679,7 +686,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 num_contratos_anterior = num_contratos
                                 option_name_anterior = option_name
                                 precio_entrada_anterior = option_open_price
-                                precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
+                                precio_salida_anterior = option_close_price
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
                                 precio_usar_cierre_anterior = option_close_price
@@ -770,7 +777,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     num_contratos_anterior = num_contratos
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
-                                    precio_salida_anterior = df_option[precio_usar_cierre].iloc[index]
+                                    precio_salida_anterior = option_close_price
                                     trade_result_anterior = trade_result
                                     precio_usar_cierre_anterior = precio_usar_cierre
                                     fecha_entrada = date
