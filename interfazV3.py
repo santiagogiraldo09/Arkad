@@ -523,19 +523,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         if señal_actual == señal_anterior: #Tenemos posibilidad de recuperar ganancia
                             st.write("Señales iguales")
                             st.write("Manteniendo señal hasta el final del día...")
-                            st.write("Fecha día anterior")
-                            st.write(fecha_entrada)
-                            st.write("trade result día anterior")
-                            st.write(trade_result_anterior)
-                            st.write("option name día anterior")
-                            st.write(option_name_anterior)
+                            #st.write("Fecha día anterior")
+                            #st.write(fecha_entrada)
+                            #st.write("trade result día anterior")
+                            #st.write(trade_result_anterior)
+                            #st.write("option name día anterior")
+                            #st.write(option_name_anterior)
                             
                             data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
                             
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
+                                etf_close_price_anterior = data_for_date_anterior['Close'].iloc[0] if not data_for_date_anterior.empty else None
                                 st.write("Precio del open de ayer")
                                 st.write(etf_open_price_anterior)
+                                st.write("Precio del close de ayer")
+                                st.write(etf_close_price_anterior)
                             
                             if not data_for_date.empty:
                                 etf_close_price = data_for_date['Close'].iloc[0] if not data_for_date.empty else None
@@ -786,8 +789,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     option_name_anterior = option_name
                                     precio_entrada_anterior = option_open_price
                                     precio_salida_anterior = option_close_price
-                                    st.write("trade result negativo que se convertirá en mi anterior:")
                                     trade_result_anterior = trade_result
+                                    st.write("trade result negativo que se convertirá en mi anterior:")
+                                    st.write(trade_result_anterior)
                                     precio_usar_cierre_anterior = precio_usar_cierre
                                     fecha_entrada = date
                                     #st.write(fecha_entrada)
