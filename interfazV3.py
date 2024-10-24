@@ -574,10 +574,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
                                 'Opcion': option_name_anterior,
-                                #'Open Día Opc': etf_open_price_anterior,
-                                #'Close Día Opc': etf_close_price,
-                                'Open Tomado': etf_open_price_anterior,
-                                'Close Tomado': etf_close_price
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_close_price
                             })
                             
                             # La posición anterior ya está cerrada
@@ -643,10 +641,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
                                 'Opcion': option_name_anterior,
-                                #'Open Día Opc': etf_open_price_anterior,
-                                #'Close Día Opc': etf_close_price,
-                                'Open Tomado': etf_open_price_anterior,
-                                'Close Tomado': etf_close_price
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_close_price
                             })
                             
                             # La posición anterior ya está cerrada
