@@ -701,7 +701,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 señal_anterior = señal_actual
                                 
                     else: #posicion_anterior_abierta = False
-                        st.write("No hay posiciones abiertas...")
+                        st.write("No hay posiciones abiertas para la fecha de:")
+                        st.write(date)
                         #Abrimos una nueva posición
                         data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
                         if data_for_date.empty:
@@ -732,9 +733,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if not df_option.empty:
                                 posicion_actual_abierta = True
                                 option_open_price = df_option[precio_usar_apertura].iloc[0]
+                                st.write("Precio de entrada para la opción día actual:")
+                                st.write(option_open_price)
                                 option_close_price = df_option[precio_usar_cierre].iloc[index]
+                                st.write("Precio de salida opción día actual:")
+                                st.write(option_close_price)
                                 max_contract_value = option_open_price * 100
                                 num_contratos = int((balance * pct_allocation) / max_contract_value)
+                                st.write("Numero de contratos día actual:")
+                                st.write(num_contratos)
                                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                                 if trade_result >= 0:
                                     balance += trade_result
