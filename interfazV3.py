@@ -571,6 +571,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(precio_usar_cierre_anterior)
                             
                             
+                            if not df_option.empty:
+                                option_open_price = df_option[precio_usar_apertura].iloc[0]
+                                option_close_price = df_option[precio_usar_cierre].iloc[index]
+                                
+                            trade_result_anterior = (df_option[precio_usar_apertura].iloc[0] - precio_entrada_anterior) * 100 * num_contratos_anterior
+                            st.write("Nuevo trade result anterior calculado:")
+                            st.write(trade_result_anterior)
+                            
+                            
                             balance += trade_result_anterior
                             
                             resultados.append({
