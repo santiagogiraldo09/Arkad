@@ -571,6 +571,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             tipo_posicion = None
                             option_name_anterior = None
                             num_contratos_anterior = 0   
+                            etf_open_price_anterior = 0 
                             #trade_result_anterior = 0
                             
                         else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
@@ -631,6 +632,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             option_name_anterior = None
                             num_contratos_anterior = 0
                             etf_open_price_anterior = 0
+                            trade_result_anterior = 0
        
                             
                         
@@ -728,7 +730,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                                     etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                                    etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None                                
+                                    st.write("Precio de entrada día actual:")
+                                    st.write(etf_close_price)
+                                    etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                                    st.write("Precio salida día actual:")
+                                    st.write(etf_close_price)
                                     
                                     resultados.append({
                                         'Fecha': date, 
