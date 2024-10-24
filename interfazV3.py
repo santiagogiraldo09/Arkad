@@ -689,9 +689,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     'Contratos': num_contratos,
                                     'Opcion': option_name,
                                     'Open Día Opc': etf_open_price,
-                                    'Close Día Opc': etf_close_price,
-                                    'Open Tomado': etf_open_price,
-                                    'Close Tomado': etf_close_price,
+                                    'Close Día Opc': etf_close_price
                                 })
                                 posicion_actual_abierta = False
                             else:  # Si la operación no es rentable, dejamos la posición abierta
@@ -787,8 +785,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                         #'Open': df_option[['open']]
                                         'Open Día Opc': etf_open_price,
                                         'Close Día Opc': etf_close_price,
-                                        'Open Tomado': etf_open_price,
-                                        'Close Tomado': etf_close_price
                                         #'Open2': etf_open_price3,
                                         #'Close2': etf_close_price3
                                     })
