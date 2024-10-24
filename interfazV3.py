@@ -524,11 +524,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("option name día anterior")
                             st.write(option_name_anterior)
                             
+                            data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            
+                            if not data_for_date_anterior.empty:
+                                etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
+                            
+                            if not data_for_date.empty:
+                                etf_close_price = data_for_date['Close'].iloc[0] if not data_for_date.empty else None
+                                
+                                
                             if not df_option.empty:
                                 option_close_price = df_option[precio_usar_cierre].iloc[index]
                             trade_result_anterior = (df_option[precio_usar_cierre].iloc[index] - precio_entrada_anterior) * 100 * num_contratos_anterior
                             st.write("Nuevo trade result anterior calculado:")
                             st.write(trade_result_anterior)
+                            
+                            
                             
                             #df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
                             #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
@@ -546,9 +557,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Salida': precio_salida_anterior, 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior
-                                #'Open': etf_open_price,
-                                #'Close': etf_close_price
+                                'Opcion': option_name_anterior,
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_close_price
                             })
                             
                             # La posición anterior ya está cerrada
@@ -569,6 +580,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(option_name_anterior)
                             st.write("Precio usar cierre anterior:")
                             st.write(precio_usar_cierre_anterior)
+                            
+                            data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            
+                            if not data_for_date_anterior.empty:
+                                etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
+                            
+                            if not data_for_date.empty:
+                                etf_open_price = data_for_date['Open'].iloc[0] if not data_for_date.empty else None
                             
                             
                             if not df_option.empty:
@@ -593,9 +612,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Precio Salida': precio_salida_anterior, 
                                 'Resultado': trade_result_anterior,
                                 'Contratos': num_contratos_anterior,
-                                'Opcion': option_name_anterior
-                                #'Open': etf_open_price,
-                                #'Close': etf_close_price
+                                'Opcion': option_name_anterior,
+                                'Open': etf_open_price_anterior,
+                                'Close': etf_open_price
                             })
                             
                             # La posición anterior ya está cerrada
