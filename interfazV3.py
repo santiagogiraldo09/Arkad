@@ -533,6 +533,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             
                             if not data_for_date.empty:
                                 etf_close_price = data_for_date['Close'].iloc[0] if not data_for_date.empty else None
+                                etf_open_price = data_for_date['Open'].iloc[0] if not data_for_date.empty else None
+                                st.write("Precio del open de hoy")
+                                st.write(etf_open_price)
                                 st.write("Precio del close de hoy")
                                 st.write(etf_close_price)
                                 
