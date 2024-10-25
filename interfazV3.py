@@ -532,7 +532,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("option name día anterior")
                             #st.write(option_name_anterior)
                             
-                            data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            #data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            data_for_date_anterior = yf.download(ticker, start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1))
                             
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
@@ -592,6 +593,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else: #señal_actual != señal_anterior  Estaríamos incrementando la pérdida -- Se cierra posición de inmediato--
                             st.write("Señales no iguales")
                             st.write("Cerrando posición...")
+                            st.write(date)
                             #st.write("Fecha día anterior")
                             #st.write(fecha_entrada)
                             #st.write("trade result día anterior")
@@ -601,7 +603,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("Precio usar cierre anterior:")
                             #st.write(precio_usar_cierre_anterior)
                             
-                            data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            #data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
+                            data_for_date_anterior = yf.download(ticker, start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1))
                             
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
