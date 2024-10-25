@@ -767,7 +767,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
                                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                                     st.write("Precio de entrada día actual:")
-                                    st.write(etf_close_price)
+                                    st.write(etf_open_price)
                                     etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                                     st.write("Precio salida día actual:")
                                     st.write(etf_close_price)
