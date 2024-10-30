@@ -777,8 +777,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                                     st.write("Precio salida día actual:")
                                     st.write(etf_close_price)
-                                    st.write("Fecha día actual, no se tiene posición abierta:")
-                                    st.write(date)
+                                    
                                     
                                     resultados.append({
                                         'Fecha': date, 
@@ -786,8 +785,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                         #'Pred': row[column_name],
                                         'toggle_false': row[column_name],
                                         'toggle_true': row[column_name],
-                                        'Fecha Apertura': df_option.index[0],
-                                        'Fecha Cierre': df_option.index[index],
+                                        'Fecha Apertura': date,
+                                        'Fecha Cierre': date,
+                                        #'Fecha Apertura': df_option.index[0],
+                                        #'Fecha Cierre': df_option.index[index],
                                         'Precio Entrada': option_open_price, 
                                         'Precio Salida': df_option[precio_usar_cierre].iloc[index], 
                                         'Resultado': trade_result,
