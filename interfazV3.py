@@ -778,7 +778,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     st.write("Precio salida día actual:")
                                     st.write(etf_close_price)
                                     st.write("Fecha día actual, no se tiene posición abierta:")
-                                    st.write(df_option.index[-1])
+                                    st.write(date)
                                     
                                     resultados.append({
                                         'Fecha': date, 
