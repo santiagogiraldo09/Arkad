@@ -456,6 +456,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     tipo_posicion = None
     precio_entrada_anterior = 0
     precio_salida_anterior = 0
+    precio_usar_apertura_anterior = 0
     precio_usar_cierre_anterior = 0
     fecha_entrada = None
     num_contratos_anterior = 0
@@ -519,6 +520,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(option_type)
                             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                         df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                        df_option_anterior = obtener_historico(option_name_anterior, api_key, date, date + timedelta(days=option_days))
+                        option_open_price_opnd = df_option_anterior[precio_usar_apertura_anterior].iloc[0]
+                        option_close_price_opnd = df_option_anterior[precio_usar_cierre_anterior].iloc[0]
+                        st.write("Precio de entrada posición abierta siguiente día:")
+                        st.write(option_open_price_opnd)
+                        st.write("Precio de entrada posición abierta siguiente día:")
+                        st.write(option_close_price_opnd)
+                        
                         
                             
                         
@@ -711,7 +720,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 precio_salida_anterior = option_close_price
                                 trade_result_anterior = trade_result
                                 fecha_entrada = date
-                                precio_usar_cierre_anterior = option_close_price
+                                #precio_usar_cierre_anterior = option_close_price
+                                precio_usar_cierre_anterior = precio_usar_cierre
+                                precio_usar_apertura_anterior = precio_usar_apertura
                                 #st.write(fecha_entrada)
                                 #st.write(precio_entrada_anterior)
                                 #st.write(num_contratos_anterior)
@@ -816,6 +827,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     st.write("trade result negativo que se convertirá en mi anterior:")
                                     st.write(trade_result_anterior)
                                     precio_usar_cierre_anterior = precio_usar_cierre
+                                    precio_usar_apertura_anterior = precio_usar_apertura
                                     fecha_entrada = date
                                     #st.write(fecha_entrada)
                                     #st.write(precio_entrada_anterior)
