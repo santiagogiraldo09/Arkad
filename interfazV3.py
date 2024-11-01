@@ -674,67 +674,67 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             trade_result_anterior = 0
                             fecha_entrada = None
        
-                        if señal_actual != señal_anterior:    
-                            option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                            
+                        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         
-                            if not df_option.empty:
-                                posicion_actual_abierta = True
-                                option_open_price = df_option[precio_usar_apertura].iloc[0]
-                                option_close_price = df_option[precio_usar_cierre].iloc[index]
-                                max_contract_value = option_open_price * 100
-                                num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-            
-                                if trade_result > 0:
-                                    balance += trade_result
-                                    # Registrar el resultado de la nueva operación
-                                    etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
-                                    etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                                    etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-                        
-                                    resultados.append({
-                                        'Fecha': date, 
-                                        'Tipo': 'Call' if señal_actual == 1 else 'Put',
-                                        'toggle_false': row[column_name],
-                                        'toggle_true': row[column_name],
-                                        #'Fecha Apertura': df_option.index[0],
-                                        #'Fecha Cierre': df_option.index[index],
-                                        'Fecha Apertura': date,
-                                        'Fecha Cierre': date,
-                                        'Precio Entrada': option_open_price, 
-                                        'Precio Salida': df_option[precio_usar_cierre].iloc[index],
-                                        'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
-                                        'Resultado': trade_result,
-                                        'Contratos': num_contratos,
-                                        'Opcion': option_name,
-                                        'Open': etf_open_price,
-                                        'Close': etf_close_price,
-                                        'Open Posición Abierta': etf_open_price,
-                                        'Close Posición Abierta': etf_close_price
-                                    })
-                                    posicion_actual_abierta = False
-                                else:  # Si la operación no es rentable, dejamos la posición abierta
-                                    #Dejamos la posición anterior abierta
-                                    posicion_anterior_abierta = True
-                                    tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
-                                    num_contratos_anterior = num_contratos
-                                    option_name_anterior = option_name
-                                    precio_entrada_anterior = option_open_price
-                                    precio_salida_anterior = option_close_price
-                                    trade_result_anterior = trade_result
-                                    fecha_entrada = date
-                                    #precio_usar_cierre_anterior = option_close_price
-                                    precio_usar_cierre_anterior = precio_usar_cierre
-                                    precio_usar_apertura_anterior = precio_usar_apertura
-                                    #st.write(fecha_entrada)
-                                    #st.write(precio_entrada_anterior)
-                                    #st.write(num_contratos_anterior)
-                                    #st.write(trade_result_anterior)
-                                    
-                                    #st.write(option_name_anterior)
-                                    # No registramos el resultado aún
-                                    # Guardamos la señal actual para la siguiente iteración
-                                    señal_anterior = señal_actual
+                        if not df_option.empty:
+                            posicion_actual_abierta = True
+                            option_open_price = df_option[precio_usar_apertura].iloc[0]
+                            option_close_price = df_option[precio_usar_cierre].iloc[index]
+                            max_contract_value = option_open_price * 100
+                            num_contratos = int((balance * pct_allocation) / max_contract_value)
+                            trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+        
+                            if trade_result > 0:
+                                balance += trade_result
+                                # Registrar el resultado de la nueva operación
+                                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                                etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                                etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                    
+                                resultados.append({
+                                    'Fecha': date, 
+                                    'Tipo': 'Call' if señal_actual == 1 else 'Put',
+                                    'toggle_false': row[column_name],
+                                    'toggle_true': row[column_name],
+                                    #'Fecha Apertura': df_option.index[0],
+                                    #'Fecha Cierre': df_option.index[index],
+                                    'Fecha Apertura': date,
+                                    'Fecha Cierre': date,
+                                    'Precio Entrada': option_open_price, 
+                                    'Precio Salida': df_option[precio_usar_cierre].iloc[index],
+                                    'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
+                                    'Resultado': trade_result,
+                                    'Contratos': num_contratos,
+                                    'Opcion': option_name,
+                                    'Open': etf_open_price,
+                                    'Close': etf_close_price,
+                                    'Open Posición Abierta': etf_open_price,
+                                    'Close Posición Abierta': etf_close_price
+                                })
+                                posicion_actual_abierta = False
+                            else:  # Si la operación no es rentable, dejamos la posición abierta
+                                #Dejamos la posición anterior abierta
+                                posicion_anterior_abierta = True
+                                tipo_posicion = 'Call' if señal_actual == 1 else 'Put'
+                                num_contratos_anterior = num_contratos
+                                option_name_anterior = option_name
+                                precio_entrada_anterior = option_open_price
+                                precio_salida_anterior = option_close_price
+                                trade_result_anterior = trade_result
+                                fecha_entrada = date
+                                #precio_usar_cierre_anterior = option_close_price
+                                precio_usar_cierre_anterior = precio_usar_cierre
+                                precio_usar_apertura_anterior = precio_usar_apertura
+                                #st.write(fecha_entrada)
+                                #st.write(precio_entrada_anterior)
+                                #st.write(num_contratos_anterior)
+                                #st.write(trade_result_anterior)
+                                
+                                #st.write(option_name_anterior)
+                                # No registramos el resultado aún
+                                # Guardamos la señal actual para la siguiente iteración
+                                señal_anterior = señal_actual
                                 
                     else: #posicion_anterior_abierta = False
                         st.write("No hay posiciones abiertas para la fecha de:")
