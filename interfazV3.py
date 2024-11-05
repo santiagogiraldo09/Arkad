@@ -1239,7 +1239,7 @@ def main():
     option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=5, step=1)
     
     # Additional inputs for the backtest function
-    balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
+    balance_inicial = st.number_input("*Balance inicial*", min_value=0, value=100000, step= 1000)
     # Agregar opción para elegir el tipo de asignación
     allocation_type = st.radio("Seleccionar tipo de asignación de capital:", ('Porcentaje de asignación', 'Monto fijo de inversión'))
     if allocation_type == 'Porcentaje de asignación':
