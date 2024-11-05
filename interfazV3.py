@@ -439,7 +439,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     resultados = []
@@ -1210,7 +1210,14 @@ def main():
     
     # Additional inputs for the backtest function
     balance_inicial = st.number_input("*Balance iniciall*", min_value=0, value=100000, step= 1000)
-    pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
+    # Agregar opción para elegir el tipo de asignación
+    allocation_type = st.radio("Seleccionar tipo de asignación de capital:", ('Porcentaje de asignación', 'Monto fijo de inversión'))
+    if allocation_type == 'Porcentaje de asignación':
+        pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
+        fixed_amount = None
+    else:
+        fixed_amount = st.number_input("*Monto fijo de inversión:*", min_value=0.0, max_value=float(balance_inicial), value=1000.0, step=1000.0)
+        pct_allocation = None
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
     
     # Checkbox "Escenario 1" con ícono de información y texto condicional
@@ -1234,15 +1241,16 @@ def main():
         
     fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
-    if periodo == '15 minutos':
-        open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
-        close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
+    #if periodo == '15 minutos':
+        #open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
+        #close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     
         
     if st.button("Run Backtest"):
-        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        resultados_df, final_balance = realizar_backtest(data_filepath, 'tXoXD_m9y_wE2kLEILzsSERW3djux3an', "SPY", balance_inicial, pct_allocation, fixed_amount, 
+        allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
