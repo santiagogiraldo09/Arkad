@@ -877,7 +877,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
                         option_close_price = df_option[precio_usar_cierre].iloc[index]
                         max_contract_value = option_open_price * 100
-                        num_contratos = int((balance * pct_allocation) / max_contract_value)
+                        if allocation_type == 'Porcentaje de asignación':
+                            num_contratos = int((balance * pct_allocation) / max_contract_value)
+                        else: #allocation_type == 'Monto fijo de inversión':
+                            if fixed_amount < max_contract_value:
+                                st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
+                                return pd.DataFrame(resultados), balance
+                            else: #fixed_amount >= max_contract_value
+                                num_contratos = int(fixed_amount / max_contract_value)
                         trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                         balance += trade_result
                         
@@ -1005,7 +1012,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if not df_option.empty:
                 #option_open_price = df_option[precio_usar_apertura].iloc[0]
                 max_contract_value = option_open_price * 100
-                num_contratos = int((balance * pct_allocation) / max_contract_value)
+                if allocation_type == 'Porcentaje de asignación':
+                    num_contratos = int((balance * pct_allocation) / max_contract_value)
+                else: #allocation_type == 'Monto fijo de inversión':
+                    if fixed_amount < max_contract_value:
+                        st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
+                        return pd.DataFrame(resultados), balance
+                    else: #fixed_amount >= max_contract_value
+                        num_contratos = int(fixed_amount / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                 balance += trade_result
 
