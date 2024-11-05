@@ -685,10 +685,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if allocation_type == 'Porcentaje de asignación':
                                 num_contratos = int((balance * pct_allocation) / max_contract_value)
                             else: #allocation_type == 'Monto fijo de inversión':
-                                if fixed_amount < max_contract_value:
+                                if balance < max_contract_value:
                                     st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                                     return pd.DataFrame(resultados), balance
-                                else: #fixed_amount >= max_contract_value
+                                else: #balance >= max_contract_value
                                     num_contratos = int(fixed_amount / max_contract_value)
                             trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
         
@@ -786,10 +786,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 if allocation_type == 'Porcentaje de asignación':
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
                                 else: #allocation_type == 'Monto fijo de inversión':
-                                    if fixed_amount < max_contract_value:
+                                    if balance < max_contract_value:
                                         st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                                         return pd.DataFrame(resultados), balance
-                                    else: #fixed_amount >= max_contract_value
+                                    else: #balance >= max_contract_value
                                         num_contratos = int(fixed_amount / max_contract_value)
                                 
                                 st.write("Numero de contratos día actual:")
@@ -899,7 +899,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if balance < max_contract_value:
                                 st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                                 return pd.DataFrame(resultados), balance
-                            else: #fixed_amount >= max_contract_value
+                            else: #balance >= max_contract_value
                                 num_contratos = int(fixed_amount / max_contract_value)
                         trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                         balance += trade_result
@@ -1031,10 +1031,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if allocation_type == 'Porcentaje de asignación':
                     num_contratos = int((balance * pct_allocation) / max_contract_value)
                 else: #allocation_type == 'Monto fijo de inversión':
-                    if fixed_amount < max_contract_value:
+                    if balance < max_contract_value:
                         st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                         return pd.DataFrame(resultados), balance
-                    else: #fixed_amount >= max_contract_value
+                    else: #balance >= max_contract_value
                         num_contratos = int(fixed_amount / max_contract_value)
                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                 balance += trade_result
