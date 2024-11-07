@@ -1233,10 +1233,10 @@ def main():
        info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
         
     # Option Days input
-    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=20, step=1)
+    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
     
     # Option Offset input
-    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=5, step=1)
+    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
     
     # Additional inputs for the backtest function
     balance_inicial = st.number_input("*Balance inicial*", min_value=0, value=100000, step= 1000)
