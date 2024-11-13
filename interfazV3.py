@@ -1118,6 +1118,10 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
 
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+    
+    # Crear un segundo eje Y (eje derecho) para el precio de cierre
+    ax2 = ax.twinx()
+    
     plt.legend()
     plt.grid(True, which='both', linestyle='-', linewidth=0.5)
     plt.tight_layout()
@@ -1307,7 +1311,8 @@ def main():
         plt.xticks(rotation=45)
         ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
         
-        
+        # Crear un segundo eje Y (eje derecho) para el precio de cierre
+        ax2 = ax.twinx()
         
         plt.legend()
         plt.grid(True, which='both', linestyle='-', linewidth=0.5)
