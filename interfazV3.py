@@ -1099,41 +1099,29 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     return resultados_df, balance
 
 def graficar_resultados(df, final_balance, balance_inicial):
-    if df.empty or 'Resultado' not in df.columns or 'Close' not in df.columns or 'Fecha' not in df.columns:
-        st.error("No se pueden graficar resultados porque el DataFrame está vacío o faltan las columnas requeridas ('Resultado', 'Close' o 'Fecha').")
+    if df.empty or 'Resultado' not in df.columns:
+        st.error("No se pueden graficar resultados porque el DataFrame está vacío o falta la columna 'Resultado'.")
         return
     
     plt.figure(figsize=(14, 7))
-    
-    # Cálculo de la ganancia acumulada
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
+    ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
+    ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
+    ax.set_xlabel('Fecha')
+    ax.set_ylabel('Ganancia/Pérdida Acumulada')
+    plt.xticks(rotation=45)
     
-    # Gráfica de la ganancia acumulada (eje Y izquierdo)
-    ax1 = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b', label='Ganancia Acumulada')
-    ax1.set_xlabel('Fecha')
-    ax1.set_ylabel('Ganancia/Pérdida Acumulada', color='b')
-    ax1.tick_params(axis='y', labelcolor='b')
-    ax1.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-    ax1.xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
-    
-    # Crear un segundo eje Y (eje derecho) para el precio de cierre
-    ax2 = ax1.twinx()
-    ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
-    ax2.plot(df['Fecha'], df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
-    ax2.set_ylabel('Precio del S&P (Close)', color='orange')
-    ax2.tick_params(axis='y', labelcolor='orange')
-    
-    # Leyendas de ambos ejes
-    ax1.legend(loc='upper left')
-    ax2.legend(loc='upper right')
-    
-    # Rejilla y ajustes finales
+    # Ajuste para mostrar correctamente fechas y horas en el eje x
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
+    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))  # Coloca marcas de horas en el eje x
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
+
+
+    ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+
+    plt.legend()
     plt.grid(True, which='both', linestyle='-', linewidth=0.5)
     plt.tight_layout()
-    
-    # Guardar y mostrar la gráfica
     plt.savefig('resultados_backtesting.png')
     plt.show()
 
