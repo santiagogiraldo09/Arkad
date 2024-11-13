@@ -1319,6 +1319,14 @@ def main():
         ax.set_ylabel('Ganancia/Pérdida Acumulada')
         plt.xticks(rotation=45)
         ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+        
+        # Crear un segundo eje Y (eje derecho) para el precio de cierre
+        ax2 = ax.twinx()
+        ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
+        ax2.plot(resultados_df['Fecha'], resultados_df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
+        ax2.set_ylabel('Precio del S&P (Close)', color='orange')
+        ax2.tick_params(axis='y', labelcolor='orange')
+        
         plt.legend()
         plt.grid(True, which='both', linestyle='-', linewidth=0.5)
         plt.tight_layout()
