@@ -1107,8 +1107,6 @@ def graficar_resultados(df, final_balance, balance_inicial):
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
     # Gráfica de la ganancia acumulada
     ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
-    # Gráfica del precio de cierre del S&P
-    df.set_index('Fecha')['Close'].plot(kind='line', linestyle='-', color='orange', label='Precio del S&P (Close)', ax=ax)
     ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
     ax.set_xlabel('Fecha')
     ax.set_ylabel('Ganancia/Pérdida Acumulada')
@@ -1122,7 +1120,19 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
 
-    plt.legend()
+    # Crear un segundo eje Y (eje derecho) para el precio de cierre
+    ax2 = ax.twinx()
+    ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
+    ax2.plot(df['Fecha'], df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
+    ax2.set_ylabel('Precio del S&P (Close)', color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+    
+    #plt.legend()
+    
+    # Leyendas de ambos ejes
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
+    
     plt.grid(True, which='both', linestyle='-', linewidth=0.5)
     plt.tight_layout()
     plt.savefig('resultados_backtesting.png')
