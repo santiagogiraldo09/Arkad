@@ -1126,7 +1126,10 @@ def graficar_resultados(df, final_balance, balance_inicial):
     ax2.set_ylabel('Precio del S&P (Close)', color='black')
     ax2.tick_params(axis='y', labelcolor='black')
     
-    plt.legend()
+    #plt.legend()
+    # Leyendas de ambos ejes
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
     plt.grid(True, which='both', linestyle='-', linewidth=0.5)
     plt.tight_layout()
     plt.savefig('resultados_backtesting.png')
@@ -1322,7 +1325,10 @@ def main():
         ax2.set_ylabel('Precio del S&P (Close)', color='black')
         ax2.tick_params(axis='y', labelcolor='black')
         
-        plt.legend()
+        #plt.legend()
+        # Leyendas de ambos ejes
+        ax.legend(loc='upper left')
+        ax2.legend(loc='upper right')
         plt.grid(True, which='both', linestyle='-', linewidth=0.5)
         plt.tight_layout()
         img_buffer = io.BytesIO()
