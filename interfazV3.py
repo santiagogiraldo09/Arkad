@@ -1122,7 +1122,7 @@ def graficar_resultados(df, final_balance, balance_inicial):
     # Crear un segundo eje Y (eje derecho) para el precio de cierre
     ax2 = ax.twinx()
     ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
-    ax2.plot(resultados_df['Fecha'], resultados_df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
+    ax2.plot(df['Fecha'], df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
     ax2.set_ylabel('Precio del S&P (Close)', color='black')
     ax2.tick_params(axis='y', labelcolor='black')
     
