@@ -1105,7 +1105,10 @@ def graficar_resultados(df, final_balance, balance_inicial):
     
     plt.figure(figsize=(14, 7))
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
+    # Gráfica de la ganancia acumulada
     ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
+    # Gráfica del precio de cierre del S&P
+    df.set_index('Fecha')['Close'].plot(kind='line', linestyle='-', color='orange', label='Precio del S&P (Close)', ax=ax)
     ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
     ax.set_xlabel('Fecha')
     ax.set_ylabel('Ganancia/Pérdida Acumulada')
