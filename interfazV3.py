@@ -1119,6 +1119,10 @@ def graficar_resultados(df, final_balance, balance_inicial):
 
     ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
 
+    ax2 = ax.twinx()
+    ax2.set_ylim(300, 700)
+    ax2.plot(df['Fecha'], df['Close'], color='o', linestyle='-', label='Precio del S&P (Close)')
+
     plt.legend()
     plt.grid(True, which='both', linestyle='-', linewidth=0.5)
     plt.tight_layout()
