@@ -492,7 +492,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("date actual:")
                         st.write(date)
                         #Abrimos una nueva posición del día actual
-                        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+                        data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         if data_for_date.empty:
                             continue
                         if trade_type == 'Close to Close':
@@ -542,7 +542,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write(option_name_anterior)
                             
                             #data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
-                            data_for_date_anterior = yf.download(ticker, start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1))
+                            data_for_date_anterior = yf.download("SPY", start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                             
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
@@ -616,7 +616,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write(precio_usar_cierre_anterior)
                             
                             #data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1))
-                            data_for_date_anterior = yf.download(ticker, start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1))
+                            data_for_date_anterior = yf.download("SPY", start=fecha_entrada, end=fecha_entrada + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                             
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
@@ -695,7 +695,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if trade_result > 0:
                                 balance += trade_result
                                 # Registrar el resultado de la nueva operación
-                                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                                etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                     
@@ -747,7 +747,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("No hay posiciones abiertas para la fecha de:")
                         st.write(date)
                         #Abrimos una nueva posición
-                        data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+                        data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         if data_for_date.empty:
                             continue
                         if trade_type == 'Close to Close':
@@ -802,7 +802,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     st.write("trade result actual positivo:")
                                     st.write(trade_result)
                                     # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                                    etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                                    etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                                     etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                                     st.write("Precio de entrada día actual:")
                                     st.write(etf_open_price)
@@ -863,7 +863,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     continue
                 
             else: #esce1 = False  
-                data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+                data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                 if data_for_date.empty:
                     continue
                 if trade_type == 'Close to Close':
@@ -905,7 +905,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         balance += trade_result
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                        etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                        etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                         etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                         etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                         
@@ -931,7 +931,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         print(trade_result)
                 
         else: #periodo == '15 minutos'
-            data_for_date = yf.download(ticker, start=date, end=date + pd.DateOffset(days=1))
+            data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
             #st.write("Fecha date:",date)
             #st.write("Fecha inicio:",fecha_inicio)
             #st.write("Fecha fin:",fecha_fin)
@@ -1046,7 +1046,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #etf_open_price, etf_close_price = get_alpha_vantage_data(ticker, date)
        
                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                etf_data = yf.download(ticker, start=date, end=date + pd.Timedelta(days=1))
+                etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                 if periodo == '15 minutos':
