@@ -920,6 +920,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
+                    
                     if not df_option.empty:
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
                         option_close_price = df_option[precio_usar_cierre].iloc[index]
@@ -937,8 +938,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                         etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                        st.write("datos sin eliminar ultimo index-etf")
-                        st.write(etf_data)
+                        #st.write("datos sin eliminar ultimo index-etf")
+                        #st.write(etf_data)
                         #etf_data = etf_data.drop(etf_data.index[-1])
                         #etf_data.columns = etf_data.columns.str.lower()
                         etf_data.index.name = 'date'
