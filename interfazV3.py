@@ -886,7 +886,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     continue
                 
             else: #esce1 = False  
-                data_for_date = yf.download("SPY", start="2022-01-01", end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
+                data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                 st.write("datos sin eliminar ultimo index")
                 st.write(data_for_date)
                 data_for_date = data_for_date.drop(data_for_date.index[-1])
@@ -936,7 +936,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         balance += trade_result
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                        etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
+                        etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                         st.write("datos sin eliminar ultimo index")
                         st.write(data_for_date)
                         etf_data = etf_data.drop(etf_data.index[-1])
