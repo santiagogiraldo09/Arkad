@@ -494,7 +494,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download("SPY", start="2022-01-01", end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         data_for_date = data_for_date.drop(data_for_date.index[-1])
-                        data_for_date.columns = data_for_date.columns.str.lower()
+                        #data_for_date.columns = data_for_date.columns.str.lower()
                         data_for_date.index.name = 'date'
                         print(data_for_date.columns)
                         if data_for_date.empty:
@@ -887,10 +887,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start="2022-01-01", end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
+                st.write("datos sin eliminar ultimo index")
+                st.write(data_for_date)
                 data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
-                print(data_for_date.columns)
+                st.write("datos eliminando ultimo index")
+                st.write(data_for_date)
+                #print(data_for_date.columns)
                 if data_for_date.empty:
                     continue
                 if trade_type == 'Close to Close':
@@ -933,9 +937,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                         etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
+                        st.write("datos sin eliminar ultimo index")
+                        st.write(data_for_date)
                         etf_data = etf_data.drop(etf_data.index[-1])
                         #etf_data.columns = etf_data.columns.str.lower()
                         etf_data.index.name = 'date'
+                        st.write("datos eliminando ultimo index")
+                        st.write(data_for_date)
                         etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                         etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                         
