@@ -494,8 +494,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #Abrimos una nueva posición del día actual
                         data_for_date = yf.download("SPY", start="2022-01-01", end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         data_for_date = data_for_date.drop(data_for_date.index[-1])
-                        #data_for_date.columns = data_for_date.columns.str.lower()
+                        data_for_date.columns = data_for_date.columns.str.lower()
                         data_for_date.index.name = 'date'
+                        print(data_for_date.columns)
                         if data_for_date.empty:
                             continue
                         if trade_type == 'Close to Close':
