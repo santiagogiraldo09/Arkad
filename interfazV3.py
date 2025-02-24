@@ -548,7 +548,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #data_for_date_anterior = yf.download(ticker, start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1)) fecha_entrada
                             data_for_date_anterior = yf.download("SPY", start="2022-01-01", end=fecha_entrada + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                             data_for_date_anterior = data_for_date_anterior.drop(data_for_date_anterior.index[-1])
-                            data_for_date_anterior.columns = data_for_date_anterior.columns.str.lower()
+                            #data_for_date_anterior.columns = data_for_date_anterior.columns.str.lower()
                             data_for_date_anterior.index.name = 'date'
                             print(data_for_date_anterior.columns)
                             if not data_for_date_anterior.empty:
