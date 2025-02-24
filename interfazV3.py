@@ -550,6 +550,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             data_for_date_anterior = data_for_date_anterior.drop(data_for_date_anterior.index[-1])
                             data_for_date_anterior.columns = data_for_date_anterior.columns.str.lower()
                             data_for_date_anterior.index.name = 'date'
+                            print(data_for_date_anterior.columns)
                             if not data_for_date_anterior.empty:
                                 etf_open_price_anterior = data_for_date_anterior['Open'].iloc[0] if not data_for_date_anterior.empty else None
                                 etf_close_price_anterior = data_for_date_anterior['Close'].iloc[0] if not data_for_date_anterior.empty else None
@@ -709,6 +710,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 etf_data = etf_data.drop(etf_data.index[-1])
                                 etf_data.columns = etf_data.columns.str.lower()
                                 etf_data.index.name = 'date'
+                                print(etf_data.columns)
                                 etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
                                 etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
                     
@@ -764,6 +766,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         data_for_date = data_for_date.drop(data_for_date.index[-1])
                         data_for_date.columns = data_for_date.columns.str.lower()
                         data_for_date.index.name = 'date'
+                        print(data_for_date.columns)
                         
                         if data_for_date.empty:
                             continue
@@ -887,6 +890,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date = data_for_date.drop(data_for_date.index[-1])
                 data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
+                print(data_for_date.columns)
                 if data_for_date.empty:
                     continue
                 if trade_type == 'Close to Close':
@@ -961,6 +965,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date = data_for_date.drop(data_for_date.index[-1])
             data_for_date.columns = data_for_date.columns.str.lower()
             data_for_date.index.name = 'date'
+            print(data_for_date.columns)
             #st.write("Fecha date:",date)
             #st.write("Fecha inicio:",fecha_inicio)
             #st.write("Fecha fin:",fecha_fin)
