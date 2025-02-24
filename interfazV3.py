@@ -889,7 +889,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                 st.write("datos sin eliminar ultimo index")
                 st.write(data_for_date)
-                data_for_date = data_for_date.drop(data_for_date.index[-1])
+                #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
                 st.write("datos eliminando ultimo index")
@@ -939,7 +939,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
                         st.write("datos sin eliminar ultimo index")
                         st.write(data_for_date)
-                        etf_data = etf_data.drop(etf_data.index[-1])
+                        #etf_data = etf_data.drop(etf_data.index[-1])
                         #etf_data.columns = etf_data.columns.str.lower()
                         etf_data.index.name = 'date'
                         st.write("datos eliminando ultimo index")
