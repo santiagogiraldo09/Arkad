@@ -920,7 +920,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                    st.write(df_option)
+                    #st.write(df_option)
                     if not df_option.empty:
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
                         option_close_price = df_option[precio_usar_cierre].iloc[index]
@@ -984,8 +984,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
             #st.write(start)
             #st.write(data_for_date)
-            st.write ("dataframe fm")
-            st.write(data_for_date_fm)
+            #st.write ("dataframe fm")
+            #st.write(data_for_date_fm)
             #st.write ("función open_close (Polygon)")
             #st.write(data_for_date3)
             #st.write ("función mostrar datos globales")
@@ -1040,10 +1040,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #vo = verificar_opcion_15min(client, ticker, fecha_inicio, fecha_fin)
             #df_option2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
             #df2 = obtener_historico_15min_pol(option_name, api_key, date, date + timedelta(days=option_days))
-            st.write("df_option:")
-            st.dataframe(df_option)
-            st.write("función get_open_and_close:")
-            st.dataframe(df)
+            #st.write("df_option:")
+            #st.dataframe(df_option)
+            #st.write("función get_open_and_close:")
+            #st.dataframe(df)
             #st.write("df_option2:")
             #st.dataframe(df_option2)
             #st.write("verificar opción:")
