@@ -249,7 +249,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     local_tz = pytz.timezone('America/New_York')
     try:
         # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker=ticker_opcion, multiplier=15, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=5, timespan="minute", #CAMBIAR A 15 MIN
                                from_=fecha_inicio, to=fecha_fin)
         #st.write(resp)
         datos = [{
@@ -890,6 +890,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 st.write("datos con get_open_and_close")
                 st.write(data_for_date2)
+                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                st.write("datos con obtener_historico_15min")
+                st.write(df_option)
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
