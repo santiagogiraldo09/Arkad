@@ -147,7 +147,7 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         params = {
             "function": "TIME_SERIES_INTRADAY",
             "symbol": ticker,
-            "interval": "15min",
+            "interval": "5min", #VOLVER A PONER A 15 MIN
             "apikey": api_av,
             "outputsize": "full",
             "extended_hours": "false",
@@ -887,8 +887,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                #st.write("datos sin eliminar ultimo index")
-                #st.write(data_for_date)
+                data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                st.write("datos con get_open_and_close")
+                st.write(data_for_date2)
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
