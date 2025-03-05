@@ -163,8 +163,8 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         #print(data)
         
         # Verificar que la respuesta contiene los datos de series temporales
-        if "Time Series (15min)" in data:
-            time_series = data["Time Series (15min)"]
+        if "Time Series (5min)" in data:
+            time_series = data["Time Series (5min)"]
             df = pd.DataFrame.from_dict(time_series, orient='index')        
             df.rename(columns=lambda x: x[3:].strip(), inplace=True)
             
