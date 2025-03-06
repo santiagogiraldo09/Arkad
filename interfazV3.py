@@ -896,6 +896,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
                 st.write("datos con get_spy_intraday_financial_modeling")
                 st.write(data_for_date_fm)
+                data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+                st.write("datos con data_for_date3")
+                st.write(data_for_date3)
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
