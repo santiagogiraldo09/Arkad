@@ -905,7 +905,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date.index.name = 'date'
                 data_for_date3.index.name = 'date'
                 datee = pd.to_datetime(date)
-                data_for_date3 = data_for_date3[data_for_date3.index >= datee]
+                #data_for_date3 = data_for_date3[data_for_date3.index >= datee]
                 st.write("datos con data_for_date3")
                 st.write(data_for_date3)
                 #st.write("datos eliminando ultimo index")
