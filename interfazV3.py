@@ -899,12 +899,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #st.write("datos con get_spy_intraday_financial_modeling")
                 #st.write(data_for_date_fm)
                 data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
-                st.write("datos con data_for_date3")
-                st.write(data_for_date3)
+                
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
                 data_for_date3.index.name = 'date'
+                data_for_date3 = data_for_date3[data_for_date3.index >= date]
+                st.write("datos con data_for_date3")
+                st.write(data_for_date3)
                 #st.write("datos eliminando ultimo index")
                 #st.write(data_for_date)
                 #print(data_for_date.columns)
@@ -924,11 +926,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     index = 1                   
                     option_price = round(data_for_date['Close'].iloc[0])
                     
+                    
                 else: #Open to Close
                     precio_usar_apertura = 'open'
                     precio_usar_cierre = 'close'
                     index = 0
                     option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                    option_price_5min = round(data_for_date3['open'].iloc[0])
                     #st.write(option_price)
                 option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                 if option_date:
