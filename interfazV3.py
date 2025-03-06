@@ -242,12 +242,12 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
-    fecha_fin = fecha_fin
-    st.write(type(fecha_inicio))
+    #fecha_fin = fecha_fin
+    #st.write(type(fecha_inicio))
     # Agregar 1 día
-    fecha_fin = fecha_inicio + timedelta(days=1)
-    st.write("fecha fin en historico 15min")
-    st.write(fecha_fin)
+    #fecha_fin = fecha_inicio + timedelta(days=1)
+    #st.write("fecha fin en historico 15min")
+    #st.write(fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     #st.write(fecha_inicio)
@@ -893,54 +893,54 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                st.write("datos con data_for_date")
-                st.write(data_for_date)
+                #st.write("datos con data_for_date")
+                #st.write(data_for_date)
                 #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.write("datos con get_open_and_close")
                 #st.write(data_for_date2)
-                df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
-                st.write("datos con obtener_historico_15min")
-                st.write(df_option)
+                #df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
+                #st.write("datos con obtener_historico_15min")
+                #st.write(df_option)
                 #data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
                 #st.write("datos con get_spy_intraday_financial_modeling")
                 #st.write(data_for_date_fm)
-                data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+                #data_for_date3 = open_close(ticker, api_key, fecha_inicio, fecha_fin)
                 
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
-                data_for_date3.index.name = 'date'
-                datee = pd.to_datetime(date)
-                datee = pd.to_datetime(datee)
+                #data_for_date3.index.name = 'date'
+                #datee = pd.to_datetime(date)
+                #datee = pd.to_datetime(datee)
                 # Reemplazar la hora, minuto y segundo
-                datee = datee.replace(hour=9, minute=35, second=0)
-                st.write("datee")
-                st.write(datee)
-                st.write("date.index")
-                st.write(data_for_date3.index[64])
-                data_for_date3 = data_for_date3[data_for_date3.index >= datee]
-                st.write("datos con data_for_date3")
-                st.write(data_for_date3)
+                #datee = datee.replace(hour=9, minute=35, second=0)
+                #st.write("datee")
+                #st.write(datee)
+                #st.write("date.index")
+                #st.write(data_for_date3.index[64])
+                #data_for_date3 = data_for_date3[data_for_date3.index >= datee]
+                #st.write("datos con data_for_date3")
+                #st.write(data_for_date3)
                 #st.write("datos eliminando ultimo index")
                 #st.write(data_for_date)
                 #print(data_for_date.columns)
                 if data_for_date.empty:
                     continue
-                if data_for_date3.empty:
-                    continue
+                #if data_for_date3.empty:
+                    #continue
                 if trade_type == 'Close to Close':
                     precio_usar_apertura = 'close'
                     precio_usar_cierre = 'close'
                     index = 1
                     option_price = round(data_for_date['Close'].iloc[0])
-                    option_price_5min = round(data_for_date['close'].iloc[0])
+                    #option_price_5min = round(data_for_date3['close'].iloc[0])
                     
                 elif trade_type == 'Close to Open':
                     precio_usar_apertura = 'close'
                     precio_usar_cierre = 'open'
                     index = 1                   
                     option_price = round(data_for_date['Close'].iloc[0])
-                    option_price_5min = round(data_for_date['close'].iloc[0])
+                    #option_price_5min = round(data_for_date3['close'].iloc[0])
                     
                     
                 else: #Open to Close
@@ -948,7 +948,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     precio_usar_cierre = 'close'
                     index = 0
                     option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
-                    option_price_5min = round(data_for_date3['open'].iloc[0])
+                    #option_price_5min = round(data_for_date3['open'].iloc[0])
                     #st.write(option_price)
                 option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                 st.write("Option_date:")
