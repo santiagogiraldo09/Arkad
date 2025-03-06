@@ -243,10 +243,11 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     fecha_fin = fecha_fin
-    # Convertir a Timestamp
-    fecha_inicio = pd.to_datetime(fecha_inicio)
+    # Convertir a datetime
+    fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+    
     # Agregar 1 día
-    fecha_fin = fecha_inicio + pd.Timedelta(days=1)
+    fecha_fin = fecha_inicio + timedelta(days=1)
     st.write("fecha fin en historico 15min")
     st.write(fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
