@@ -911,7 +911,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write("datee")
                 st.write(datee)
                 st.write("date.index")
-                st.write(data_for_date3.iloc[72])
+                st.write(data_for_date3.index[72])
                 data_for_date3 = data_for_date3[data_for_date3.index[72] >= datee]
                 st.write("datos con data_for_date3")
                 st.write(data_for_date3)
