@@ -912,7 +912,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write(datee)
                 st.write("date.index")
                 st.write(data_for_date3.index[64])
-                data_for_date3 = data_for_date3[data_for_date3.index[64] >= datee]
+                data_for_date3 = data_for_date3[data_for_date3.index >= datee]
                 st.write("datos con data_for_date3")
                 st.write(data_for_date3)
                 #st.write("datos eliminando ultimo index")
