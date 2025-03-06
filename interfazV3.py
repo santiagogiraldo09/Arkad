@@ -424,7 +424,7 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
     max_days = option_days + option_offset #37
     best_date = None
     for offset in range(min_days, max_days + 1):
-        for hour_offset in range(0, 24 * 60, 15):  # Iterar cada 15 minutos
+        for hour_offset in range(0, 24 * 60, 5):  # Iterar cada 15 minutos   CAMBIAR A 15 MIN
             option_date = (base_date + timedelta(days=offset, minutes=hour_offset)).strftime('%y%m%d')       
             option_type = 'C' if column_name == 1 else 'P'
             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
@@ -924,12 +924,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     precio_usar_cierre = 'close'
                     index = 1
                     option_price = round(data_for_date['Close'].iloc[0])
+                    option_price_5min = round(data_for_date['close'].iloc[0])
                     
                 elif trade_type == 'Close to Open':
                     precio_usar_apertura = 'close'
                     precio_usar_cierre = 'open'
                     index = 1                   
                     option_price = round(data_for_date['Close'].iloc[0])
+                    option_price_5min = round(data_for_date['close'].iloc[0])
                     
                     
                 else: #Open to Close
@@ -940,6 +942,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_price_5min = round(data_for_date3['open'].iloc[0])
                     #st.write(option_price)
                 option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                option_date_5min = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                st.write("Datos con encontrar_opcion_cercana_15min      Option_date")
+                st.write(option_date_5min)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
