@@ -29,7 +29,7 @@ def open_close(ticker, api_key, fecha_inicio, fecha_fin):
     i = 1
     try:
         # Obtener datos agregados cada 15 minutos
-        resp = client.get_aggs(ticker=ticker, multiplier=15, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker, multiplier=5, timespan="minute", #VOLVER A CAMBIAR A 15 MIN
                                from_=fecha_inicio, to=fecha_fin)
         #st.write(resp)
         datos = [{
