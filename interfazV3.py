@@ -285,7 +285,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         
         # Filtrar el DataFrame por las fechas de inicio y fin
         df = df[(df.index >= fecha_inicio) & (df.index <= fecha_fin)]
-        st.dataframe(df)
+        #st.dataframe(df)
         
         return df
     
@@ -887,6 +887,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
+                st.write("datos con data_for_date")
+                st.write(data_for_date)
                 #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.write("datos con get_open_and_close")
                 #st.write(data_for_date2)
@@ -902,10 +904,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
+                data_for_date3.index.name = 'date'
                 #st.write("datos eliminando ultimo index")
                 #st.write(data_for_date)
                 #print(data_for_date.columns)
                 if data_for_date.empty:
+                    continue
+                if data_for_date3.empty:
                     continue
                 if trade_type == 'Close to Close':
                     precio_usar_apertura = 'close'
