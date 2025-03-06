@@ -942,9 +942,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_price_5min = round(data_for_date3['open'].iloc[0])
                     #st.write(option_price)
                 option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                option_date_5min = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                st.write("Datos con encontrar_opcion_cercana_15min      Option_date")
-                st.write(option_date_5min)
+                st.rite("Option_date:")
+                st.write(option_date)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
