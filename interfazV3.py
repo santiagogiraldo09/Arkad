@@ -242,6 +242,7 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     return df
 
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    fecha_fin = fecha_inicio
     #fecha_inicio.strftime('%Y-%m-%d')
     #api_av = "KCIUEY7RBRKTL8GI"
     #st.write(fecha_inicio)
