@@ -244,6 +244,8 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     fecha_fin = fecha_fin
     st.write(type(fecha_inicio))
+    # Agregar 1 día
+    fecha_fin = fecha_inicio + timedelta(days=1)
     st.write("fecha fin en historico 15min")
     st.write(fecha_fin)
     #fecha_inicio.strftime('%Y-%m-%d')
