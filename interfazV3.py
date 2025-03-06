@@ -905,6 +905,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 data_for_date.index.name = 'date'
                 data_for_date3.index.name = 'date'
                 datee = pd.to_datetime(date)
+                # Reemplazar la hora, minuto y segundo
+                datee = datee.replace(hour=9, minute=35, second=0)
                 st.write("datee")
                 st.write(datee)
                 data_for_date3 = data_for_date3[data_for_date3.index >= datee]
