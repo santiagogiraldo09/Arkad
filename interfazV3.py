@@ -104,7 +104,7 @@ def get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin):
     fecha_fin = pd.to_datetime(fecha_fin)
     API_KEY = "dXm5M61pLypaHuujU7K4ULqol9IEWNp3"
  
-    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/15min/SPY'
+    base_url = 'https://financialmodelingprep.com/api/v3/historical-chart/5min/SPY' #VOLVER A CAMBIAR A 15 MIN
     params = {
         'from': fecha_inicio,
         'to': fecha_fin,
@@ -893,6 +893,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 st.write("datos con obtener_historico_15min")
                 st.write(df_option)
+                data_for_date_fm = get_spy_intraday_financial_modeling(fecha_inicio, fecha_fin)
+                st.write("datos con get_spy_intraday_financial_modeling")
+                st.write(data_for_date_fm)
                 #data_for_date = data_for_date.drop(data_for_date.index[-1])
                 #data_for_date.columns = data_for_date.columns.str.lower()
                 data_for_date.index.name = 'date'
