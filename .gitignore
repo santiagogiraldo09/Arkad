@@ -1,0 +1,7 @@
+# Archivos con credenciales
+config/settings.env
+*.env
+__pycache__/
+.env.local
+secrets/
+credentials.json
