@@ -3,7 +3,7 @@ name: Firebase to Excel
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *'  # Ejecuta diario a las 8 AM UTC
+    - cron: '0 17 * * 3,5'  # Ejecuta miércoles y viernes a las 12 PM hora de Colombia (17:00 UTC)
 
 jobs:
   export-firebase-to-excel:
