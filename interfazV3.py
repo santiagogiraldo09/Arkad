@@ -894,11 +894,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                #st.write("datos con data_for_date")
-                #st.write(data_for_date)
-                #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
-                #st.write("datos con get_open_and_close")
-                #st.write(data_for_date2)
+                st.write("datos con data_for_date (yahoo finance)")
+                st.write(data_for_date)
+                data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
+                st.write("datos con get_open_and_close (alpha vantage")
+                st.write(data_for_date2)
                 #df_option = obtener_historico_15min(option_name, api_key, date, date + timedelta(days=option_days))
                 #st.write("datos con obtener_historico_15min")
                 #st.write(df_option)
