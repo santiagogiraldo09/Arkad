@@ -46,7 +46,7 @@ def get_information_firebase(collection, db):
 # Función principal
 def main():
     db = initialize_firebase()
-    collections = ["spyVOC", "spyFOC", "spySOC", "spyAOC", "spyEnsamble"]
+    collections = ["spyVOC", "spyMOC", "spyEnsamble"]
     
     for collection in collections:
         try:
