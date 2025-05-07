@@ -201,7 +201,8 @@ def get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin):
         fecha_actual=ultimo_dia_mes + pd.Timedelta(days=1)
     
     
-api_av = "KCIUEY7RBRKTL8GI"
+#api_av = "KCIUEY7RBRKTL8GI"
+api_av = "A5FNH8G5HZAQHL2"
 
 def listar_archivos_xlxs(directorio):
     archivos = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.xlsx')]
