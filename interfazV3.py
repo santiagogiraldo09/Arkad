@@ -443,6 +443,19 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
                 break
     return best_date
 
+def encontrar_strike_cercano(client, base_date, option_price, column_name, option_days, option_offset, ticker, it_max = 10):
+    actual_option_price = option_price
+    for i in range(it_max):
+        best_date = encontrar_opcion_cercana(client, base_date, actual_option_price, column_name, option_days, option_offset, ticker)
+        if best_date is not None:
+            break
+        if column_name == 1:
+            actual_option_price += ((i + 1)*((-1)**i))
+        else:
+            actual_option_price -= ((i + 1)*((-1)**(i + 1)))
+
+    return best_date, actual_option_price
+
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
