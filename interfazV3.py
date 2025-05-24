@@ -537,7 +537,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             index = 0
                             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                             #st.write(option_price)
-                        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        option_price = actual_option_price
                         if option_date:
                             option_type = 'C' if row[column_name] == 1 else 'P'
                             st.write("option type para posición abierta:")
@@ -808,7 +810,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             index = 0
                             option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                             #st.write(option_price)
-                        option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        option_price = actual_option_price
                         if option_date:
                             option_type = 'C' if row[column_name] == 1 else 'P'
                             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
@@ -964,7 +968,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                     #option_price_5min = round(data_for_date3['open'].iloc[0])
                     #st.write(option_price)
-                option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                option_price = actual_option_price
                 #st.write("Option_date:")
                 #st.write(option_date)
                 if option_date:
@@ -1069,7 +1075,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 option_price= round(data_for_date4.loc[date]['open'])
                 #st.write(option_price)
         
-            option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+            #option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+            option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+            option_price = actual_option_price
             if option_date:
                 option_type = 'C' if row[column_name] == 1 else 'P'
                 option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
