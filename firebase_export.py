@@ -7,7 +7,8 @@ import os
 
 # Configuración de Firebase (usando credenciales desde GitHub Secrets)
 def initialize_firebase():
-    cred = credentials.Certificate("serviceAccountKey.json")
+    cred = credentials.Certificate(r"C:\Users\Lenovo Thinkpad E14\Documents\ARKAD\MODEL-VOLUMEN\money-lab-d086e-f157c6cfe6ec.json")
+    #cred = credentials.Certificate("serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
     return firestore.client()
 
@@ -46,7 +47,7 @@ def get_information_firebase(collection, db):
 # Función principal
 def main():
     db = initialize_firebase()
-    collections = ["spyVOC", "spyCanalSOC","spyMOC", "spyEnsembleVM", "spyEnsembleVS"]
+    collections = ["spyVOC", "spyCanalSOC","spyMOC", "spyEnsembleVM", "spyEnsembleVS", "spySOC"]
     
     for collection in collections:
         try:
