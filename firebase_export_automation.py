@@ -4,11 +4,15 @@ from firebase_admin import credentials, firestore
 import firebase_admin
 from datetime import datetime
 import os
+import json
 
 # Configuración de Firebase (usando credenciales desde GitHub Secrets)
 def initialize_firebase():
-    cred = credentials.Certificate(r"C:\Users\Lenovo Thinkpad E14\Documents\ARKAD\MODEL-VOLUMEN\money-lab-d086e-f157c6cfe6ec.json")
-    #cred = credentials.Certificate("serviceAccountKey.json")
+    # Guardar las credenciales del secreto en un archivo temporal
+    firebase_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
+    with open("firebase_key.json", "w") as f:
+        f.write(firebase_json)
+    cred = credentials.Certificate("firebase_key.json")
     firebase_admin.initialize_app(cred)
     return firestore.client()
 
@@ -52,7 +56,7 @@ def main():
     for collection in collections:
         try:
             df = get_information_firebase(collection, db)
-            output_file = f"firebase_data_{collection}.xlsx"
+            output_file = f"firebase_data_{collection}_automation.xlsx"
             
             # Guardar en Excel (en el repositorio)
             df.to_excel(output_file, index=True)

@@ -1,0 +1,38 @@
+name: Exportar Firebase a Excel
+
+on:
+  schedule:
+    - cron: '0 10 * * 3,5'  # Ejecuta miércoles y viernes a las 10:00 UTC
+  workflow_dispatch:         # Permite ejecución manual
+
+jobs:
+  export-firebase:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas firebase-admin openpyxl protobuf
+
+    - name: Crear archivo de credenciales de Firebase
+      run: echo "${{ secrets.FIREBASE_CREDENTIALS_JSON }}" > firebase_key.json
+
+    - name: Ejecutar script de exportación
+      run: python firebase_export_automation.py  # Cambia esto por el nombre real de tu archivo Python
+
+    - name: Commit y Push
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add *.xlsx
+        git commit -m "Actualización automática - $(date -u +'%Y-%m-%d %H:%M:%S')" || echo "Nada que commitear"
+        git push
