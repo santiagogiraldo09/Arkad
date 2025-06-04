@@ -8,14 +8,6 @@ import json
 
 # Configuración de Firebase (usando credenciales desde GitHub Secrets)
 def initialize_firebase():
-    firebase_json = os.environ.get("FIREBASE_CREDENTIALS_JSON")
-    
-    if not firebase_json:
-        raise ValueError("El secreto FIREBASE_CREDENTIALS_JSON no está definido")
-
-    with open("firebase_key.json", "w") as f:
-        f.write(firebase_json)
-
     cred = credentials.Certificate("firebase_key.json")
     firebase_admin.initialize_app(cred)
     return firestore.client()
