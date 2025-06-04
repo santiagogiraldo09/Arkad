@@ -2,8 +2,8 @@ name: Exportar Firebase a Excel
 
 on:
   schedule:
-    - cron: '0 10 * * 3,5'  # Ejecuta miércoles y viernes a las 10:00 UTC
-  workflow_dispatch:         # Permite ejecución manual
+    - cron: '0 10 * * 3,5'  # Miércoles y viernes a las 10:00 UTC
+  workflow_dispatch:
 
 jobs:
   export-firebase:
@@ -24,10 +24,16 @@ jobs:
         pip install pandas firebase-admin openpyxl protobuf
 
     - name: Crear archivo de credenciales de Firebase
-      run: echo "${{ secrets.FIREBASE_CREDENTIALS_JSON }}" > firebase_key.json
+      run: |
+        echo "$FIREBASE_CREDENTIALS_JSON" | jq '.' > firebase_key.json
+      env:
+        FIREBASE_CREDENTIALS_JSON: ${{ secrets.FIREBASE_CREDENTIALS_JSON }}
+
+    - name: Verificar que el archivo se creó
+      run: cat firebase_key.json
 
     - name: Ejecutar script de exportación
-      run: python firebase_export_automation.py  # Cambia esto por el nombre real de tu archivo Python
+      run: python firebase_export_automation.py
 
     - name: Commit y Push
       run: |
