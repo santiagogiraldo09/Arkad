@@ -30,16 +30,20 @@ jobs:
         
     - name: Create Firebase credentials file
       run: |
-        # Método más confiable para crear el JSON
-        cat <<EOF > serviceAccountKey.json
-        ${{ secrets.FIREBASE_CREDENTIALS }}
-        EOF
+        # Verifica que el secreto existe
+        if [ -z "${{ secrets.FIREBASE_CREDENTIALS }}" ]; then
+          echo "❌ Error: El secreto FIREBASE_CREDENTIALS está vacío o no existe"
+          exit 1
+        fi
         
-        # Verificación del archivo creado
+        # Crea el archivo de forma segura
+        echo '${{ secrets.FIREBASE_CREDENTIALS }}' > firebase_key.json
+        
+        # Verifica el archivo generado
         echo "=== Contenido del archivo (primeras líneas) ==="
-        head -n 5 serviceAccountKey.json
+        head -n 5 firebase_key.json
         echo "=== Verificación JSON ==="
-        python -c "import json; json.load(open('serviceAccountKey.json')); print('✓ JSON válido')"
+        python -c "import json; json.load(open('firebase_key.json')); print('✓ JSON válido')" || exit 1
       
     - name: Run export script
       run: python firebase_export_automation.py
