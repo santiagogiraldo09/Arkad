@@ -7,9 +7,21 @@ import os
 
 # Configuración de Firebase (usando credenciales desde GitHub Secrets)
 def initialize_firebase():
-    cred = credentials.Certificate("serviceAccountKey.json")
-    firebase_admin.initialize_app(cred)
-    return firestore.client()
+    try:
+        # Verifica que el archivo existe y es legible
+        with open("firebase_key.json", "r") as f:
+            content = f.read()
+            if not content.strip():
+                raise ValueError("El archivo firebase_key.json está vacío")
+                
+        cred = credentials.Certificate("firebase_key.json")
+        return firestore.client()
+    except Exception as e:
+        print(f"❌ Error inicializando Firebase: {str(e)}")
+        print("Contenido actual del archivo firebase_key.json:")
+        with open("firebase_key.json", "r") as f:
+            print(f.read())
+        raise
 
 # Función para obtener y procesar datos
 def get_information_firebase(collection, db):
