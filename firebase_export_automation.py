@@ -4,11 +4,10 @@ from firebase_admin import credentials, firestore
 import firebase_admin
 from datetime import datetime
 import os
-import json
 
 # Configuración de Firebase (usando credenciales desde GitHub Secrets)
 def initialize_firebase():
-    cred = credentials.Certificate("firebase_key.json")
+    cred = credentials.Certificate("serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
     return firestore.client()
 
@@ -31,7 +30,7 @@ def get_information_firebase(collection, db):
             pred_date = pred_date.replace(tzinfo=None)
         
         data_list.append({
-            "date": pred_date,
+            "Fecha": pred_date,
             "Direction": direction,
             "toggle_false": pred_direction,
             "Resultado": result
