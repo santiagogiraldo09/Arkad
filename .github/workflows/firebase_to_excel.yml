@@ -44,7 +44,12 @@ jobs:
         head -n 5 firebase_key.json
         echo "=== Verificación JSON ==="
         python -c "import json; json.load(open('firebase_key.json')); print('✓ JSON válido')" || exit 1
-      
+
+    - name: Debug - Mostrar secreto (solo para diagnóstico)
+      run: |
+        echo "Longitud del secreto: ${#FIREBASE_CREDENTIALS} caracteres"
+        echo "Primeros 100 caracteres: ${FIREBASE_CREDENTIALS:0:100}"
+        
     - name: Run export script
       run: python firebase_export_automation.py
       
