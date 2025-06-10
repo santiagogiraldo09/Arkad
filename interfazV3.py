@@ -268,7 +268,7 @@ def obtener_historico_15min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
             'volume': agg.volume
         } for agg in resp]
         
-        #st.write(fecha_inicio)
+        st.write(fecha_inicio)
         #st.write(fecha_inicio.strftime('%Y-%m-%d'))
         # Procesar la respuesta para crear el DataFrame
         #datos = [{'fecha': pd.to_datetime(agg.timestamp, unit='ms'), 'open': agg.open, 'high': agg.high, 
@@ -911,8 +911,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             else: #esce1 = False  
                 data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                #st.write("datos con data_for_date (yahoo finance)")
-                #st.write(data_for_date)
+                st.write("datos con data_for_date (yahoo finance)")
+                st.write(data_for_date)
                 #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                 #st.write("datos con get_open_and_close (alpha vantage")
                 #st.write(data_for_date2)
