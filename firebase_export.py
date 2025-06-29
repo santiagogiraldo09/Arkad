@@ -41,7 +41,7 @@ def get_information_firebase(collection,db):
             pred_date = pred_date.replace(tzinfo=None)
         
         data_list.append({
-        "Fecha": pred_date,
+        "date": pred_date,
         "Direction": direction,
         "toggle_false": pred_direction,
         "Resultado": result,
