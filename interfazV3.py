@@ -618,20 +618,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             continue
                         
                         if trade_type == 'Close to Close':
-                            #precio_usar_apertura = 'close'
-                            #precio_usar_cierre = 'close'
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'close'
                             index = 1
                             #option_price = round(spy_intraday_historial['Close'].iloc[0]) #cambiar a 'close'
                             
                         elif trade_type == 'Close to Open':
-                            #precio_usar_apertura = 'close'
-                            #precio_usar_cierre = 'open'
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'open'
                             index = 1                   
                             #option_price = round(spy_intraday_historial['Close'].iloc[0]) #cambiar a 'close'
                             
                         else: #Open to Close
-                            #precio_usar_apertura = 'open'
-                            #precio_usar_cierre = 'close'
+                            precio_usar_apertura = 'open'
+                            precio_usar_cierre = 'close'
                             index = 0
                             #option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
                          
