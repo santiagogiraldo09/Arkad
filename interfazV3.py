@@ -483,6 +483,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     option_name = ''
     señal_anterior = None  # Para comparar señales entre días
     
+    if periodo == 'Diario':
+        fecha_inicio = fecha_inicio.date()
+        fecha_fin = fecha_fin.date()
+    else:
+        fecha_inicio = pd.Timestamp(fecha_inicio)
+        fecha_fin = pd.Timestamp(fecha_fin)
+    
     if "Trades_H1" in data_filepath:
         #Bucle a través de cada fila del archivo Trades_H1
         for date, row in data.iterrows():
