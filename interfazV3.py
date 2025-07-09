@@ -529,11 +529,32 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write(date)
                         #Abrimos una nueva posición
                         data_for_date = yf.download("SPY", start="2022-01-01", end=date.date() + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                        st.write(data_for_date)
+                        
                         data_for_date = data_for_date.drop(data_for_date.index[-1])
                         data_for_date.columns = data_for_date.columns.str.lower()
                         data_for_date.index.name = 'date'
+                        st.write(data_for_date)
                         print(data_for_date.columns)
+                        
+                        if data_for_date.empty:
+                            continue
+                        if trade_type == 'Close to Close':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'close'
+                            index = 1
+                            option_price = round(data_for_date['Close'].iloc[0])
+                            
+                        elif trade_type == 'Close to Open':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'open'
+                            index = 1                   
+                            option_price = round(data_for_date['Close'].iloc[0])
+                            
+                        else: #Open to Close
+                            precio_usar_apertura = 'open'
+                            precio_usar_cierre = 'close'
+                            index = 0
+                            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
         
         
         if periodo == 'Diario':
