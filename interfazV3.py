@@ -573,9 +573,38 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("No hay posiciones abiertas para la fecha de:")
                         st.write(date)
                         
+                        #Esto sería lo nuevo
+                        if spy_intraday_historial.empty:
+                            continue
+                        
+                        if trade_type == 'Close to Close':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'close'
+                            index = 1
+                            option_price = round(spy_intraday_historial['Close'].iloc[0]) #cambiar a 'close'
+                            
+                        elif trade_type == 'Close to Open':
+                            precio_usar_apertura = 'close'
+                            precio_usar_cierre = 'open'
+                            index = 1                   
+                            option_price = round(spy_intraday_historial['Close'].iloc[0]) #cambiar a 'close'
+                            
+                        else: #Open to Close
+                            precio_usar_apertura = 'open'
+                            precio_usar_cierre = 'close'
+                            index = 0
+                            option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
+                        
+                        st.write("Option price con datos intradía")
+                        st.write(option_price)
                         
                         
                         
+                        
+                        
+                        
+                        
+                        #Esto posiblemente se cambia
                         #Abrimos una nueva posición
                         data_for_date = yf.download("SPY", start="2022-01-01", end=date.date() + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         
