@@ -554,7 +554,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_usar_apertura = 'open'
                             precio_usar_cierre = 'close'
                             index = 0
-                            option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
+                            option_price = round(data_for_date['open'].iloc[0]) #Se basa en la apertura del día actual
         
         
         if periodo == 'Diario':
