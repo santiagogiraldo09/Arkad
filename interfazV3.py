@@ -657,6 +657,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 if allocation_type == 'Porcentaje de asignación':
                                     st.write("Entra en este allocation_type")
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
+                                    st.write(balance)
+                                    st.write(pct_allocation)
+                                    st.write(max_contract_value)
                                     st.write(num_contratos)
                                 else: #allocation_type == 'Monto fijo de inversión':
                                     if balance < max_contract_value:
