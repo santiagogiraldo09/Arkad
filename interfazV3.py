@@ -558,10 +558,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #2. Extraer tiempos de entrada y salida del archivo
                 start_time = pd.to_datetime(row['start_time'])
                 end_time = pd.to_datetime(row['end_time'])
+                option_price = pd.road(row['start_price'])
                 
                 st.write("Si está tomando el archivo")
                 st.write(start_time)
                 st.write(end_time)
+                st.write(option_price)
                 st.write(señal_actual)
                 
                 if señal_actual in [0,1]:
@@ -594,10 +596,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_usar_cierre = 'close'
                             index = 0
                             option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
-                        
-                        st.write("Option price con datos intradía")
-                        st.write(option_price)
-                        
+                                             
                         
                         
                         
