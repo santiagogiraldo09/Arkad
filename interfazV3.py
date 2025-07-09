@@ -21,16 +21,14 @@ from datetime import time
 datos1 = None
 datos2 = None
 
-def open_close_1h(ticker, api_key, fecha_inicio, fecha_fin):
-    global datos1, datos2
-    ticker = "SPY"
+def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
     
     try:
         # --- LÍNEA MODIFICADA ---
-        # Obtener datos agregados cada hora
-        resp = client.get_aggs(ticker=ticker, multiplier=1, timespan="hour", 
+        # Obtener datos agregados cada 30 minutos
+        resp = client.get_aggs(ticker=ticker, multiplier=30, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
         
         datos = [{
@@ -550,7 +548,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             st.write("Descargando historial intradía del SPY...")
             # Llama a tu función existente para obtener los datos del ETF
-            spy_intraday_historial = open_close_1h("SPY", api_key, fecha_inicio, fecha_fin)
+            spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
             st.write(spy_intraday_historial)
             #Bucle a través de cada fila del archivo Trades_H1
             for date, row in data.iterrows():
@@ -565,6 +563,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write(start_time)
                 st.write(end_time)
                 st.write(señal_actual)
+                
                 if señal_actual in [0,1]:
                     if posicion_anterior_abierta: #posicion_anterior_abierta = true
                         st.write("Hay posiciones abiertas...")
