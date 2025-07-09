@@ -505,18 +505,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "Trades_H1" in data_filepath:
-            #Bucle a través de cada fila del archivo Trades_H1
-            for date, row in data.iterrows():
-                if date < fecha_inicio or date > fecha_fin:
-                    continue
+            
                 
-                #2. Extraer tiempos de entrada y salida del archivo
-                start_time = pd.to_datetime(row['start_time'])
-                end_time = pd.to_datetime(row['end_time'])
-                
-                st.print("Si está tomando el archivo")
-                st.print(start_time)
-                st.print(end_time)
+            #2. Extraer tiempos de entrada y salida del archivo
+            start_time = pd.to_datetime(row['start_time'])
+            end_time = pd.to_datetime(row['end_time'])
+            
+            st.print("Si está tomando el archivo")
+            st.print(start_time)
+            st.print(end_time)
         
         
         if periodo == 'Diario':
