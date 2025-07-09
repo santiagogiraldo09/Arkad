@@ -518,6 +518,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 st.write("Si está tomando el archivo")
                 st.write(start_time)
                 st.write(end_time)
+                st.write(señal_actual)
                 if señal_actual in [0,1]:
                     if posicion_anterior_abierta: #posicion_anterior_abierta = true
                         st.write("Hay posiciones abiertas...")
