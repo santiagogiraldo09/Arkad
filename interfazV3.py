@@ -551,7 +551,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             st.write("Descargando historial intradía del SPY...")
             # Llama a tu función existente para obtener los datos del ETF
             spy_intraday_historial = open_close_1h("SPY", api_key, fecha_inicio, fecha_fin)
-            
+            st.write(spy_intraday_historial)
             #Bucle a través de cada fila del archivo Trades_H1
             for date, row in data.iterrows():
                 if date.date() < fecha_inicio or date.date() > fecha_fin:
