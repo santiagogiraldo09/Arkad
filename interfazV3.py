@@ -483,26 +483,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     option_name = ''
     señal_anterior = None  # Para comparar señales entre días
     
-    if periodo == 'Diario':
-        fecha_inicio = fecha_inicio.date()
-        fecha_fin = fecha_fin.date()
-    else:
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
     
-    if "Trades_H1" in data_filepath:
-        #Bucle a través de cada fila del archivo Trades_H1
-        for date, row in data.iterrows():
-            if date < fecha_inicio or date > fecha_fin:
-                continue
-            
-            #2. Extraer tiempos de entrada y salida del archivo
-            start_time = pd.to_datetime(row['start_time'])
-            end_time = pd.to_datetime(row['end_time'])
-            
-            st.print("Si está tomando el archivo")
-            st.print(start_time)
-            st.print(end_time)
+    
     
     if periodo == 'Diario':
         fecha_inicio = fecha_inicio.date()
@@ -521,6 +503,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         if row[column_name] not in [0, 1]:
             continue
+        
+        if "Trades_H1" in data_filepath:
+            #Bucle a través de cada fila del archivo Trades_H1
+            for date, row in data.iterrows():
+                if date < fecha_inicio or date > fecha_fin:
+                    continue
+                
+                #2. Extraer tiempos de entrada y salida del archivo
+                start_time = pd.to_datetime(row['start_time'])
+                end_time = pd.to_datetime(row['end_time'])
+                
+                st.print("Si está tomando el archivo")
+                st.print(start_time)
+                st.print(end_time)
         
         
         if periodo == 'Diario':
