@@ -655,6 +655,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write(max_contract_value)
                                 
                                 if allocation_type == 'Porcentaje de asignación':
+                                    st.write("Entra en este allocation_type")
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
                                 else: #allocation_type == 'Monto fijo de inversión':
                                     if balance < max_contract_value:
@@ -668,6 +669,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write("Option Type actual:")
                                 st.write(option_type)
                                 trade_result = (precio_usar_cierre - option_open_price) * 100 * num_contratos
+                                
                                 if trade_result >= 0:
                                     balance += trade_result
                                     st.write("trade result actual positivo:")
