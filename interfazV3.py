@@ -558,7 +558,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #2. Extraer tiempos de entrada y salida del archivo
                 start_time = pd.to_datetime(row['start_time'])
                 end_time = pd.to_datetime(row['end_time'])
-                option_price = pd.road(row['start_price'])
+                option_price = round(row['start_price'])
                 
                 st.write("Si está tomando el archivo")
                 st.write(start_time)
