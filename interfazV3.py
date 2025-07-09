@@ -744,6 +744,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if periodo == 'Diario':
             señal_actual = row[column_name]
             # Nueva estrategia cuando el checkbox está seleccionado y el periodo es 'Diario'
+            if 'Selected_Models' in data.columns:
+                st.write("Si tiene la columna de modelos seleccionados")
+            else:
+                st.write("El archivo no tiene la columna de modelos seleccionados")
             if esce1:
                 if señal_actual in [0, 1]:
                     if posicion_anterior_abierta:  #posicion_anterior_abierta = True
