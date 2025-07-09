@@ -212,7 +212,7 @@ def listar_archivos_xlxs(directorio):
 def cargar_datos(filepath):
     data = pd.read_excel(filepath)
     if 'date' in data.columns:
-        data['date'] = pd.to_datetime(data['date'])
+        data['date'] = pd.to_datetime(data['date']).dt.tz_localize(None)
     else:
         return None
         
