@@ -652,6 +652,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 st.write("Precio de salida opción día actual:")
                                 st.write(option_close_price)
                                 max_contract_value = option_open_price * 100
+                                st.write(max_contract_value)
                                 
                                 if allocation_type == 'Porcentaje de asignación':
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
