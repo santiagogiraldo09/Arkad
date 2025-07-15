@@ -581,6 +581,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         
         if "Trades_H1" in data_filepath:
             nombre_de_la_columna = 'start_time' 
+            colombia_tz = 'America/Bogota'
+            ny_tz = 'America/New_York'
 
             # El -1 le dice a shift que "suba" el valor de la fila de abajo.
             data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
@@ -597,8 +599,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
                 #2. Extraer tiempos de entrada y salida del archivo
                 start_time = pd.to_datetime(row['start_time'])
+                start_time = start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
+
                 next_start_time = row[f'siguiente_{nombre_de_la_columna}']
+                next_start_time = next_start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
                 end_time = pd.to_datetime(row['end_time'])
+                end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
                 precio_usar_apertura = row['start_price']
                 precio_usar_cierre = row['end_price']
                 option_price = round(row['start_price'])
