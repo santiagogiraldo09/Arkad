@@ -568,6 +568,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
 
+    nombre_de_la_columna = 'start_time' 
+    # El -1 le dice a shift que "suba" el valor de la fila de abajo.
+    data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)    
+
     for date, row in data.iterrows():
         if periodo == 'Diario':
             date = date.date()
@@ -584,8 +588,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
 
-            # El -1 le dice a shift que "suba" el valor de la fila de abajo.
-            data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+            
             señal_actual = row[column_name]
             
             st.write("Descargando historial intradía del SPY...")
