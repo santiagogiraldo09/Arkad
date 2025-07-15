@@ -557,6 +557,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     option_name = ''
     señal_anterior = None  # Para comparar señales entre días
     
+    nombre_de_la_columna = 'start_time' 
+
+    # El -1 le dice a shift que "suba" el valor de la fila de abajo.
+    data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
     
     
     
@@ -592,6 +596,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
                 #2. Extraer tiempos de entrada y salida del archivo
                 start_time = pd.to_datetime(row['start_time'])
+                next_start_time = row[f'siguiente_{nombre_de_la_columna}']
                 end_time = pd.to_datetime(row['end_time'])
                 precio_usar_apertura = row['start_price']
                 precio_usar_cierre = row['end_price']
@@ -599,6 +604,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
                 st.write("Si está tomando el archivo")
                 st.write(start_time)
+                st.write(next_start_time)
                 st.write(end_time)
                 st.write(precio_usar_apertura)
                 st.write(precio_usar_cierre)
