@@ -691,21 +691,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("Este es el precio de cierre de la opción para ese día:")
                             st.write(df_option[precio_usar_cierre].iloc[index])
                             
-                            
+                             
                             balance += trade_result
                             st.write("trade result actual positivo:")
                             st.write(trade_result)
+                            
                             # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                            etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                            etf_data = etf_data.drop(etf_data.index[-1])
-                            etf_data.columns = etf_data.columns.str.lower()
-                            etf_data.index.name = 'date'
-                            etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                            st.write("Precio de entrada día actual:")
-                            st.write(etf_open_price)
-                            etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-                            st.write("Precio salida día actual:")
-                            st.write(etf_close_price)
+                            #etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
+                            #etf_data = etf_data.drop(etf_data.index[-1])
+                            #etf_data.columns = etf_data.columns.str.lower()
+                            #etf_data.index.name = 'date'
+                            #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                            #st.write("Precio de entrada día actual:")
+                            #st.write(etf_open_price)
+                            #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                            #st.write("Precio salida día actual:")
+                            #st.write(etf_close_price)
                             
                             
                             resultados.append({
@@ -720,14 +721,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Fecha Cierre': df_option.index[index],
                                 'Precio Entrada': option_open_price, 
                                 'Precio Salida': df_option[precio_usar_cierre].iloc[index],
-                                'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
+                                #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
+                                'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre],
                                 'Resultado': trade_result,
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
-                                'Open': etf_open_price,
-                                'Close': etf_close_price,
-                                'Open Posición Abierta': etf_open_price,
-                                'Close Posición Abierta': etf_close_price
+                                #'Open': etf_open_price,
+                                #'Close': etf_close_price,
+                                #'Open Posición Abierta': etf_open_price,
+                                #'Close Posición Abierta': etf_close_price
                             })
                             posicion_actual_abierta = False
                             print(trade_result)
