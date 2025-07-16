@@ -16,6 +16,7 @@ import numpy as np
 import requests
 import pytz
 from datetime import time
+import datetime as dt
 
 # Variables globales para almacenar datos1 y datos2
 datos1 = None
@@ -559,9 +560,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     señal_anterior = None  # Para comparar señales entre días
     
     
-    
-    
-    
     if periodo == 'Diario':
         fecha_inicio = fecha_inicio.date()
         fecha_fin = fecha_fin.date()
@@ -573,6 +571,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
         data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        hora_especifica = dt.time(23, 0, 0)
+        fecha_inicio = dt.datetime.combine(fecha_inicio.date(), hora_especifica)
+        fecha_fin = dt.datetime.combine(fecha_fin.date(), hora_especifica)
         
 
     for date, row in data.iterrows():
@@ -763,6 +764,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Opcion': option_name,
                             'Open': precio_usar_apertura_excel,
                             'Close': precio_usar_cierre_excel,
+                            'Costo Posiciones': cost_trade,
                             'Balance Posiciones': balance_posiciones
                             #'Open Posición Abierta': etf_open_price,
                             #'Close Posición Abierta': etf_close_price
