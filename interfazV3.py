@@ -727,13 +727,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         
                         resultados.append({
-                            'Fecha': row[date], 
+                            'Fecha': row['date'], 
                             'Tipo': 'Call' if row[column_name] == 1 else 'Put',
                             #'Pred': row[column_name],
                             'toggle_false': row[column_name],
                             'toggle_true': row[column_name],
-                            'Fecha Apertura': row[start_time],
-                            'Fecha Cierre': row[end_time],
+                            'Fecha Apertura': row['start_time'],
+                            'Fecha Cierre': row['end_time'],
                             #'Fecha Apertura': df_option.index[0],
                             #'Fecha Cierre': df_option.index[index],
                             'Precio Entrada': option_open_price, 
