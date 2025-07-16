@@ -560,13 +560,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     señal_anterior = None  # Para comparar señales entre días
     
     
-    if periodo == 'Diario':
-        fecha_inicio = fecha_inicio.date()
-        fecha_fin = fecha_fin.date()
-    else:
-        fecha_inicio = pd.Timestamp(fecha_inicio)
-        fecha_fin = pd.Timestamp(fecha_fin)
-
     if "Trades_H1" in data_filepath:
         nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
@@ -575,6 +568,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = dt.datetime.combine(fecha_inicio.date(), hora_especifica)
         fecha_fin = dt.datetime.combine(fecha_fin.date(), hora_especifica)
         
+    
+    elif periodo == 'Diario':
+        fecha_inicio = fecha_inicio.date()
+        fecha_fin = fecha_fin.date()
+        
+    else:
+        fecha_inicio = pd.Timestamp(fecha_inicio)
+        fecha_fin = pd.Timestamp(fecha_fin)
+
+    
 
     for date, row in data.iterrows():
         
