@@ -614,7 +614,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_cierre = row['end_price']
             option_price = round(row['start_price'])
             
-            st.write("Descargando historial intradía del SPY para la fecha {start_time}...")
+            st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
             spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
             st.write(spy_intraday_historial)
