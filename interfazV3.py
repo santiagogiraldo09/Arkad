@@ -632,8 +632,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if señal_actual in [0,1]:
                                        
                 #Esto sería lo nuevo
-                if spy_intraday_historial.empty: #Esto a lo mejor ya no se necesita
-                    continue
+                #if spy_intraday_historial.empty: #Esto a lo mejor ya no se necesita
+                    #continue
                 
                 if trade_type == 'Close to Close':
                     precio_usar_apertura = 'close'
@@ -715,8 +715,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                         etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                        #st.write("etf_data")
-                        #st.write(etf_data)
+                        st.write("etf_data")
+                        st.write(etf_data)
                         etf_data = etf_data.drop(etf_data.index[-1])
                         etf_data.columns = etf_data.columns.str.lower()
                         etf_data.index.name = 'date'
