@@ -713,7 +713,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         if next_start_time < end_time:
                             st.write("Balance con posiciones abiertas:")
-                            balance_posiciones += cost_trade
+                            balance_posiciones -= cost_trade
                             st.write(balance_posiciones)
                             trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
                             balance += trade_result
