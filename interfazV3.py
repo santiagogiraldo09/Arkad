@@ -535,6 +535,7 @@ option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
 def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
+    balance_posiciones = balance
     resultados = []
     client = RESTClient(api_key)
     
@@ -685,11 +686,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         if allocation_type == 'Porcentaje de asignación':
                             st.write("Entra en este allocation_type")
-                            num_contratos = int((balance * pct_allocation) / max_contract_value)
-                            st.write(balance)
-                            st.write(pct_allocation)
-                            st.write(max_contract_value)
-                            st.write(num_contratos)
+                            if next_start_time < end_time:
+                                num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                                st.write(balance_posiciones)
+                                st.write(num_contratos)
+                            else: #next_start_time > end_time:
+                                num_contratos = int((balance * pct_allocation) / max_contract_value)
+                                st.write(balance)
+                                st.write(pct_allocation)
+                                st.write(max_contract_value)
+                                st.write(num_contratos)
                         else: #allocation_type == 'Monto fijo de inversión':
                             if balance < max_contract_value:
                                 st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
@@ -704,13 +710,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         cost_trade = max_contract_value * num_contratos
                         st.write("Costo de la operación:")
                         st.write(cost_trade)
-                        #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                        trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
-                        st.write("Este es el precio de cierre de la opción para ese día:")
-                        st.write(df_option[precio_usar_cierre].iloc[index])
                         
+                        if next_start_time < end_time:
+                            st.write("Balance con posiciones abiertas:")
+                            balance_posiciones += cost_trade
+                            st.write(balance_posiciones)
+                            trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
+                            balance += trade_result
+                        else: #next_start_time > end_time:
+                            #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                            trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
+                            st.write("Este es el precio de cierre de la opción para ese día:")
+                            st.write(df_option[precio_usar_cierre].iloc[index])
+                            balance += trade_result
+                            balance_posiciones = balance
                          
-                        balance += trade_result
+                        
                         #st.write("trade result actual positivo:")
                         #st.write(trade_result)
                         
@@ -748,6 +763,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Opcion': option_name,
                             'Open': precio_usar_apertura_excel,
                             'Close': precio_usar_cierre_excel,
+                            'Balance Posiciones': balance_posiciones
                             #'Open Posición Abierta': etf_open_price,
                             #'Close Posición Abierta': etf_close_price
                         })
