@@ -570,7 +570,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
     if "Trades_H1" in data_filepath:
         nombre_de_la_columna = 'start_time'
-        # ¡CORRECTO! Creas la columna una sola vez, antes de recorrer
+        # Se crea la columna una sola vez, antes de recorrer
         data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
         
 
@@ -595,10 +595,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             señal_actual = row[column_name]
             
-            st.write("Descargando historial intradía del SPY...")
-            # Llama a tu función existente para obtener los datos del ETF
-            spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
-            st.write(spy_intraday_historial)
+            
                 
             #2. Extraer tiempos de entrada y salida del archivo
             start_time = pd.to_datetime(row['start_time'])
@@ -616,6 +613,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_apertura = row['start_price']
             precio_usar_cierre = row['end_price']
             option_price = round(row['start_price'])
+            
+            st.write("Descargando historial intradía del SPY para la fecha {start_time}...")
+            # Llama a tu función existente para obtener los datos del ETF
+            spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
+            st.write(spy_intraday_historial)
+            
             
             st.write("Si está tomando el archivo")
             st.write(start_time)
