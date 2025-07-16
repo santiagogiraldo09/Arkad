@@ -714,16 +714,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write(trade_result)
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                        #etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                        #etf_data = etf_data.drop(etf_data.index[-1])
-                        #etf_data.columns = etf_data.columns.str.lower()
-                        #etf_data.index.name = 'date'
-                        #etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
-                        #st.write("Precio de entrada día actual:")
-                        #st.write(etf_open_price)
-                        #etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
-                        #st.write("Precio salida día actual:")
-                        #st.write(etf_close_price)
+                        etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
+                        etf_data = etf_data.drop(etf_data.index[-1])
+                        etf_data.columns = etf_data.columns.str.lower()
+                        etf_data.index.name = 'date'
+                        etf_open_price = etf_data['Open'].iloc[0] if not etf_data.empty else None
+                        st.write("Precio de entrada día actual:")
+                        st.write(etf_open_price)
+                        etf_close_price = etf_data['Close'].iloc[0] if not etf_data.empty else None
+                        st.write("Precio salida día actual:")
+                        st.write(etf_close_price)
                         
                         
                         resultados.append({
@@ -743,8 +743,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Resultado': trade_result,
                             'Contratos': num_contratos,
                             'Opcion': option_name,
-                            #'Open': etf_open_price,
-                            #'Close': etf_close_price,
+                            'Open': etf_open_price,
+                            'Close': etf_close_price,
                             #'Open Posición Abierta': etf_open_price,
                             #'Close Posición Abierta': etf_close_price
                         })
