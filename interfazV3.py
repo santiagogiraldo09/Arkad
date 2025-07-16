@@ -568,6 +568,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
 
+    if "Trades_H1" in data_filepath:
+        nombre_de_la_columna = 'start_time'
+        # ¡CORRECTO! Creas la columna una sola vez, antes de recorrer
+        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
         
 
     for date, row in data.iterrows():
@@ -583,10 +587,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "Trades_H1" in data_filepath:
-            nombre_de_la_columna = 'start_time' 
-            # El -1 le dice a shift que "suba" el valor de la fila de abajo.
-            data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
-            nombre_de_la_columna = 'start_time' 
+            st.write("--------------------------------------------------------------------------------")
+        
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
 
