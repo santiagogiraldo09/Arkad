@@ -616,20 +616,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             precio_usar_cierre_excel = row['end_price']
             option_price = round(row['start_price'])
             
-            st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
+            #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
             spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
-            st.write(spy_intraday_historial)
+            #st.write(spy_intraday_historial)
             
             
-            st.write("Si está tomando el archivo")
-            st.write(start_time)
-            st.write(next_start_time)
-            st.write(end_time)
-            st.write(precio_usar_apertura_excel)
-            st.write(precio_usar_cierre_excel)
-            st.write(option_price)
-            st.write(señal_actual)
+            #st.write("Si está tomando el archivo")
+            #st.write(start_time)
+            #st.write(next_start_time)
+            #st.write(end_time)
+            #st.write(precio_usar_apertura_excel)
+            #st.write(precio_usar_cierre_excel)
+            #st.write(option_price)
+            #st.write(señal_actual)
             
             if señal_actual in [0,1]:
                                        
@@ -657,72 +657,72 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                  
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                 option_price = actual_option_price
-                st.write("option date")
-                st.write(option_date)
+                #st.write("option date")
+                #st.write(option_date)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
-                    st.write("df_option:")
-                    st.write(df_option)
+                    #st.write("df_option:")
+                    #st.write(df_option)
                     df_option = df_option.loc[start_time:]
-                    st.write("df_option recortado:")
-                    st.write(df_option)
+                    #st.write("df_option recortado:")
+                    #st.write(df_option)
                     df_option_cierre = df_option.loc[end_time]
-                    st.write("df_option recortado al cierre:")
-                    st.write(df_option_cierre)
+                    #st.write("df_option recortado al cierre:")
+                    #st.write(df_option_cierre)
                     if not df_option.empty:
                         posicion_actual_abierta = True
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
-                        st.write("Precio de entrada para la opción día actual:")
-                        st.write(option_open_price)
+                        #st.write("Precio de entrada para la opción día actual:")
+                        #st.write(option_open_price)
                         option_close_price = df_option[precio_usar_cierre].iloc[index]
-                        st.write("Precio de salida opción día actual:")
-                        st.write(option_close_price)
+                        #st.write("Precio de salida opción día actual:")
+                        #st.write(option_close_price)
                         option_close_price_cierre = df_option_cierre[precio_usar_cierre]
-                        st.write("Precio de salida opción día de cierre:")
-                        st.write(option_close_price_cierre)
+                        #st.write("Precio de salida opción día de cierre:")
+                        #st.write(option_close_price_cierre)
                         max_contract_value = option_open_price * 100
-                        st.write(max_contract_value)
+                        #st.write(max_contract_value)
                         
                         if allocation_type == 'Porcentaje de asignación':
-                            st.write("Entra en este allocation_type")
+                            #st.write("Entra en este allocation_type")
                             if next_start_time < end_time:
                                 num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                st.write(balance_posiciones)
-                                st.write(num_contratos)
+                                #st.write(balance_posiciones)
+                                #st.write(num_contratos)
                             else: #next_start_time > end_time:
                                 num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                st.write(balance)
-                                st.write(pct_allocation)
-                                st.write(max_contract_value)
-                                st.write(num_contratos)
+                                #st.write(balance)
+                                #st.write(pct_allocation)
+                                #st.write(max_contract_value)
+                                #st.write(num_contratos)
                         else: #allocation_type == 'Monto fijo de inversión':
                             if balance < max_contract_value:
-                                st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
+                                #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                                 return pd.DataFrame(resultados), balance
                             else: #balance >= max_contract_value
                                 num_contratos = int(fixed_amount / max_contract_value)
                         
-                        st.write("Numero de contratos día actual:")
-                        st.write(num_contratos)
-                        st.write("Option Type actual:")
-                        st.write(option_type)
+                        #st.write("Numero de contratos día actual:")
+                        #st.write(num_contratos)
+                        #st.write("Option Type actual:")
+                        #st.write(option_type)
                         cost_trade = max_contract_value * num_contratos
-                        st.write("Costo de la operación:")
-                        st.write(cost_trade)
+                        #st.write("Costo de la operación:")
+                        #st.write(cost_trade)
                         
                         if next_start_time < end_time:
-                            st.write("Balance con posiciones abiertas:")
+                            #st.write("Balance con posiciones abiertas:")
                             balance_posiciones -= cost_trade
-                            st.write(balance_posiciones)
+                            #st.write(balance_posiciones)
                             trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
                             balance += trade_result
                         else: #next_start_time > end_time:
                             #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
-                            st.write("Este es el precio de cierre de la opción para ese día:")
-                            st.write(df_option[precio_usar_cierre].iloc[index])
+                            #st.write("Este es el precio de cierre de la opción para ese día:")
+                            #st.write(df_option[precio_usar_cierre].iloc[index])
                             balance += trade_result
                             balance_posiciones = balance
                          
@@ -732,17 +732,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                         etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                        st.write("etf_data")
-                        st.write(etf_data)
+                        #st.write("etf_data")
+                        #st.write(etf_data)
                         etf_data = etf_data.drop(etf_data.index[-1])
                         etf_data.columns = etf_data.columns.str.lower()
                         etf_data.index.name = 'date'
                         etf_open_price = etf_data['open'].iloc[0] if not etf_data.empty else None
-                        st.write("Precio de entrada día actual:")
-                        st.write(etf_open_price)
+                        #st.write("Precio de entrada día actual:")
+                        #st.write(etf_open_price)
                         etf_close_price = etf_data['close'].iloc[0] if not etf_data.empty else None
-                        st.write("Precio salida día actual:")
-                        st.write(etf_close_price)
+                        #st.write("Precio salida día actual:")
+                        #st.write(etf_close_price)
                         
                         
                         resultados.append({
