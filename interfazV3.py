@@ -589,7 +589,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "Trades_H1" in data_filepath:
-            st.write("--------------------------------------------------------------------------------")
+            #st.write("--------------------------------------------------------------------------------")
         
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
