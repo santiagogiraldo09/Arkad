@@ -746,8 +746,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Resultado': trade_result,
                             'Contratos': num_contratos,
                             'Opcion': option_name,
-                            'Open': etf_open_price,
-                            'Close': etf_close_price,
+                            'Open': precio_usar_apertura,
+                            'Close': precio_usar_cierre,
                             #'Open Posición Abierta': etf_open_price,
                             #'Close Posición Abierta': etf_close_price
                         })
