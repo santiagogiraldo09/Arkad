@@ -610,8 +610,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
             end_time = end_time.tz_localize(None)
             
-            precio_usar_apertura = row['start_price']
-            precio_usar_cierre = row['end_price']
+            precio_usar_apertura_excel = row['start_price']
+            precio_usar_cierre_excel = row['end_price']
             option_price = round(row['start_price'])
             
             st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
@@ -624,8 +624,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             st.write(start_time)
             st.write(next_start_time)
             st.write(end_time)
-            st.write(precio_usar_apertura)
-            st.write(precio_usar_cierre)
+            st.write(precio_usar_apertura_excel)
+            st.write(precio_usar_cierre_excel)
             st.write(option_price)
             st.write(señal_actual)
             
@@ -711,8 +711,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                          
                         balance += trade_result
-                        st.write("trade result actual positivo:")
-                        st.write(trade_result)
+                        #st.write("trade result actual positivo:")
+                        #st.write(trade_result)
                         
                         # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                         etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
@@ -746,8 +746,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Resultado': trade_result,
                             'Contratos': num_contratos,
                             'Opcion': option_name,
-                            'Open': precio_usar_apertura,
-                            'Close': precio_usar_cierre,
+                            'Open': precio_usar_apertura_excel,
+                            'Close': precio_usar_cierre_excel,
                             #'Open Posición Abierta': etf_open_price,
                             #'Close Posición Abierta': etf_close_price
                         })
