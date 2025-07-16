@@ -669,8 +669,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write("df_option recortado:")
                     #st.write(df_option)
                     df_option_cierre = df_option.loc[end_time]
-                    #st.write("df_option recortado al cierre:")
-                    #st.write(df_option_cierre)
+                    st.write("df_option recortado al cierre:")
+                    st.write(df_option_cierre)
                     if not df_option.empty:
                         posicion_actual_abierta = True
                         option_open_price = df_option[precio_usar_apertura].iloc[0]
