@@ -704,7 +704,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         cost_trade = max_contract_value * num_contratos
                         st.write("Costo de la operación:")
                         st.write(cost_trade)
-                        trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                        #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                        trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
                         st.write("Este es el precio de cierre de la opción para ese día:")
                         st.write(df_option[precio_usar_cierre].iloc[index])
                         
