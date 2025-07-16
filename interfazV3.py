@@ -668,109 +668,111 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     df_option = df_option.loc[start_time:]
                     st.write("df_option recortado:")
                     st.write(df_option)
-                    df_option_cierre = df_option.loc[end_time]
-                    st.write("df_option recortado al cierre:")
-                    st.write(df_option_cierre)
-                    if not df_option_cierre.empty:
-                        posicion_actual_abierta = True
-                        option_open_price = df_option[precio_usar_apertura].iloc[0]
-                        #st.write("Precio de entrada para la opción día actual:")
-                        #st.write(option_open_price)
-                        option_close_price = df_option[precio_usar_cierre].iloc[index]
-                        #st.write("Precio de salida opción día actual:")
-                        #st.write(option_close_price)
-                        option_close_price_cierre = df_option_cierre[precio_usar_cierre]
-                        #st.write("Precio de salida opción día de cierre:")
-                        #st.write(option_close_price_cierre)
-                        max_contract_value = option_open_price * 100
-                        #st.write(max_contract_value)
-                        
-                        if allocation_type == 'Porcentaje de asignación':
-                            #st.write("Entra en este allocation_type")
+                    
+                    if not df_option.empty:
+                        if end_time in df_option.index:
+                            df_option_cierre = df_option.loc[end_time]
+                            st.write("df_option recortado al cierre:")
+                            st.write(df_option_cierre)
+                            posicion_actual_abierta = True
+                            option_open_price = df_option[precio_usar_apertura].iloc[0]
+                            #st.write("Precio de entrada para la opción día actual:")
+                            #st.write(option_open_price)
+                            option_close_price = df_option[precio_usar_cierre].iloc[index]
+                            #st.write("Precio de salida opción día actual:")
+                            #st.write(option_close_price)
+                            option_close_price_cierre = df_option_cierre[precio_usar_cierre]
+                            #st.write("Precio de salida opción día de cierre:")
+                            #st.write(option_close_price_cierre)
+                            max_contract_value = option_open_price * 100
+                            #st.write(max_contract_value)
+                            
+                            if allocation_type == 'Porcentaje de asignación':
+                                #st.write("Entra en este allocation_type")
+                                if next_start_time < end_time:
+                                    num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                                    #st.write(balance_posiciones)
+                                    #st.write(num_contratos)
+                                else: #next_start_time > end_time:
+                                    num_contratos = int((balance * pct_allocation) / max_contract_value)
+                                    #st.write(balance)
+                                    #st.write(pct_allocation)
+                                    #st.write(max_contract_value)
+                                    #st.write(num_contratos)
+                            else: #allocation_type == 'Monto fijo de inversión':
+                                if balance < max_contract_value:
+                                    #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
+                                    return pd.DataFrame(resultados), balance
+                                else: #balance >= max_contract_value
+                                    num_contratos = int(fixed_amount / max_contract_value)
+                            
+                            #st.write("Numero de contratos día actual:")
+                            #st.write(num_contratos)
+                            #st.write("Option Type actual:")
+                            #st.write(option_type)
+                            cost_trade = max_contract_value * num_contratos
+                            #st.write("Costo de la operación:")
+                            #st.write(cost_trade)
+                            
                             if next_start_time < end_time:
-                                num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                                #st.write("Balance con posiciones abiertas:")
+                                balance_posiciones -= cost_trade
                                 #st.write(balance_posiciones)
-                                #st.write(num_contratos)
+                                trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
+                                balance += trade_result
                             else: #next_start_time > end_time:
-                                num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                #st.write(balance)
-                                #st.write(pct_allocation)
-                                #st.write(max_contract_value)
-                                #st.write(num_contratos)
-                        else: #allocation_type == 'Monto fijo de inversión':
-                            if balance < max_contract_value:
-                                #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
-                                return pd.DataFrame(resultados), balance
-                            else: #balance >= max_contract_value
-                                num_contratos = int(fixed_amount / max_contract_value)
-                        
-                        #st.write("Numero de contratos día actual:")
-                        #st.write(num_contratos)
-                        #st.write("Option Type actual:")
-                        #st.write(option_type)
-                        cost_trade = max_contract_value * num_contratos
-                        #st.write("Costo de la operación:")
-                        #st.write(cost_trade)
-                        
-                        if next_start_time < end_time:
-                            #st.write("Balance con posiciones abiertas:")
-                            balance_posiciones -= cost_trade
-                            #st.write(balance_posiciones)
-                            trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
-                            balance += trade_result
-                        else: #next_start_time > end_time:
-                            #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                            trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
-                            #st.write("Este es el precio de cierre de la opción para ese día:")
-                            #st.write(df_option[precio_usar_cierre].iloc[index])
-                            balance += trade_result
-                            balance_posiciones = balance
-                         
-                        
-                        #st.write("trade result actual positivo:")
-                        #st.write(trade_result)
-                        
-                        # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
-                        etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                        #st.write("etf_data")
-                        #st.write(etf_data)
-                        etf_data = etf_data.drop(etf_data.index[-1])
-                        etf_data.columns = etf_data.columns.str.lower()
-                        etf_data.index.name = 'date'
-                        etf_open_price = etf_data['open'].iloc[0] if not etf_data.empty else None
-                        #st.write("Precio de entrada día actual:")
-                        #st.write(etf_open_price)
-                        etf_close_price = etf_data['close'].iloc[0] if not etf_data.empty else None
-                        #st.write("Precio salida día actual:")
-                        #st.write(etf_close_price)
-                        
-                        
-                        resultados.append({
-                            'Fecha': start_time, 
-                            'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                            #'Pred': row[column_name],
-                            'toggle_false': row[column_name],
-                            'toggle_true': row[column_name],
-                            'Fecha Apertura': start_time,
-                            'Fecha Cierre': end_time,
-                            #'Fecha Apertura': df_option.index[0],
-                            #'Fecha Cierre': df_option.index[index],
-                            'Precio Entrada': option_open_price, 
-                            'Precio Salida': df_option[precio_usar_cierre].iloc[index],
-                            #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
-                            'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre],
-                            'Resultado': trade_result,
-                            'Contratos': num_contratos,
-                            'Opcion': option_name,
-                            'Open': precio_usar_apertura_excel,
-                            'Close': precio_usar_cierre_excel,
-                            'Costo Posiciones': cost_trade,
-                            'Balance Posiciones': balance_posiciones
-                            #'Open Posición Abierta': etf_open_price,
-                            #'Close Posición Abierta': etf_close_price
-                        })
-                        posicion_actual_abierta = False
-                        print(trade_result)
+                                #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                                trade_result = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
+                                #st.write("Este es el precio de cierre de la opción para ese día:")
+                                #st.write(df_option[precio_usar_cierre].iloc[index])
+                                balance += trade_result
+                                balance_posiciones = balance
+                             
+                            
+                            #st.write("trade result actual positivo:")
+                            #st.write(trade_result)
+                            
+                            # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
+                            etf_data = yf.download("SPY", start="2022-01-01", end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
+                            #st.write("etf_data")
+                            #st.write(etf_data)
+                            etf_data = etf_data.drop(etf_data.index[-1])
+                            etf_data.columns = etf_data.columns.str.lower()
+                            etf_data.index.name = 'date'
+                            etf_open_price = etf_data['open'].iloc[0] if not etf_data.empty else None
+                            #st.write("Precio de entrada día actual:")
+                            #st.write(etf_open_price)
+                            etf_close_price = etf_data['close'].iloc[0] if not etf_data.empty else None
+                            #st.write("Precio salida día actual:")
+                            #st.write(etf_close_price)
+                            
+                            
+                            resultados.append({
+                                'Fecha': start_time, 
+                                'Tipo': 'Call' if row[column_name] == 1 else 'Put',
+                                #'Pred': row[column_name],
+                                'toggle_false': row[column_name],
+                                'toggle_true': row[column_name],
+                                'Fecha Apertura': start_time,
+                                'Fecha Cierre': end_time,
+                                #'Fecha Apertura': df_option.index[0],
+                                #'Fecha Cierre': df_option.index[index],
+                                'Precio Entrada': option_open_price, 
+                                'Precio Salida': df_option[precio_usar_cierre].iloc[index],
+                                #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
+                                'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre],
+                                'Resultado': trade_result,
+                                'Contratos': num_contratos,
+                                'Opcion': option_name,
+                                'Open': precio_usar_apertura_excel,
+                                'Close': precio_usar_cierre_excel,
+                                'Costo Posiciones': cost_trade,
+                                'Balance Posiciones': balance_posiciones
+                                #'Open Posición Abierta': etf_open_price,
+                                #'Close Posición Abierta': etf_close_price
+                            })
+                            posicion_actual_abierta = False
+                            print(trade_result)
                                 
         
         else: #El archivo no es Trades_H1
