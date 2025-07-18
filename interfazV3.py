@@ -663,17 +663,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
-                    st.write("df_option:")
-                    st.write(df_option)
+                    #st.write("df_option:")
+                    #st.write(df_option)
                     df_option = df_option.loc[start_time:]
-                    st.write("df_option recortado:")
-                    st.write(df_option)
+                    #st.write("df_option recortado:")
+                    #st.write(df_option)
                     
                     if not df_option.empty:
                         if end_time in df_option.index:
                             df_option_cierre = df_option.loc[end_time]
-                            st.write("df_option recortado al cierre:")
-                            st.write(df_option_cierre)
+                            #st.write("df_option recortado al cierre:")
+                            #st.write(df_option_cierre)
                             posicion_actual_abierta = True
                             option_open_price = df_option[precio_usar_apertura].iloc[0]
                             #st.write("Precio de entrada para la opción día actual:")
