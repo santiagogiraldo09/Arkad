@@ -567,15 +567,28 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
 
-    keywords = ["Trades_H1", "Trades_H1_Best1", "Trades_H1_Best2", "Trades_H1_Best3"]
-    if any(keyword in data_filepath for keyword in keywords):
-    #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
+    if "Trades_H1" in data_filepath:
         nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
         data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
         #hora_especifica = dt.time(23, 0, 0)
         #fecha_inicio = dt.datetime.combine(fecha_inicio.date(), hora_especifica)
         #fecha_fin = dt.datetime.combine(fecha_fin.date(), hora_especifica)
+    if "Trades_H1_Best1" in data_filepath:
+        nombre_de_la_columna = 'start_time'
+        # Se crea la columna una sola vez, antes de recorrer
+        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+
+    if "Trades_H1_Best2" in data_filepath:
+        nombre_de_la_columna = 'start_time'
+        # Se crea la columna una sola vez, antes de recorrer
+        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+    
+    if "Trades_H1_Best3" in data_filepath:
+        nombre_de_la_columna = 'start_time'
+        # Se crea la columna una sola vez, antes de recorrer
+        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+
         
 
     for date, row in data.iterrows():
