@@ -1224,8 +1224,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                     else: #esce1 = False  
                         data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                        st.write("datos con data_for_date (yahoo finance)")
-                        st.write(data_for_date)
+                        #st.write("datos con data_for_date (yahoo finance)")
+                        #st.write(data_for_date)
                         #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                         #st.write("datos con get_open_and_close (alpha vantage")
                         #st.write(data_for_date2)
@@ -1260,13 +1260,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #if data_for_date3.empty:
                             #continue
                         if trade_type == 'Close to Close':
-                            st.write("Es close to close")
+                            #st.write("Es close to close")
                             precio_usar_apertura = 'close'
                             precio_usar_cierre = 'close'
                             index = 1
                             option_price = round(data_for_date['Close'].iloc[0])
-                            st.write("option price 1:")
-                            st.write(option_price)
+                            #st.write("option price 1:")
+                            #st.write(option_price)
                             #option_price_5min = round(data_for_date3['close'].iloc[0])
                             
                         elif trade_type == 'Close to Open':
@@ -1287,30 +1287,30 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         option_price = actual_option_price
-                        st.write("Option_date:")
-                        st.write(option_date)
-                        st.write("option price 2:")
-                        st.write(option_price)
+                        #st.write("Option_date:")
+                        #st.write(option_date)
+                        #st.write("option price 2:")
+                        #st.write(option_price)
                         if option_date:
                             option_type = 'C' if row[column_name] == 1 else 'P'
                             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                             df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                            st.write("df_option:")
-                            st.write(df_option)
+                            #st.write("df_option:")
+                            #st.write(df_option)
                             if not df_option.empty:
                                 option_open_price = df_option[precio_usar_apertura].iloc[0]
                                 option_close_price = df_option[precio_usar_cierre].iloc[index]
-                                st.write("option open price:")
-                                st.write(option_open_price)
-                                st.write("option close price:")
-                                st.write(option_close_price)
+                                #st.write("option open price:")
+                                #st.write(option_open_price)
+                                #st.write("option close price:")
+                                #st.write(option_close_price)
                                 max_contract_value = option_open_price * 100
-                                st.write("max_contract_value")
-                                st.write(max_contract_value)
+                                #st.write("max_contract_value")
+                                #st.write(max_contract_value)
                                 if allocation_type == 'Porcentaje de asignación':
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                    st.write("Número de contratos:")
-                                    st.write(num_contratos)
+                                    #st.write("Número de contratos:")
+                                    #st.write(num_contratos)
                                 else: #allocation_type == 'Monto fijo de inversión':
                                     if balance < max_contract_value:
                                         st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
@@ -1318,16 +1318,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     else: #balance >= max_contract_value
                                         num_contratos = int(fixed_amount / max_contract_value)
                                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                st.write("trade result:")
-                                st.write(trade_result)
+                                #st.write("trade result:")
+                                #st.write(trade_result)
                                 balance += trade_result
-                                st.write("Balance:")
-                                st.write(balance)
+                                #st.write("Balance:")
+                                #st.write(balance)
                                 
                                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                                 etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                                st.write("datos sin eliminar ultimo index-etf")
-                                st.write(etf_data)
+                                #st.write("datos sin eliminar ultimo index-etf")
+                                #st.write(etf_data)
                                 #etf_data = etf_data.drop(etf_data.index[-1])
                                 #etf_data.columns = etf_data.columns.str.lower()
                                 etf_data.index.name = 'date'
