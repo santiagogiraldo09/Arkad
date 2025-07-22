@@ -1101,11 +1101,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 data_for_date = data_for_date.drop(data_for_date.index[-1])
                                 data_for_date.columns = data_for_date.columns.str.lower()
                                 data_for_date.index.name = 'date'
+                                st.write("data_for_date")
+                                st.write(data_for_date)
                                 print(data_for_date.columns)
                                 
                                 if data_for_date.empty:
                                     continue
                                 if trade_type == 'Close to Close':
+                                    st.write("Es close to close")
                                     precio_usar_apertura = 'close'
                                     precio_usar_cierre = 'close'
                                     index = 1
