@@ -1300,9 +1300,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if not df_option.empty:
                                 option_open_price = df_option[precio_usar_apertura].iloc[0]
                                 option_close_price = df_option[precio_usar_cierre].iloc[index]
+                                st.write("option open price:")
+                                st.write(option_open_price)
+                                st.write("option close price:")
+                                st.write(option_close_price)
                                 max_contract_value = option_open_price * 100
+                                st.write("max_contract_value")
+                                st.write(max_contract_value)
                                 if allocation_type == 'Porcentaje de asignación':
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
+                                    st.write("Número de contratos:")
+                                    st.write(num_contratos)
                                 else: #allocation_type == 'Monto fijo de inversión':
                                     if balance < max_contract_value:
                                         st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
@@ -1310,12 +1318,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     else: #balance >= max_contract_value
                                         num_contratos = int(fixed_amount / max_contract_value)
                                 trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                                st.write("trade result:")
+                                st.write(trade_result)
                                 balance += trade_result
+                                st.write("Balance:")
+                                st.write(balance)
                                 
                                 # Obtener el precio de apertura del ETF del índice para la fecha correspondiente con Yahoo Finance
                                 etf_data = yf.download("SPY", start=date, end=date + pd.Timedelta(days=1), multi_level_index=False, auto_adjust=False)
-                                #st.write("datos sin eliminar ultimo index-etf")
-                                #st.write(etf_data)
+                                st.write("datos sin eliminar ultimo index-etf")
+                                st.write(etf_data)
                                 #etf_data = etf_data.drop(etf_data.index[-1])
                                 #etf_data.columns = etf_data.columns.str.lower()
                                 etf_data.index.name = 'date'
