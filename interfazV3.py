@@ -1224,8 +1224,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         
                     else: #esce1 = False  
                         data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
-                        #st.write("datos con data_for_date (yahoo finance)")
-                        #st.write(data_for_date)
+                        st.write("datos con data_for_date (yahoo finance)")
+                        st.write(data_for_date)
                         #data_for_date2 = get_open_and_close(ticker, api_av, fecha_inicio, fecha_fin)
                         #st.write("datos con get_open_and_close (alpha vantage")
                         #st.write(data_for_date2)
@@ -1260,6 +1260,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #if data_for_date3.empty:
                             #continue
                         if trade_type == 'Close to Close':
+                            st.write("Es close to close")
                             precio_usar_apertura = 'close'
                             precio_usar_cierre = 'close'
                             index = 1
