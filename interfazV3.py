@@ -603,7 +603,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if row[column_name] not in [0, 1]:
             continue
         
-        if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
+        #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
+        if "Trades_H1" in data_filepath:
             #st.write("--------------------------------------------------------------------------------")
         
             colombia_tz = 'America/Bogota'
