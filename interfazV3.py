@@ -810,7 +810,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     ensamble = False
                 
                 if ensamble and row['Selected_Models'] == "[]":
-                #if ensamble and row['probability'] == 0 or ensamble and row['Selected_Models'] == "[]":
+                #if ensamble and row['probability'] == 0:
                     continue
                 else: #Si tiene modelos
                     
@@ -826,10 +826,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 data_for_date = data_for_date.drop(data_for_date.index[-1])
                                 #data_for_date.columns = data_for_date.columns.str.lower()
                                 data_for_date.index.name = 'date'
+                                st.write("data_for_date")
+                                st.write(data_for_date)
                                 print(data_for_date.columns)
                                 if data_for_date.empty:
                                     continue
                                 if trade_type == 'Close to Close':
+                                    st.write("Es close to close")
                                     precio_usar_apertura = 'close'
                                     precio_usar_cierre = 'close'
                                     index = 1
