@@ -1777,7 +1777,7 @@ def main():
         datos = pd.read_excel(r"resultados_trades_1.xlsx")
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio)) & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
         if trade_type == 'Close to Close':
-            datos['Direction'] = (datos['Close'] > datos['Close'].shift(1)).astype(int)
+            datos['Direction'] = (datos['Close'].shift(-1) > datos['Close']).astype(int)
         elif trade_type == 'Close to Open':
             datos['Direction'] = (datos['Close'].shift(1) < datos['Open']).astype(int)
         elif trade_type == 'Open to Close':
@@ -1798,11 +1798,23 @@ def main():
         datos['accu'] = datos['cumsum']/(datos.index + 1)
         
         # Muestra el DataFrame actualizado
-        datos['open_to_close_pct'] = datos['Close']/datos['Open'] - 1
-
-        # Calcula la ganancia
-        datos['Ganancia'] = datos.apply(lambda row: abs(
-            row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
+        if trade_type == 'Open to Close':
+            datos['open_to_close_pct'] = datos['Close']/datos['Open'] - 1
+    
+            # Calcula la ganancia
+            datos['Ganancia'] = datos.apply(lambda row: abs(
+                row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
+            
+        elif trade_type == 'Close to Close':
+            datos['close_to_close_pct'] = datos['Close'].shift(-1) / datos['Close'] - 1
+            # Calcula la ganancia
+            datos['Ganancia'] = datos.apply(lambda row: abs(
+                row['close_to_close_pct']) if row['acierto'] else -abs(row['close_to_close_pct']), axis=1)
+        else:
+            datos['close_to_open_pct'] = datos['Open'].shift(-1) / datos['Close'] - 1 
+            # Calcula la ganancia
+            datos['Ganancia'] = datos.apply(lambda row: abs(
+                row['close_to_open_pct']) if row['acierto'] else -abs(row['close_to_open_pct']), axis=1)
 
         # Calcula la ganancia acumulada
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
