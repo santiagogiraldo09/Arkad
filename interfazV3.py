@@ -1265,6 +1265,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             precio_usar_cierre = 'close'
                             index = 1
                             option_price = round(data_for_date['Close'].iloc[0])
+                            st.write("option price 1:")
+                            st.write(option_price)
                             #option_price_5min = round(data_for_date3['close'].iloc[0])
                             
                         elif trade_type == 'Close to Open':
@@ -1285,13 +1287,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
                         option_price = actual_option_price
-                        #st.write("Option_date:")
-                        #st.write(option_date)
+                        st.write("Option_date:")
+                        st.write(option_date)
+                        st.write("option price 2:")
+                        st.write(option_price)
                         if option_date:
                             option_type = 'C' if row[column_name] == 1 else 'P'
                             option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                             df_option = obtener_historico(option_name, api_key, date, date + timedelta(days=option_days))
-                            #st.write(df_option)
+                            st.write("df_option:")
+                            st.write(df_option)
                             if not df_option.empty:
                                 option_open_price = df_option[precio_usar_apertura].iloc[0]
                                 option_close_price = df_option[precio_usar_cierre].iloc[index]
