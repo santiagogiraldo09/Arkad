@@ -795,14 +795,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             if periodo == 'Diario':
                 señal_actual = row[column_name]
                 
-                if 'probability' or 'Selecteed_Models' in data.columns:
+                if 'probability' in data.columns:
+                    #st.write("Si tiene la columna de modelos seleccionados")
+                    ensamble = True
+                else:
+                    #st.write("El archivo no tiene la columna de modelos seleccionados")
+                    ensamble = False
+                    
+                if 'Selecteed_Models' in data.columns:
                     #st.write("Si tiene la columna de modelos seleccionados")
                     ensamble = True
                 else:
                     #st.write("El archivo no tiene la columna de modelos seleccionados")
                     ensamble = False
                 
-                if ensamble and row['probability'] == 0 or ensamble and row['Selected_Models'] == "[]":
+                if ensamble and row['Selected_Models'] == "[]":
+                #if ensamble and row['probability'] == 0 or ensamble and row['Selected_Models'] == "[]":
                     continue
                 else: #Si tiene modelos
                     
