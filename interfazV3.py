@@ -29,7 +29,7 @@ def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     try:
         # --- LÍNEA MODIFICADA ---
         # Obtener datos agregados cada 30 minutos
-        resp = client.get_aggs(ticker=ticker, multiplier=30, timespan="minute", 
+        resp = client.get_aggs(ticker=ticker, multiplier=1, timespan="hour", 
                                from_=fecha_inicio, to=fecha_fin)
         
         datos = [{
@@ -635,7 +635,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
             spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
-            #st.write(spy_intraday_historial)
+            st.write(spy_intraday_historial)
             
             
             #st.write("Si está tomando el archivo")
