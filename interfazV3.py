@@ -284,14 +284,21 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
 def obtener_historico_30min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
-    local_tz = pytz.timezone('America/New_York') # Importante para la zona horaria de NY
+    # Define la zona horaria de Nueva York. Esta es la clave.
+    local_tz = pytz.timezone('America/New_York')
 
     try:
-        # 1. Parámetros cambiados para obtener datos cada 30 minutos
-        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="hour", 
-                               from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
+        # 1. La llamada a la API no cambia. Trae los bloques de 1 hora.
+        resp = client.get_aggs(
+            ticker=ticker_opcion,
+            multiplier=1,
+            timespan="hour",
+            from_=fecha_inicio.strftime('%Y-%m-%d'),
+            to=fecha_fin.strftime('%Y-%m-%d')
+        )
         
-        # 2. Se incluyen todos los datos (high, low, volume) que son útiles para intradía
+        # 2. Convertimos el timestamp UTC de la API a la zona horaria de NY.
+        # pandas y pytz se encargan de aplicar EDT (-4h) o EST (-5h) según la fecha.
         datos = [{
             'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
             'open': agg.open,
@@ -306,11 +313,15 @@ def obtener_historico_30min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
         if df.empty:
             return pd.DataFrame()
 
-        # 3. Se procesa la fecha y se establece como índice (conservando la hora)
-        df['fecha'] = df['fecha'].dt.tz_localize(None)
+        # 3. Se establece la columna 'fecha' (ya localizada en NY) como índice.
         df.set_index('fecha', inplace=True)
         
-        return df
+        # 4. Filtramos por la hora local de NY.
+        # Esto funciona todo el año porque el índice ya está ajustado por DST.
+        # Siempre filtrará entre las 9:30 AM y las 4:00 PM hora local de NY.
+        df_mercado = df.between_time('09:30', '16:00', include_start=True, include_end=True)
+        
+        return df_mercado
 
     except Exception as e:
         print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
