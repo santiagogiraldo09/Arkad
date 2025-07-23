@@ -635,7 +635,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
             spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
-            st.write(spy_intraday_historial)
+            #st.write(spy_intraday_historial)
             
             
             #st.write("Si está tomando el archivo")
@@ -679,8 +679,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
-                    st.write("df_option:")
-                    st.write(df_option)
+                    #st.write("df_option:")
+                    #st.write(df_option)
                     df_option = df_option.loc[start_time:]
                     #st.write("df_option recortado:")
                     #st.write(df_option)
