@@ -517,8 +517,19 @@ def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,
                 break
     return best_date
 
-def encontrar_strike_cercano(client, base_date, option_price, column_name, option_days, option_offset, ticker, it_max = 10):
-    actual_option_price = option_price
+def desfasar_strike(actual_strike, column_name, method = None, offset = 5):
+    strike = actual_strike
+    if method == "OTM":
+        if column_name == 1:
+            strike = int(actual_strike + offset)
+        else:
+            strike = int(actual_strike - offset)
+ 
+    return strike
+
+def encontrar_strike_cercano(client, base_date, option_price, column_name, option_days, option_offset, ticker, method, offset, it_max = 10):
+    
+    actual_option_price = desfasar_strike(option_price, column_name, method, offset)
     for i in range(it_max):
         best_date = encontrar_opcion_cercana(client, base_date, actual_option_price, column_name, option_days, option_offset, ticker)
         if best_date is not None:
@@ -533,7 +544,7 @@ def encontrar_strike_cercano(client, base_date, option_price, column_name, optio
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Close to Close', periodo='Diario', column_name='toggle_false', esce1=False):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Open to Close', periodo='Diario', column_name='toggle_false', method = "ATM", offset = 5, esce1=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     balance_posiciones = balance
@@ -671,7 +682,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     index = 0
                     #option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
                  
-                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
                 #st.write("option date")
                 #st.write(option_date)
@@ -851,7 +862,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                                     #st.write(option_price)
                                 #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                                 option_price = actual_option_price
                                 if option_date:
                                     option_type = 'C' if row[column_name] == 1 else 'P'
@@ -1124,7 +1135,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     option_price = round(data_for_date['Open'].iloc[0]) #Se basa en la apertura del día actual
                                     #st.write(option_price)
                                 #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                                 option_price = actual_option_price
                                 if option_date:
                                     option_type = 'C' if row[column_name] == 1 else 'P'
@@ -1285,7 +1296,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #option_price_5min = round(data_for_date3['open'].iloc[0])
                             #st.write(option_price)
                         #option_date = encontrar_opcion_cercana(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                        option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                        option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                         option_price = actual_option_price
                         #st.write("Option_date:")
                         #st.write(option_date)
@@ -1407,7 +1418,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write(option_price)
             
                 #option_date = encontrar_opcion_cercana_15min(client, date, option_price, row[column_name], option_days, option_offset, ticker)
-                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker)
+                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
@@ -1694,6 +1705,7 @@ def main():
     else:
         fixed_amount = st.number_input("*Monto fijo de inversión:*", min_value=0.0, max_value=float(balance_inicial), value=1000.0, step=1000.0)
         pct_allocation = None
+        
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
     
     # Checkbox "Escenario 1" con ícono de información y texto condicional
@@ -1720,13 +1732,21 @@ def main():
     #if periodo == '15 minutos':
         #open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
         #close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
+        
+    method = st.radio("*Seleccionar Strikes a Considerar*", ('ATM','OTM'))
+    
+    if method == "OTM":   
+        offset = st.number_input("*Seleccionar cantidad de strikes a desplazarse*")
+    else:
+        offset = 0
+    
     trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
     
     
         
     if st.button("Run Backtest"):
         resultados_df, final_balance = realizar_backtest(data_filepath, 'rlD0rjy9q_pT4Pv2UBzYlXl6SY5Wj7UT', "SPY", balance_inicial, pct_allocation, fixed_amount, 
-        allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, esce1)
+        allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, method, offset, esce1)
         st.success("Backtest ejecutado correctamente!")
 
         # Guardar resultados en el estado de la sesión
@@ -1779,7 +1799,7 @@ def main():
         if trade_type == 'Close to Close':
             datos['Direction'] = (datos['Close'].shift(-1) > datos['Close']).astype(int)
         elif trade_type == 'Close to Open':
-            datos['Direction'] = (datos['Close'].shift(1) < datos['Open']).astype(int)
+            datos['Direction'] = (datos['Close'] < datos['Open'].shift(-1)).astype(int)
         elif trade_type == 'Open to Close':
             datos['Direction'] = (datos['Open'] < datos['Close']).astype(int)
         else:
