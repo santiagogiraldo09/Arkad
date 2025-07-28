@@ -1736,7 +1736,7 @@ def main():
     method = st.radio("*Seleccionar Strikes a Considerar*", ('ATM','OTM'))
     
     if method == "OTM":   
-        offset = st.number_input("*Seleccionar cantidad de strikes a desplazarse*")
+        offset = st.number_input("*Seleccionar cantidad de strikes a desplazarse*", min_value=0, value=5, step=1)
     else:
         offset = 0
     
