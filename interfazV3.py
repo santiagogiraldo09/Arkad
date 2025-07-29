@@ -288,7 +288,7 @@ def obtener_historico_30min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
 
     try:
         # 1. Parámetros cambiados para obtener datos cada 30 minutos
-        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="hour", 
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="minute", 
                                from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
         
         # 2. Se incluyen todos los datos (high, low, volume) que son útiles para intradía
