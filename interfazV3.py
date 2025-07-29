@@ -802,6 +802,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                         
                     else:
+                        continue
                         st.write(f"se salta el registro para el día {date}")
         
         else: #El archivo no es Trades_H1
