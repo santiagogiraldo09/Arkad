@@ -615,7 +615,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
-        if "Trades_H1" in data_filepath:
+        if "Trades_M1" in data_filepath:
             #st.write("--------------------------------------------------------------------------------")
         
             colombia_tz = 'America/Bogota'
@@ -800,7 +800,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             })
                             posicion_actual_abierta = False
                             print(trade_result)
-                                
+                        
+                    else:
+                        st.write(f"se salta el registro para el día {date}")
         
         else: #El archivo no es Trades_H1
             if periodo == 'Diario':
