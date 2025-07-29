@@ -1742,7 +1742,7 @@ def main():
     else:
         offset = 0
     
-    trade_type = st.radio('*Tipo de Operación*', ('Close to Close', 'Open to Close', 'Close to Open'))
+    trade_type = st.radio('*Tipo de Operación*', ('Open to Close', 'Close to Close', 'Close to Open'))
     
     
         
