@@ -727,18 +727,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write("df_option_start_time:")
                     st.write(df_option_start_time)
                     df_option_end_time = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
-                    st.write("df_option:")
+                    st.write("df_option_end_time:")
                     st.write(df_option_end_time)
                     df_option_start_time = df_option_start_time.loc[start_time:]
-                    st.write("df_option recortado a start_time:")
+                    st.write("df_option_start_time recortado a start_time:")
                     st.write(df_option_start_time)
                     df_option_end_time = df_option_end_time.loc[start_time:]
                     st.write("df_option_end_time recortado a start_time:")
                     st.write(df_option_end_time)
                     
                     if not df_option_start_time.empty:
-                        st.write("entra porque el df_option no está vacío")
+                        st.write("entra porque el df_option_start_time no está vacío")
                         st.write(df_option_end_time.index)
+                        df_option_end_time = df_option_end_time.loc[end_time:]
+                        st.write("data frame empezando desde end_time o cercano:")
+                        st.write(df_option_end_time)
                         #if not end_time in df_option.index:
                             #hacer end_time el siguiente registro del dataframe df_option.index 
                         if end_time in df_option_end_time.index:
