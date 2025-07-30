@@ -747,7 +747,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #if end_time in df_option_end_time.index:
                         if not df_option_end_time.empty:
                             #st.write("entra acá porque end_time si está en df_option.index")
-                            df_option_cierre = df_option_end_time.loc[end_time]
+                            df_option_cierre = df_option_end_time.loc[end_time:]
                             st.write("df_option recortado al cierre: a revisar")
                             st.write(df_option_cierre)
                             posicion_actual_abierta = True
