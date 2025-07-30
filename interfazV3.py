@@ -700,6 +700,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("entra porque el df_option no está vacío")
                         st.write(df_option.index)
                         if end_time in df_option.index:
+                            st.write("entra acá porque end_time si está en df_option.index")
                             df_option_cierre = df_option.loc[end_time]
                             #st.write("df_option recortado al cierre:")
                             #st.write(df_option_cierre)
@@ -802,6 +803,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             })
                             posicion_actual_abierta = False
                             print(trade_result)
+                        else:
+                            st.write("No entró al end_time en df_option.index")
         
         else: #El archivo no es Trades_H1
             if periodo == 'Diario':
