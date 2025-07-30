@@ -744,8 +744,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write(df_option_end_time)
                         #if not end_time in df_option.index:
                             #hacer end_time el siguiente registro del dataframe df_option.index 
-                        #if end_time in df_option_end_time.index:
-                        if not df_option_end_time.empty:
+                        if end_time in df_option_end_time.index:
+                        #if not df_option_end_time.empty:
                             #st.write("entra acá porque end_time si está en df_option.index")
                             df_option_cierre = df_option_end_time.loc[end_time:]
                             st.write("df_option recortado al cierre: a revisar")
@@ -757,7 +757,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             option_close_price = df_option_start_time[precio_usar_cierre].iloc[index]
                             st.write("Precio de salida opción día actual:")
                             st.write(option_close_price)
-                            option_close_price_cierre = df_option_cierre[precio_usar_cierre].iloc[index]#A revisar también
+                            option_close_price_cierre = df_option_cierre[precio_usar_cierre]#A revisar también
                             st.write("Precio de salida opción día de cierre:")
                             st.write(option_close_price_cierre)
                             max_contract_value = option_open_price * 100
