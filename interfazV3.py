@@ -699,6 +699,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     if not df_option.empty:
                         st.write("entra porque el df_option no está vacío")
                         st.write(df_option.index)
+                        #if not end_time in df_option.index:
+                            #hacer end_time el siguiente registro del dataframe df_option.index 
                         if end_time in df_option.index:
                             st.write("entra acá porque end_time si está en df_option.index")
                             df_option_cierre = df_option.loc[end_time]
