@@ -755,20 +755,20 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("Precio de entrada para la opción día actual:")
                             #st.write(option_open_price)
                             option_close_price = df_option_start_time[precio_usar_cierre].iloc[index]
-                            #st.write("Precio de salida opción día actual:")
-                            #st.write(option_close_price)
+                            st.write("Precio de salida opción día actual:")
+                            st.write(option_close_price)
                             option_close_price_cierre = df_option_cierre[precio_usar_cierre].iloc[index]#A revisar también
-                            #st.write("Precio de salida opción día de cierre:")
-                            #st.write(option_close_price_cierre)
+                            st.write("Precio de salida opción día de cierre:")
+                            st.write(option_close_price_cierre)
                             max_contract_value = option_open_price * 100
-                            #st.write(max_contract_value)
+                            st.write(max_contract_value)
                             
                             if allocation_type == 'Porcentaje de asignación':
                                 #st.write("Entra en este allocation_type")
                                 if next_start_time < end_time:
                                     num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    #st.write(balance_posiciones)
-                                    #st.write(num_contratos)
+                                    st.write(balance_posiciones)
+                                    st.write(num_contratos)
                                 else: #next_start_time > end_time:
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
                                     #st.write(balance)
