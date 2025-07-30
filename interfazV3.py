@@ -693,10 +693,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write("df_option:")
                     #st.write(df_option)
                     df_option = df_option.loc[start_time:]
-                    #st.write("df_option recortado:")
-                    #st.write(df_option)
+                    st.write("df_option recortado a start_time:")
+                    st.write(df_option)
                     
                     if not df_option.empty:
+                        st.write("entra porque el df_option no está vacío")
+                        st.write(df_option.index)
                         if end_time in df_option.index:
                             df_option_cierre = df_option.loc[end_time]
                             #st.write("df_option recortado al cierre:")
