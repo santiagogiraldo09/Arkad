@@ -690,8 +690,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option:")
-                    #st.write(df_option)
+                    st.write("df_option:")
+                    st.write(df_option)
                     df_option = df_option.loc[start_time:]
                     st.write("df_option recortado a start_time:")
                     st.write(df_option)
