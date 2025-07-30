@@ -282,6 +282,40 @@ def obtener_historico(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     df.index = df.index.date
     return df
 
+def obtener_historico_30min_start_time(ticker_opcion, api_key, fecha_inicio, fecha_fin):
+    client = RESTClient(api_key)
+    local_tz = pytz.timezone('America/New_York') # Importante para la zona horaria de NY
+
+    try:
+        # 1. Parámetros cambiados para obtener datos cada 30 minutos
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="hour", 
+                               from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
+        
+        # 2. Se incluyen todos los datos (high, low, volume) que son útiles para intradía
+        datos = [{
+            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
+            'open': agg.open,
+            'high': agg.high,
+            'low': agg.low,
+            'close': agg.close,
+            'volume': agg.volume
+        } for agg in resp]
+        
+        df = pd.DataFrame(datos)
+        
+        if df.empty:
+            return pd.DataFrame()
+
+        # 3. Se procesa la fecha y se establece como índice (conservando la hora)
+        df['fecha'] = df['fecha'].dt.tz_localize(None)
+        df.set_index('fecha', inplace=True)
+        
+        return df
+
+    except Exception as e:
+        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
+        return pd.DataFrame()
+
 def obtener_historico_30min(ticker_opcion, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York') # Importante para la zona horaria de NY
@@ -689,6 +723,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                    df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
+                    st.write("df_option_start_time:")
+                    st.write(df_option_start_time)
                     df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
                     st.write("df_option:")
                     st.write(df_option)
