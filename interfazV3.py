@@ -726,31 +726,31 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
                     st.write("df_option_start_time:")
                     st.write(df_option_start_time)
-                    df_option = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
+                    df_option_end_time = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days))
                     st.write("df_option:")
-                    st.write(df_option)
+                    st.write(df_option_end_time)
                     df_option_start_time = df_option_start_time.loc[start_time:]
                     st.write("df_option recortado a start_time:")
                     st.write(df_option_start_time)
-                    df_option = df_option.loc[start_time:]
-                    st.write("df_option recortado a start_time:")
-                    st.write(df_option)
+                    df_option_end_time = df_option_end_time.loc[start_time:]
+                    st.write("df_option_end_time recortado a start_time:")
+                    st.write(df_option_end_time)
                     
-                    if not df_option.empty:
+                    if not df_option_start_time.empty:
                         st.write("entra porque el df_option no está vacío")
-                        st.write(df_option.index)
+                        st.write(df_option_end_time.index)
                         #if not end_time in df_option.index:
                             #hacer end_time el siguiente registro del dataframe df_option.index 
-                        if end_time in df_option.index:
+                        if end_time in df_option_end_time.index:
                             st.write("entra acá porque end_time si está en df_option.index")
-                            df_option_cierre = df_option.loc[end_time]
+                            df_option_cierre = df_option_end_time.loc[end_time]
                             #st.write("df_option recortado al cierre:")
                             #st.write(df_option_cierre)
                             posicion_actual_abierta = True
-                            option_open_price = df_option[precio_usar_apertura].iloc[0]
+                            option_open_price = df_option_start_time[precio_usar_apertura].iloc[0]##PENDIENTE DE REVISAR
                             #st.write("Precio de entrada para la opción día actual:")
                             #st.write(option_open_price)
-                            option_close_price = df_option[precio_usar_cierre].iloc[index]
+                            option_close_price = df_option_start_time[precio_usar_cierre].iloc[index]
                             #st.write("Precio de salida opción día actual:")
                             #st.write(option_close_price)
                             option_close_price_cierre = df_option_cierre[precio_usar_cierre]
@@ -830,7 +830,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Fecha Apertura': df_option.index[0],
                                 #'Fecha Cierre': df_option.index[index],
                                 'Precio Entrada': option_open_price, 
-                                'Precio Salida': df_option[precio_usar_cierre].iloc[index],
+                                'Precio Salida': df_option_start_time[precio_usar_cierre].iloc[index],
                                 #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
                                 'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre],
                                 'Resultado': trade_result,
