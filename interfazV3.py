@@ -863,12 +863,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write("El archivo no tiene la columna de modelos seleccionados")
                     ensamble = False
                     
-                if 'Selecteed_Models' in data.columns:
+                #if 'Selecteed_Models' in data.columns:
                     #st.write("Si tiene la columna de modelos seleccionados")
-                    ensamble = True
-                else:
+                    #ensamble = True
+                #else:
                     #st.write("El archivo no tiene la columna de modelos seleccionados")
-                    ensamble = False
+                    #ensamble = False
                 
                 #if ensamble and row['Selected_Models'] == "[]":
                 if ensamble and row['probability'] == 0:
