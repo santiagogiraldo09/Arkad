@@ -612,8 +612,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
         
-    if "start_time" in data.columns:
+    if "start_time" and "end_time" in data.columns:
         st.write("El archivo contiene datos intra día")
+        nombre_de_la_columna = 'start_time'
+        # Se crea la columna una sola vez, antes de recorrer
+        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
 
     if "Trades_H1_Best1_v3" in data_filepath:
         nombre_de_la_columna = 'start_time'
