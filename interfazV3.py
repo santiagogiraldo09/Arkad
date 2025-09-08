@@ -29,7 +29,7 @@ def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     try:
         # --- LÍNEA MODIFICADA ---
         # Obtener datos agregados cada 30 minutos
-        resp = client.get_aggs(ticker=ticker, multiplier=1, timespan="hour", 
+        resp = client.get_aggs(ticker=ticker, multiplier=1, timespan="minute", 
                                from_=fecha_inicio, to=fecha_fin)
         
         datos = [{
@@ -288,7 +288,7 @@ def obtener_historico_30min_start_time(ticker_opcion, api_key, fecha_inicio, fec
 
     try:
         # 1. Parámetros cambiados para obtener datos cada 30 minutos
-        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="hour", 
+        resp = client.get_aggs(ticker=ticker_opcion, multiplier=1, timespan="minute", 
                                from_=fecha_inicio.strftime('%Y-%m-%d'), to=fecha_fin.strftime('%Y-%m-%d'))
         
         # 2. Se incluyen todos los datos (high, low, volume) que son útiles para intradía
@@ -654,8 +654,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         if row[column_name] not in [0, 1]:
             continue
         
+        if "start_time" and "end_time" in data.columns:
+        
         #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
-        if "Trades_H1_Best1_v3" in data_filepath:
+        #if "Trades_H1_Best1_v3" in data_filepath:
             #st.write("--------------------------------------------------------------------------------")
         
             colombia_tz = 'America/Bogota'
