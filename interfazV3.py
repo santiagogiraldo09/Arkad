@@ -618,27 +618,27 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         # Se crea la columna una sola vez, antes de recorrer
         data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
 
-    if "Trades_H1_Best1_v3" in data_filepath:
-        nombre_de_la_columna = 'start_time'
+    #if "Trades_H1_Best1_v3" in data_filepath:
+        #nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
-        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        #data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
         #hora_especifica = dt.time(23, 0, 0)
         #fecha_inicio = dt.datetime.combine(fecha_inicio.date(), hora_especifica)
         #fecha_fin = dt.datetime.combine(fecha_fin.date(), hora_especifica)
-    if "Trades_H1_Best1" in data_filepath:
-        nombre_de_la_columna = 'start_time'
+    #if "Trades_H1_Best1" in data_filepath:
+        #nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
-        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        #data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
 
-    if "Trades_H1_Best2" in data_filepath:
-        nombre_de_la_columna = 'start_time'
+    #if "Trades_H1_Best2" in data_filepath:
+        #nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
-        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        #data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
     
-    if "Trades_H1_Best3" in data_filepath:
-        nombre_de_la_columna = 'start_time'
+    #if "Trades_H1_Best3" in data_filepath:
+        #nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
-        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        #data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
 
         
 
