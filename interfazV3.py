@@ -611,6 +611,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     else:
         fecha_inicio = pd.Timestamp(fecha_inicio)
         fecha_fin = pd.Timestamp(fecha_fin)
+        
+    if "start_time" in data.columns:
+        st.write("El archivo contiene datos intra día")
 
     if "Trades_H1_Best1_v3" in data_filepath:
         nombre_de_la_columna = 'start_time'
