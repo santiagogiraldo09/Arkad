@@ -884,6 +884,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
                             st.write("Punto de inicio")
                             st.write(punto_de_inicio)
+                            
+                            df_option_end_time = df_option_end_time.loc[punto_de_inicio:]
+
+                            # Ahora, la variable `df_option_end_time` ha sido modificada permanentemente
+                            # y solo contiene los datos desde la fecha y hora de inicio.
+                            print("DataFrame después de ser cortado:")
+                            print(df_option_end_time)
                                      
 
                             # Imprimir el resultado
