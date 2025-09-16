@@ -865,28 +865,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                         else:
                             st.write("No entró al end_time en df_option.index")
-                            # 1. Convierte el índice a tipo de dato datetime, forzando los errores a NaT
-                            df_option_end_time.index = pd.to_datetime(df_option_end_time.index, errors='coerce')
                             
-                            # 2. Asigna un nombre al índice para poder usarlo en dropna()
-                            df_option_end_time.index.name = 'fecha'
+                            # 1. Asegurarse de que el índice es de tipo datetime
+                            df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
                             
-                            # 3. Elimina las filas con valores NaT en el índice, ahora que el índice tiene un nombre
-                            df_option_end_time = df_option_end_time.dropna(subset=[df_option_end_time.index.name])
-                            
-                            # El resto de tu código ya no debería dar problemas
-                            ultima_fecha = df_option_end_time.index.max().date()
-                            st.write("ultima fecha")
-                            st.write(ultima_fecha)
-                            
-                            # 4. Construir el punto de corte para las 15:00:00
-                            punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
-                            
-                            # 5. Encontrar el primer registro que sea mayor o igual al punto de corte
-                            df_filtrado_corte = df_option_end_time[df_option_end_time.index >= punto_de_corte]
-                            
-                            st.write("df filtrado corte:")
-                            st.write(df_filtrado_corte)
+                            # 2. Extraer solo la fecha del índice
+                            fechas_extraidas = df_option_end_time.index.date
+
+                            # Imprimir el resultado
+                            st.write("fechas_extraidas")
+                            st.write(fechas_extraidas)
                             
         
         else: #El archivo no es Trades_H1
