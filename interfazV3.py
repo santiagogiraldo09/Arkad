@@ -867,20 +867,44 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("No entró al end_time en df_option.index")
                             df_option_end_time = df_option_start_time.loc[start_time:]
                             
+                            #Convertir el índice a la zona horaria de Nueva York
+                            df_ny_time = df_option_end_time.tz_convert('America/New_York')
+                            
+                            #Encontrar el último timestamp exacto en horario de NY
+                            latest_timestamp_ny = df_ny_time.index.max()
+                            
+                            # DECISIÓN AUTOMÁTICA: Determinar la hora de corte según la temporada
+                            # Verificamos el nombre de la zona horaria del último timestamp.
+                            # .tzname() devolverá 'EDT' para verano o 'EST' para invierno.
+                            if latest_timestamp_ny.tzname() == 'EDT':
+                                # Es horario de verano ("verano")
+                                HORA_DE_CORTE_NY = 15
+                                st.write(f"La fecha {latest_timestamp_ny.date()} está en horario de VERANO (EDT).")
+                            else:
+                                # Es horario estándar ("invierno")
+                                HORA_DE_CORTE_NY = 14
+                                st.write(f"La fecha {latest_timestamp_ny.date()} está en horario de INVIERNO (EST).")
+                            
+                            st.write(f"==> Se usará la hora de corte: {HORA_DE_CORTE_NY}:00 Hora de NY")                           
+                            
                             # 1. Asegurarse de que el índice es de tipo datetime
                             df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
                             
                             # 2. Extraer solo la fecha del índice
                             fechas_extraidas = df_option_end_time.index.date
 
-                            # 1. Obtener la fecha más reciente (el último día) como un texto.
+                            #Obtener la fecha más reciente (el último día) como un texto.
                             #    df.index.max() encuentra el timestamp completo más reciente (ej: '2025-01-07 15:04:00')
                             #    .strftime('%Y-%m-%d') lo convierte a un texto con solo la fecha (ej: '2025-01-07')
                             ultima_fecha_str = df_option_end_time.index.max().strftime('%Y-%m-%d')
                             
                             # 2. Crear el punto de inicio para el filtro como un texto.
                             #    Juntamos la fecha que encontramos con la hora de inicio deseada.
-                            punto_de_inicio = f"{ultima_fecha_str} 15:00:00"
+                            # 4. Construir el punto de inicio del filtro usando la hora decidida
+                            punto_de_inicio = pd.Timestamp(
+                                f"{latest_timestamp_ny.date()} {HORA_DE_CORTE_NY}:00:00",
+                                tz='America/New_York'
+                            )
 
                             st.write("Punto de inicio")
                             st.write(punto_de_inicio)
