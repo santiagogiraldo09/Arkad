@@ -869,7 +869,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             ultima_fecha = df_option_end_time.index.max().date()
                             
                             # 2. Filtrar el DataFrame para obtener solo los registros de esa última fecha
-                            df_ultima_fecha = df_option_end_time[df_option_end_time.inde.date == ultima_fecha]
+                            df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
                             
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
                             # Crear un punto de referencia para las 15:00:00 del día
