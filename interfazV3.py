@@ -865,29 +865,26 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                         else:
                             st.write("No entró al end_time en df_option.index")
-                            # Muestra los tipos de datos de las columnas
-                            st.write(df_option_end_time.info())
-                            
-                            # Muestra si hay valores nulos en el índice
-                            st.write(df_option_end_time.index.isnull().sum())
+                            # Convierte el índice a un tipo de dato datetime
+                            df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
                             # 1. Encontrar la última fecha disponible en el DataFrame
                             ultima_fecha = df_option_end_time.index.max().date()
                             st.write("ultima fecha")
                             st.write(ultima_fecha)
                             # 2. Filtrar el DataFrame para obtener solo los registros de esa última fecha
-                            df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
+                            #df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
                             
                              
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
                             # Esta línea es la que funciona correctamente. No la cambies.
-                            punto_de_corte = datetime.combine(ultima_fecha, datetime.strptime('15:00:00', '%H:%M:%S').time())
+                            punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
                              
                             # La línea siguiente es la que causa el error. ¡DEBEMOS ELIMINARLA!
                             # punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
                              
                             # Encontrar el primer registro que sea mayor o igual al punto de corte
                             # Esto nos da la hora exacta a las 15:00:00 o la siguiente si no existe ese registro
-                            df_filtrado_corte = df_ultima_fecha[df_ultima_fecha.index >= punto_de_corte]
+                            df_filtrado_corte = df_option_end_time[df_option_end_time.index >= punto_de_corte]
                             
                             st.write("df filtrado corte:")
                             st.write(df_filtrado_corte)
