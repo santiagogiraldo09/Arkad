@@ -867,11 +867,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("No entró al end_time en df_option.index")
                             # 1. Encontrar la última fecha disponible en el DataFrame
                             ultima_fecha = df_option_end_time.index.max().date()
-                             
+                             st.write("ultima fecha")
+                             st.write(ultima_fecha)
                             # 2. Filtrar el DataFrame para obtener solo los registros de esa última fecha
                             df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
-                            st.write("df ultima fecha")
-                            st.write(df_ultima_fecha)
+                            
                              
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
                             # Esta línea es la que funciona correctamente. No la cambies.
