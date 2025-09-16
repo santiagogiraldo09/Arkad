@@ -914,7 +914,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write(punto_de_inicio_ny)
                             
                             # PASO 4 (CORREGIDO): Cortar/Filtrar el DataFrame que SÍ está en la zona horaria de NY
-                            df_recortado_final = df_ny_time.loc[punto_de_inicio_ny:]
+                            #df_recortado_final = df_ny_time.loc[punto_de_inicio_ny:]
+                            df_recortado_final = df_option_end_time.loc[punto_de_inicio_ny:]
                             
                             # Ahora, la variable `df_recortado_final` contiene el resultado correcto.
                             st.write("DataFrame después de ser cortado:")
