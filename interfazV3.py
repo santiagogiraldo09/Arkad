@@ -865,6 +865,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                         else:
                             st.write("No entró al end_time en df_option.index")
+                            df_option_end_time = df_option_start_time.loc[start_time:]
                             
                             # 1. Asegurarse de que el índice es de tipo datetime
                             df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
