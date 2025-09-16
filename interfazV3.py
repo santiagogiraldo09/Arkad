@@ -867,59 +867,56 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("No entró al end_time en df_option.index")
                             df_option_end_time = df_option_start_time.loc[start_time:]
                             
-                            #Convertir el índice a la zona horaria de Nueva York
-                            df_ny_time = df_option_end_time.tz_convert('America/New_York')
+                            # PASO 1: Asegurarse de que el índice es de tipo Datetime.
+                            # Esto debe hacerse ANTES de cualquier operación de zona horaria.
+                            df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
                             
-                            #Encontrar el último timestamp exacto en horario de NY
+                            # PASO 2: ASIGNAR la zona horaria original (Localize). ¡ESTE ES EL PASO CLAVE!
+                            # Le decimos a pandas que tus datos están en UTC. Si estuvieran en hora de Colombia,
+                            # usarías 'America/Bogota'. 'UTC' es la opción más común y segura para datos de APIs.
+                            try:
+                                # Intentamos localizar. Si ya tiene zona horaria, esto dará un error y pasaremos al except.
+                                df_localized = df_option_end_time.tz_localize('UTC')
+                            except TypeError:
+                                # Si ya tenía una zona horaria, no hacemos nada y usamos el DataFrame como está.
+                                df_localized = df_option_end_time
+                            
+                            # PASO 3: CONVERTIR la zona horaria a la de Nueva York.
+                            # Ahora que pandas sabe que los datos originales son UTC, sí puede convertirlos.
+                            df_ny_time = df_localized.tz_convert('America/New_York')
+                            
+                            # -------------------------------------------------------------------------
+                            # A partir de aquí, trabajamos SIEMPRE con 'df_ny_time'
+                            # -------------------------------------------------------------------------
+                            
+                            # Encontrar el último timestamp exacto en horario de NY
                             latest_timestamp_ny = df_ny_time.index.max()
                             
                             # DECISIÓN AUTOMÁTICA: Determinar la hora de corte según la temporada
-                            # Verificamos el nombre de la zona horaria del último timestamp.
-                            # .tzname() devolverá 'EDT' para verano o 'EST' para invierno.
                             if latest_timestamp_ny.tzname() == 'EDT':
-                                # Es horario de verano ("verano")
                                 HORA_DE_CORTE_NY = 15
                                 st.write(f"La fecha {latest_timestamp_ny.date()} está en horario de VERANO (EDT).")
                             else:
-                                # Es horario estándar ("invierno")
                                 HORA_DE_CORTE_NY = 14
                                 st.write(f"La fecha {latest_timestamp_ny.date()} está en horario de INVIERNO (EST).")
                             
-                            st.write(f"==> Se usará la hora de corte: {HORA_DE_CORTE_NY}:00 Hora de NY")                           
+                            st.write(f"==> Se usará la hora de corte: {HORA_DE_CORTE_NY}:00 Hora de NY")
                             
-                            # 1. Asegurarse de que el índice es de tipo datetime
-                            df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
-                            
-                            # 2. Extraer solo la fecha del índice
-                            fechas_extraidas = df_option_end_time.index.date
-
-                            #Obtener la fecha más reciente (el último día) como un texto.
-                            #    df.index.max() encuentra el timestamp completo más reciente (ej: '2025-01-07 15:04:00')
-                            #    .strftime('%Y-%m-%d') lo convierte a un texto con solo la fecha (ej: '2025-01-07')
-                            ultima_fecha_str = df_option_end_time.index.max().strftime('%Y-%m-%d')
-                            
-                            # 2. Crear el punto de inicio para el filtro como un texto.
-                            #    Juntamos la fecha que encontramos con la hora de inicio deseada.
-                            # 4. Construir el punto de inicio del filtro usando la hora decidida
-                            punto_de_inicio = pd.Timestamp(
+                            # Construir el punto de inicio del filtro usando la hora decidida y la zona horaria de NY
+                            punto_de_inicio_ny = pd.Timestamp(
                                 f"{latest_timestamp_ny.date()} {HORA_DE_CORTE_NY}:00:00",
                                 tz='America/New_York'
                             )
-
-                            st.write("Punto de inicio")
-                            st.write(punto_de_inicio)
                             
-                            df_option_end_time = df_option_end_time.loc[punto_de_inicio:]
-
-                            # Ahora, la variable `df_option_end_time` ha sido modificada permanentemente
-                            # y solo contiene los datos desde la fecha y hora de inicio.
+                            st.write("Punto de inicio para el filtro:")
+                            st.write(punto_de_inicio_ny)
+                            
+                            # PASO 4 (CORREGIDO): Cortar/Filtrar el DataFrame que SÍ está en la zona horaria de NY
+                            df_recortado_final = df_ny_time.loc[punto_de_inicio_ny:]
+                            
+                            # Ahora, la variable `df_recortado_final` contiene el resultado correcto.
                             st.write("DataFrame después de ser cortado:")
-                            st.write(df_option_end_time)
-                                     
-
-                            # Imprimir el resultado
-                            st.write("fechas_extraidas")
-                            st.write(fechas_extraidas)
+                            st.write(df_recortado_final)              
                             
         
         else: #El archivo no es Trades_H1
