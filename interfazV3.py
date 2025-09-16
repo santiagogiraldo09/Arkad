@@ -867,18 +867,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             st.write("No entró al end_time en df_option.index")
                             # 1. Encontrar la última fecha disponible en el DataFrame
                             ultima_fecha = df_option_end_time.index.max().date()
-                            
+                             
                             # 2. Filtrar el DataFrame para obtener solo los registros de esa última fecha
                             df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
-                            
+                             
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
+                            # Esta línea es la que funciona correctamente. No la cambies.
                             punto_de_corte = datetime.combine(ultima_fecha, datetime.strptime('15:00:00', '%H:%M:%S').time())
-                            # Crear un punto de referencia para las 15:00:00 del día
-                            punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
-                            
+                             
+                            # La línea siguiente es la que causa el error. ¡DEBEMOS ELIMINARLA!
+                            # punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
+                             
                             # Encontrar el primer registro que sea mayor o igual al punto de corte
                             # Esto nos da la hora exacta a las 15:00:00 o la siguiente si no existe ese registro
                             df_filtrado_corte = df_ultima_fecha[df_ultima_fecha.index >= punto_de_corte]
+                            
                             st.write("df filtrado corte:")
                             st.write(df_filtrado_corte)
                             
