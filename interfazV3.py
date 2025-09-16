@@ -866,10 +866,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else:
                             st.write("No entró al end_time en df_option.index")
                             # 1. Encontrar la última fecha disponible en el DataFrame
-                            ultima_fecha = df_option_end_time['fecha'].max().date()
+                            ultima_fecha = df_option_end_time.index.max().date()
                             
                             # 2. Filtrar el DataFrame para obtener solo los registros de esa última fecha
-                            df_ultima_fecha = df_option_end_time[df_option_end_time['fecha'].dt.date == ultima_fecha]
+                            df_ultima_fecha = df_option_end_time[df_option_end_time.inde.date == ultima_fecha]
                             
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
                             # Crear un punto de referencia para las 15:00:00 del día
@@ -877,7 +877,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             
                             # Encontrar el primer registro que sea mayor o igual al punto de corte
                             # Esto nos da la hora exacta a las 15:00:00 o la siguiente si no existe ese registro
-                            df_filtrado_corte = df_ultima_fecha[df_ultima_fecha['fecha'] >= punto_de_corte]
+                            df_filtrado_corte = df_ultima_fecha[df_ultima_fecha.index >= punto_de_corte]
                             st.write("df filtrado corte:")
                             st.write(df_filtrado_corte)
                             
