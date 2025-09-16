@@ -905,8 +905,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # Construir el punto de inicio del filtro usando la hora decidida y la zona horaria de NY
                             punto_de_inicio_ny = pd.Timestamp(
                                 f"{latest_timestamp_ny.date()} {HORA_DE_CORTE_NY}:00:00",
-                                tz='America/New_York'
-                            )
+                                tz='America/New_York')
+                            
+                            # Le quitas la zona horaria
+                            punto_de_inicio_ny = punto_de_inicio_ny.tz_localize(None)
                             
                             st.write("Punto de inicio para el filtro:")
                             st.write(punto_de_inicio_ny)
