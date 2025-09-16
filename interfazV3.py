@@ -865,6 +865,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             print(trade_result)
                         else:
                             st.write("No entró al end_time en df_option.index")
+                            # Muestra los tipos de datos de las columnas
+                            st.write(df_option_end_time.info())
+                            
+                            # Muestra si hay valores nulos en el índice
+                            st.write(df_option_end_time.index.isnull().sum())
                             # 1. Encontrar la última fecha disponible en el DataFrame
                             ultima_fecha = df_option_end_time.index.max().date()
                             st.write("ultima fecha")
