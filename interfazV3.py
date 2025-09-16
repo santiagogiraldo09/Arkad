@@ -872,6 +872,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             df_ultima_fecha = df_option_end_time[df_option_end_time.index.date == ultima_fecha]
                             
                             # 3. Encontrar el registro a las 15:00:00 o la hora más cercana posterior
+                            punto_de_corte = datetime.combine(ultima_fecha, datetime.strptime('15:00:00', '%H:%M:%S').time())
                             # Crear un punto de referencia para las 15:00:00 del día
                             punto_de_corte = pd.to_datetime(f'{ultima_fecha} 15:00:00')
                             
