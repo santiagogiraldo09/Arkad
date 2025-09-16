@@ -873,6 +873,19 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # 2. Extraer solo la fecha del índice
                             fechas_extraidas = df_option_end_time.index.date
 
+                            # 1. Obtener la fecha más reciente (el último día) como un texto.
+                            #    df.index.max() encuentra el timestamp completo más reciente (ej: '2025-01-07 15:04:00')
+                            #    .strftime('%Y-%m-%d') lo convierte a un texto con solo la fecha (ej: '2025-01-07')
+                            ultima_fecha_str = df_option_end_time.index.max().strftime('%Y-%m-%d')
+                            
+                            # 2. Crear el punto de inicio para el filtro como un texto.
+                            #    Juntamos la fecha que encontramos con la hora de inicio deseada.
+                            punto_de_inicio = f"{ultima_fecha_str} 15:00:00"
+
+                            st.write("Punto de inicio")
+                            st.write(punto_de_inicio)
+                                     
+
                             # Imprimir el resultado
                             st.write("fechas_extraidas")
                             st.write(fechas_extraidas)
