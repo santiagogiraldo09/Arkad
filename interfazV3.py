@@ -866,15 +866,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else:
                             st.write("No entró al end_time en df_option.index")
                             # 1. Convierte el índice a tipo de dato datetime, forzando los errores a NaT
-                            # Esto permite que la operación no falle si encuentra un formato inválido
                             df_option_end_time.index = pd.to_datetime(df_option_end_time.index, errors='coerce')
                             
-                            # 2. Elimina las filas con valores NaT en el índice
-                            # Es crucial para que .max() devuelva un valor de fecha y hora válido
+                            # 2. Asigna un nombre al índice para poder usarlo en dropna()
+                            df_option_end_time.index.name = 'fecha'
+                            
+                            # 3. Elimina las filas con valores NaT en el índice, ahora que el índice tiene un nombre
                             df_option_end_time = df_option_end_time.dropna(subset=[df_option_end_time.index.name])
                             
-                            # Ahora, el resto de tu código funcionará correctamente:
-                            # 3. Encontrar la última fecha disponible en el DataFrame
+                            # El resto de tu código ya no debería dar problemas
                             ultima_fecha = df_option_end_time.index.max().date()
                             st.write("ultima fecha")
                             st.write(ultima_fecha)
