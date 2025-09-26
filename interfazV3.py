@@ -672,17 +672,17 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             start_time = pd.to_datetime(row['start_time'])
             #start_time = start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
             start_time = start_time.tz_localize(ny_tz)
-            start_time = start_time.tz_localize(None)
+            #start_time = start_time.tz_localize(None)
 
             next_start_time = pd.to_datetime(row[f'siguiente_{nombre_de_la_columna}'])
             #next_start_time = next_start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
             next_start_time = next_start_time.tz_localize(ny_tz)
-            next_start_time = next_start_time.tz_localize(None)
+            #next_start_time = next_start_time.tz_localize(None)
             
             end_time = pd.to_datetime(row['end_time'])
             #end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
             end_time = end_time.tz_localize(ny_tz)
-            end_time = end_time.tz_localize(None)
+            #end_time = end_time.tz_localize(None)
             
             precio_usar_apertura_excel = row['start_price']
             precio_usar_cierre_excel = row['end_price']
