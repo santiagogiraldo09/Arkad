@@ -734,15 +734,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-                    #st.write("Option name:")
-                    #st.write(option_name)
+                    st.write("Option name:")
+                    st.write(option_name)
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_start_time:")
-                    #st.write(df_option_start_time)
+                    st.write("df_option_start_time:")
+                    st.write(df_option_start_time)
                     #df_option_end_time = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days)) #para end_time de minuto
                     df_option_end_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_end_time:")
-                    #st.write(df_option_end_time)
+                    st.write("df_option_end_time:")
+                    st.write(df_option_end_time)
                     df_option_start_time = df_option_start_time.loc[start_time:]
                     #st.write("df_option_start_time recortado a start_time:")
                     #st.write(df_option_start_time)
@@ -752,8 +752,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write(df_option_end_time)
                     
                     if not df_option_start_time.empty:
-                        #st.write("entra porque el df_option_start_time no está vacío")
-                        #st.write(df_option_end_time.index)
+                        st.write("entra porque el df_option_start_time no está vacío")
+                        st.write(df_option_end_time.index)
                         #df_option_end_time = df_option_end_time.loc[end_time:] #para end_time de minuto
                         df_option_end_time = df_option_start_time.loc[end_time:]
                         #st.write("data frame empezando desde end_time o cercano: debería de ser el exacto")
@@ -781,11 +781,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write(max_contract_value)
                             
                             if allocation_type == 'Porcentaje de asignación':
-                                #st.write("Entra en este allocation_type")
+                                st.write("Entra en este allocation_type por porcentaje de asignación")
                                 if next_start_time < end_time:
                                     num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    #st.write(balance_posiciones)
-                                    #st.write(num_contratos)
+                                    st.write("balance_posiciones")
+                                    st.write(balance_posiciones)
+                                    st.write("num_contratos")
+                                    st.write(num_contratos)
                                 else: #next_start_time > end_time:
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
                                     #st.write(balance)
