@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import FuncFormatter
 from polygon import RESTClient
-from datetime import timedelta
+from datetime import timedelta, date
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import time
@@ -60,6 +60,91 @@ def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     except Exception as e:
         print(f"Error al obtener datos para {ticker}: {str(e)}")
         return pd.DataFrame()
+
+def descargar_historico_completo_spy(api_key: str, fecha_inicio_str: str) -> pd.DataFrame:
+    """
+    Descarga el historial completo de datos minuto a minuto para el ETF SPY
+    desde una fecha de inicio hasta la fecha actual.
+
+    Esta función está diseñada para ser robusta, iterando día por día y pausando
+    entre llamadas para respetar los límites de la API.
+
+    Args:
+        api_key (str): Tu clave de la API de Polygon.io.
+        fecha_inicio_str (str): Fecha de inicio en formato 'YYYY-MM-DD'.
+
+    Returns:
+        pd.DataFrame: Un único DataFrame con todos los datos OHLCV desde la fecha de inicio
+                      hasta hoy. Retorna un DataFrame vacío si hay un error.
+    """
+    # --- CORREGIDO: Usando el ticker para el ETF SPY ---
+    ticker = "SPY"
+    client = RESTClient(api_key)
+    local_tz = pytz.timezone('America/New_York')
+    
+    todos_los_datos = []
+    
+    try:
+        fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-MM-DD').date()
+        fecha_fin = date.today()
+        
+        print(f"Iniciando descarga masiva para {ticker} desde {fecha_inicio} hasta {fecha_fin}.")
+        
+        fecha_actual = fecha_inicio
+        while fecha_actual <= fecha_fin:
+            # Solo procesar días de semana (lunes=0, domingo=6)
+            if fecha_actual.weekday() < 5:
+                fecha_actual_str = fecha_actual.strftime('%Y-MM-d')
+                print(f"  - Obteniendo datos para el día: {fecha_actual_str}...")
+                
+                try:
+                    resp = client.get_aggs(
+                        ticker=ticker,
+                        multiplier=1,
+                        timespan="minute",
+                        from_=fecha_actual_str,
+                        to=fecha_actual_str,
+                        limit=50000
+                    )
+                    
+                    if resp:
+                        datos_dia = [{
+                            'fecha': pd.to_datetime(agg.timestamp, unit='ms').tz_localize('UTC').tz_convert(local_tz),
+                            'open': agg.open, 'high': agg.high, 'low': agg.low,
+                            'close': agg.close, 'volume': agg.volume
+                        } for agg in resp]
+                        todos_los_datos.extend(datos_dia)
+                        print(f"    -> {len(datos_dia)} registros encontrados.")
+                    else:
+                        print("    -> No se encontraron datos para este día (posible feriado).")
+
+                except Exception as e:
+                    print(f"    -> ERROR al obtener datos para {fecha_actual_str}: {e}")
+                
+                # Pausa de seguridad para no superar el límite de la API (5 llamadas/min)
+                print("    ... Pausa de 13 segundos para respetar el límite de la API.")
+                time.sleep(13)
+            else:
+                print(f"  - Omitiendo {fecha_actual.strftime('%Y-%m-%d')} (fin de semana).")
+
+            fecha_actual += timedelta(days=1)
+
+        if not todos_los_datos:
+            print("\nAdvertencia: No se pudo descargar ningún dato en el rango especificado.")
+            return pd.DataFrame()
+
+        # Crear el DataFrame final a partir de todos los datos recopilados
+        df_completo = pd.DataFrame(todos_los_datos)
+        df_completo['fecha'] = df_completo['fecha'].dt.tz_localize(None)
+        df_completo.set_index('fecha', inplace=True)
+        
+        print(f"\n¡Descarga completada! Total de registros obtenidos: {len(df_completo)}")
+        return df_completo
+
+    except Exception as e:
+        print(f"\nError fatal durante el proceso de descarga: {str(e)}")
+        return pd.DataFrame()
+
 
 def open_close(ticker, api_key, fecha_inicio, fecha_fin):
     global datos1, datos2
@@ -655,6 +740,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "start_time" and "end_time" in data.columns:
+            
         
         #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
         #if "Trades_H1_Best1_v3" in data_filepath:
@@ -736,7 +822,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     #st.write("Option name:")
                     #st.write(option_name)
-                    df_subyacente = open_close(ticker, api_key, fecha_inicio, fecha_fin)
+                    df_subyacente = descargar_historico_completo_spy(api_key, date)
                     st.write("Data frame con valores del subyacente:")
                     st.write(df_subyacente)
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
