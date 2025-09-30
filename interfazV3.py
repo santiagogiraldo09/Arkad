@@ -741,8 +741,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         
         if "start_time" and "end_time" in data.columns:
             df_subyacente = descargar_historico_completo_spy(api_key, date)
-            st.write("Data frame con valores del subyacente:")
-            st.write(df_subyacente)
+            #st.write("Data frame con valores del subyacente:")
+            #st.write(df_subyacente)
             
         
         #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
@@ -818,8 +818,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                  
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
-                st.write("option date")
-                st.write(option_date)
+                #st.write("option date")
+                #st.write(option_date)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
