@@ -1051,22 +1051,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             
                             if allocation_type == 'Porcentaje de asignación':
                                 #st.write("Entra en este allocation_type")
-                                if next_start_time < end_time:
-                                    num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    #st.write(balance_posiciones)
-                                    #st.write(num_contratos)
-                                else: #next_start_time > end_time:
-                                    num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                    #st.write(balance)
-                                    #st.write(pct_allocation)
-                                    #st.write(max_contract_value)
-                                    #st.write(num_contratos)
-                            else: #allocation_type == 'Monto fijo de inversión':
-                                if balance < max_contract_value:
-                                    #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
-                                    return pd.DataFrame(resultados), balance
-                                else: #balance >= max_contract_value
-                                    num_contratos = int(fixed_amount / max_contract_value)
+                                num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                            
                             
                             #st.write("Numero de contratos día actual:")
                             #st.write(num_contratos)
