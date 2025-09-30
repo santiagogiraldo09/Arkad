@@ -740,6 +740,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "start_time" and "end_time" in data.columns:
+            df_subyacente = descargar_historico_completo_spy(api_key, date)
+            st.write("Data frame con valores del subyacente:")
+            st.write(df_subyacente)
             
         
         #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
@@ -822,9 +825,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     #st.write("Option name:")
                     #st.write(option_name)
-                    df_subyacente = descargar_historico_completo_spy(api_key, date)
-                    st.write("Data frame con valores del subyacente:")
-                    st.write(df_subyacente)
+                    
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
                     #st.write("df_option_start_time:")
                     #st.write(df_option_start_time)
