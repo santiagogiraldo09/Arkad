@@ -701,7 +701,27 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #st.write("El archivo contiene datos intra día")
         nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
-        data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        #data[f'siguiente_{nombre_de_la_columna}'] = data[nombre_de_la_columna].shift(-1)
+        
+        # Función para encontrar el siguiente start_time válido
+        def encontrar_siguiente_start_time_valido(idx):
+            if idx >= len(data) - 1:  # Si es la última fila
+                return pd.NaT
+            
+            end_time_actual = data.iloc[idx]['end_time']
+            
+            # Buscar en las filas siguientes
+            for j in range(idx + 1, len(data)):
+                if data.iloc[j]['start_time'] >= end_time_actual:
+                    return data.iloc[j]['start_time']
+            
+            return pd.NaT  # Si no encuentra ninguno válido
+        
+        # Crear la columna con los siguientes start_time válidos
+        data['siguiente_start_time'] = [
+            encontrar_siguiente_start_time_valido(i) 
+            for i in range(len(data))
+        ]
 
         
 
@@ -741,10 +761,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             start_time = start_time.tz_localize(ny_tz)
             start_time = start_time.tz_localize(None)
 
-            next_start_time = pd.to_datetime(row[f'siguiente_{nombre_de_la_columna}'])
-            #next_start_time = next_start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
-            next_start_time = next_start_time.tz_localize(ny_tz)
-            next_start_time = next_start_time.tz_localize(None)
+            next_start_time = pd.to_datetime(row['siguiente_start_time'])
+            # Verificar que existe un siguiente válido
+            if pd.notna(next_start_time):
+                next_start_time = next_start_time.tz_localize(ny_tz)
+                next_start_time = next_start_time.tz_localize(None)
             
             end_time = pd.to_datetime(row['end_time'])
             #end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
@@ -760,6 +781,35 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
             #st.write(spy_intraday_historial)
             
+            # ========== NUEVO: CERRAR POSICIONES QUE YA LLEGARON A SU END_TIME ==========
+            posiciones_a_mantener = []
+            
+            for pos in posiciones_abiertas:
+                # Si el start_time actual >= end_time de esta posición, CERRARLA
+                if start_time >= pos['end_time']:
+                    # Calcular ganancia/pérdida de ESTA posición específica
+                    trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
+                                       - pos['option_open_price']) * 100 * pos['num_contratos']
+                    
+                    # Actualizar balance con la ganancia de esta posición cerrada
+                    balance += trade_result_pos
+                    
+                    # Devolver el costo de esta posición al balance_posiciones
+                    balance_posiciones += pos['cost_trade']
+                    
+                    # Opcional: Log del cierre
+                    #st.write(f"✅ Cerrada posición: {pos['option_name']}, Resultado: ${trade_result_pos:.2f}")
+                    
+                else:
+                    # Esta posición sigue abierta, mantenerla
+                    posiciones_a_mantener.append(pos)
+            
+            # Actualizar la lista de posiciones abiertas (sin las que se cerraron)
+            posiciones_abiertas = posiciones_a_mantener
+            
+            # Actualizar balance_posiciones después de los cierres
+            balance_posiciones = balance - sum([p['cost_trade'] for p in posiciones_abiertas])
+            # ========== FIN DE CIERRE DE POSICIONES ==========
             
             #st.write("Si está tomando el archivo")
             #st.write(start_time)
@@ -849,28 +899,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("max_contract_value")
                             #st.write(max_contract_value)
                             
+                            # Calcular número de contratos basado en balance_posiciones
                             if allocation_type == 'Porcentaje de asignación':
-                                #st.write("Entra en este allocation_type por porcentaje de asignación")
-                                if next_start_time < end_time:
-                                    #st.write("next_start_time < end_time")
-                                    num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    #st.write("balance_posiciones")
-                                    #st.write(balance_posiciones)
-                                    #st.write("num_contratos")
-                                    #st.write(num_contratos)
-                                else: #next_start_time > end_time:
-                                    #st.write("next_start_time > end_time")
-                                    num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                    #st.write(balance)
-                                    #st.write(pct_allocation)
-                                    #st.write(max_contract_value)
-                                    #st.write(num_contratos)
+                                num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
                             else: #allocation_type == 'Monto fijo de inversión':
                                 if balance < max_contract_value:
-                                    #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
                                     return pd.DataFrame(resultados), balance
-                                else: #balance >= max_contract_value
+                                else:
                                     num_contratos = int(fixed_amount / max_contract_value)
+                            
                             
                             #st.write("Numero de contratos día actual:")
                             #st.write(num_contratos)
@@ -879,21 +916,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             cost_trade = max_contract_value * num_contratos
                             #st.write("Costo de la operación:")
                             #st.write(cost_trade)
+                            # Restar el costo de la nueva posición
+                            balance_posiciones -= cost_trade
                             
-                            if next_start_time < end_time:
-                                #st.write("Balance con posiciones abiertas:")
-                                balance_posiciones -= cost_trade
-                                #st.write("balance_posiciones")
-                                #st.write(balance_posiciones)
-                                trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                balance += trade_result
-                            else: #next_start_time > end_time:
-                                #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                #st.write("Este es el precio de cierre de la opción para ese día:")
-                                #st.write(df_option[precio_usar_cierre].iloc[index])
-                                balance += trade_result
-                                balance_posiciones = balance
+                            # Agregar esta nueva posición a la lista de abiertas
+                            posiciones_abiertas.append({
+                                'num_contratos': num_contratos,
+                                'option_open_price': option_open_price,
+                                'option_name': option_name,
+                                'df_option_cierre': df_option_cierre,
+                                'precio_usar_cierre': precio_usar_cierre,
+                                'index': index,
+                                'cost_trade': cost_trade,
+                                'end_time': end_time,  # IMPORTANTE: Guardar el end_time
+                                'start_time': start_time  # Opcional, para debugging
+                            })
+                            
                              
                             
                             #st.write("trade result actual positivo:")
@@ -913,33 +951,26 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("Precio salida día actual:")
                             #st.write(etf_close_price)
                             
-                            
+                            trade_result_display = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             resultados.append({
                                 'Fecha': start_time, 
                                 'Tipo': 'Call' if row[column_name] == 1 else 'Put',
-                                #'Pred': row[column_name],
                                 'toggle_false': row[column_name],
                                 'toggle_true': row[column_name],
                                 'Fecha Apertura': start_time,
                                 'Fecha Cierre': end_time,
-                                #'Fecha Apertura': df_option.index[0],
-                                #'Fecha Cierre': df_option.index[index],
                                 'Precio Entrada': option_open_price, 
-                                #'Precio Salida': df_option_start_time[precio_usar_cierre].iloc[index],
-                                #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
                                 'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre].iloc[index],
-                                'Resultado': trade_result,
+                                'Resultado': trade_result_display,  # Solo para mostrar
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
                                 'Open': precio_usar_apertura_excel,
                                 'Close': precio_usar_cierre_excel,
                                 'Costo Posiciones': cost_trade,
                                 'Balance Posiciones': balance_posiciones
-                                #'Open Posición Abierta': etf_open_price,
-                                #'Close Posición Abierta': etf_close_price
                             })
                             posicion_actual_abierta = False
-                            print(trade_result)
+                            #print(trade_result)
                         else:
                             #st.write("No entró al end_time en df_option.index")
                             df_option_end_time = df_option_start_time.loc[start_time:]
@@ -1020,22 +1051,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             
                             if allocation_type == 'Porcentaje de asignación':
                                 #st.write("Entra en este allocation_type")
-                                if next_start_time < end_time:
-                                    num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    #st.write(balance_posiciones)
-                                    #st.write(num_contratos)
-                                else: #next_start_time > end_time:
-                                    num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                    #st.write(balance)
-                                    #st.write(pct_allocation)
-                                    #st.write(max_contract_value)
-                                    #st.write(num_contratos)
-                            else: #allocation_type == 'Monto fijo de inversión':
-                                if balance < max_contract_value:
-                                    #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
-                                    return pd.DataFrame(resultados), balance
-                                else: #balance >= max_contract_value
-                                    num_contratos = int(fixed_amount / max_contract_value)
+                                num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                            
                             
                             #st.write("Numero de contratos día actual:")
                             #st.write(num_contratos)
@@ -1045,19 +1062,23 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("Costo de la operación:")
                             #st.write(cost_trade)
                             
-                            if next_start_time < end_time:
-                                #st.write("Balance con posiciones abiertas:")
-                                balance_posiciones -= cost_trade
-                                #st.write(balance_posiciones)
-                                trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                balance += trade_result
-                            else: #next_start_time > end_time:
-                                #trade_result = (df_option[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
-                                #st.write("Este es el precio de cierre de la opción para ese día:")
-                                #st.write(df_option[precio_usar_cierre].iloc[index])
-                                balance += trade_result
-                                balance_posiciones = balance     
+                            # Restar costo y agregar a posiciones abiertas
+                            balance_posiciones -= cost_trade
+                            
+                            posiciones_abiertas.append({
+                                'num_contratos': num_contratos,
+                                'option_open_price': option_open_price,
+                                'option_name': option_name,
+                                'df_option_cierre': df_option_cierre,
+                                'precio_usar_cierre': precio_usar_cierre,
+                                'index': index,
+                                'cost_trade': cost_trade,
+                                'end_time': end_time,
+                                'start_time': start_time
+                            })
+                            
+                            # Solo para display
+                            trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                             
                             
                             resultados.append({
