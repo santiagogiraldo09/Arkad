@@ -868,25 +868,25 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("Precio de salida opción día de cierre:")
                             #st.write(option_close_price_cierre)
                             max_contract_value = option_open_price * 100
-                            st.write("max_contract_value")
-                            st.write(max_contract_value)
+                            #st.write("max_contract_value")
+                            #st.write(max_contract_value)
                             
                             if allocation_type == 'Porcentaje de asignación':
-                                st.write("Entra en este allocation_type por porcentaje de asignación")
+                                #st.write("Entra en este allocation_type por porcentaje de asignación")
                                 if next_start_time < end_time:
-                                    st.write("next_start_time < end_time")
+                                    #st.write("next_start_time < end_time")
                                     num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
-                                    st.write("balance_posiciones")
-                                    st.write(balance_posiciones)
-                                    st.write("num_contratos")
-                                    st.write(num_contratos)
+                                    #st.write("balance_posiciones")
+                                    #st.write(balance_posiciones)
+                                    #st.write("num_contratos")
+                                    #st.write(num_contratos)
                                 else: #next_start_time > end_time:
-                                    st.write("next_start_time > end_time")
+                                    #st.write("next_start_time > end_time")
                                     num_contratos = int((balance * pct_allocation) / max_contract_value)
-                                    st.write(balance)
-                                    st.write(pct_allocation)
-                                    st.write(max_contract_value)
-                                    st.write(num_contratos)
+                                    #st.write(balance)
+                                    #st.write(pct_allocation)
+                                    #st.write(max_contract_value)
+                                    #st.write(num_contratos)
                             else: #allocation_type == 'Monto fijo de inversión':
                                 if balance < max_contract_value:
                                     #st.error("No hay suficiente dinero para abrir más posiciones. La ejecución del tester ha terminado.")
@@ -894,19 +894,19 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 else: #balance >= max_contract_value
                                     num_contratos = int(fixed_amount / max_contract_value)
                             
-                            st.write("Numero de contratos día actual:")
-                            st.write(num_contratos)
-                            st.write("Option Type actual:")
-                            st.write(option_type)
+                            #st.write("Numero de contratos día actual:")
+                            #st.write(num_contratos)
+                            #st.write("Option Type actual:")
+                            #st.write(option_type)
                             cost_trade = max_contract_value * num_contratos
-                            st.write("Costo de la operación:")
-                            st.write(cost_trade)
+                            #st.write("Costo de la operación:")
+                            #st.write(cost_trade)
                             
                             if next_start_time < end_time:
-                                st.write("Balance con posiciones abiertas:")
+                                #st.write("Balance con posiciones abiertas:")
                                 balance_posiciones -= cost_trade
-                                st.write("balance_posiciones")
-                                st.write(balance_posiciones)
+                                #st.write("balance_posiciones")
+                                #st.write(balance_posiciones)
                                 trade_result = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
                                 balance += trade_result
                             else: #next_start_time > end_time:
