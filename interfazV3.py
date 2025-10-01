@@ -797,6 +797,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     # Devolver el costo de esta posición al balance_posiciones
                     balance_posiciones += pos['cost_trade']
                     
+                    # ✅ NUEVO: Actualizar el resultado en la fila correspondiente
+                    # Buscar la fila en resultados que corresponde a esta posición
+                    for resultado in resultados:
+                        if (resultado['Fecha Apertura'] == pos['start_time'] and 
+                            resultado['Opcion'] == pos['option_name']):
+                            resultado['Resultado'] = trade_result_pos  # Actualizar de 0 al valor real
+                            break
+                    
                     # Opcional: Log del cierre
                     #st.write(f"✅ Cerrada posición: {pos['option_name']}, Resultado: ${trade_result_pos:.2f}")
                     
@@ -961,7 +969,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Fecha Cierre': end_time,
                                 'Precio Entrada': option_open_price, 
                                 'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre].iloc[index],
-                                'Resultado': trade_result_display,  # Solo para mostrar
+                                'Resultado': 0,  # Solo para mostrar
+                                'Resultado Potencial': trade_result_display,
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
                                 'Open': precio_usar_apertura_excel,
@@ -1095,7 +1104,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 #'Precio Salida': df_option_start_time[precio_usar_cierre].iloc[index],
                                 #'Precio Salida Utilizado': df_option[precio_usar_cierre].iloc[index],
                                 'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre].iloc[index],
-                                'Resultado': trade_result,
+                                'Resultado': 0,
+                                'Resultado Potencial': trade_result,
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
                                 'Open': precio_usar_apertura_excel,
