@@ -1851,6 +1851,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #'Close2': etf_close_price3
                     })
                     print(trade_result)
+    # Cerrar solo las posiciones cuyo end_time ya pasó según fecha_fin
+    for pos in posiciones_abiertas:
+        # Comparar end_time de la posición con fecha_fin del backtest
+        if pos['end_time'] <= pd.Timestamp(fecha_fin):
+            # Esta posición SÍ debió cerrarse porque su end_time ya pasó
+            trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
+                               - pos['option_open_price']) * 100 * pos['num_contratos']
+            balance += trade_result_pos
+            
+            # Actualizar el resultado en resultados
+            for resultado in resultados:
+                if (resultado['Fecha Apertura'] == pos['start_time'] and 
+                    resultado['Opcion'] == pos['option_name']):
+                    resultado['Resultado'] = trade_result_pos
+                    break
 
     resultados_df = pd.DataFrame(resultados)
     if not resultados_df.empty and 'Resultado' in resultados_df.columns:
