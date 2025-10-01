@@ -1048,8 +1048,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("entra acá porque end_time si está en df_option.index")
                             df_option_cierre = df_option_end_time.loc[punto_de_inicio_ny:] #para end_time de minuto
                             df_option_cierre = df_option_start_time.loc[punto_de_inicio_ny:]
-                            #st.write("df_option recortado al cierre: a revisar (este es el que lo corta en punto_de_inicio_ny)")
-                            #st.write(df_option_cierre)
+                            st.write("df_option recortado al cierre: a revisar (este es el que lo corta en punto_de_inicio_ny)")
+                            st.write(df_option_cierre)
                             #posicion_actual_abierta = True
                             option_open_price = df_option_start_time[precio_usar_apertura].iloc[0]##PENDIENTE DE REVISAR
                             #st.write("Precio de entrada para la opción día actual:")
