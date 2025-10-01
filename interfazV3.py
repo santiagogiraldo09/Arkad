@@ -911,8 +911,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             if allocation_type == 'Porcentaje de asignación':
                                 num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
                             else: #allocation_type == 'Monto fijo de inversión':
-                                if balance < max_contract_value:
-                                    return pd.DataFrame(resultados), balance
+                                if balance_posiciones < max_contract_value:
+                                    continue
+                                    #return pd.DataFrame(resultados), balance
                                 else:
                                     num_contratos = int(fixed_amount / max_contract_value)
                             
@@ -924,6 +925,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             cost_trade = max_contract_value * num_contratos
                             #st.write("Costo de la operación:")
                             #st.write(cost_trade)
+                            # ✅ VALIDAR ANTES DE ABRIR
+                            if cost_trade > balance_posiciones or num_contratos == 0:
+                                
+                                continue
                             # Restar el costo de la nueva posición
                             balance_posiciones -= cost_trade
                             
