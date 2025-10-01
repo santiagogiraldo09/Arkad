@@ -820,9 +820,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             # ========== FIN DE CIERRE DE POSICIONES ==========
             
             #st.write("Si está tomando el archivo")
-            #st.write(start_time)
-            #st.write(next_start_time)
-            #st.write(end_time)
+            st.write(start_time)
+            st.write(next_start_time)
+            st.write(end_time)
             #st.write(precio_usar_apertura_excel)
             #st.write(precio_usar_cierre_excel)
             #st.write(option_price)
