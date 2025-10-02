@@ -723,8 +723,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             for i in range(len(data))
         ]
 
-        
-
+    data_for_ROI = yf.download("SPY", start=fecha_inicio, end=fecha_fin + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)     
+    ROI_SPY = ((data_for_ROI['Close'].iloc[-1] - data_for_ROI['Open'].iloc[0]) / data_for_ROI['Open'].iloc[0]) * 100
     for date, row in data.iterrows():
         
         if periodo == 'Diario':
@@ -978,6 +978,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Resultado Potencial': trade_result_display,
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
+                                'ROI SPY': ROI_SPY,
                                 'Open': precio_usar_apertura_excel,
                                 'Close': precio_usar_cierre_excel,
                                 'Costo Posiciones': cost_trade,
@@ -1113,6 +1114,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 'Resultado Potencial': trade_result,
                                 'Contratos': num_contratos,
                                 'Opcion': option_name,
+                                'ROI SPY': ROI_SPY,
                                 'Open': precio_usar_apertura_excel,
                                 'Close': precio_usar_cierre_excel,
                                 'Costo Posiciones': cost_trade,
@@ -1260,6 +1262,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                         'Resultado': trade_result_anterior,
                                         'Contratos': num_contratos_anterior,
                                         'Opcion': option_name_anterior,
+                                        'ROI SPY': ROI_SPY,
                                         'Open': etf_open_price_anterior,
                                         'Close': etf_close_price,
                                         'Open Posición Abierta': etf_open_price_anterior,
@@ -1336,6 +1339,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                         'Resultado': trade_result_anterior,
                                         'Contratos': num_contratos_anterior,
                                         'Opcion': option_name_anterior,
+                                        'ROI SPY': ROI_SPY,
                                         'Open': etf_open_price_anterior,
                                         'Close': etf_open_price,
                                         'Open Posición Abierta': etf_open_price_anterior,
@@ -1395,6 +1399,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                             'Resultado': trade_result,
                                             'Contratos': num_contratos,
                                             'Opcion': option_name,
+                                            'ROI SPY': ROI_SPY,
                                             'Open': etf_open_price,
                                             'Close': etf_close_price,
                                             'Open Posición Abierta': etf_open_price,
@@ -1518,6 +1523,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                                 'Resultado': trade_result,
                                                 'Contratos': num_contratos,
                                                 'Opcion': option_name,
+                                                'ROI SPY': ROI_SPY,
                                                 'Open': etf_open_price,
                                                 'Close': etf_close_price,
                                                 'Open Posición Abierta': etf_open_price,
@@ -1681,6 +1687,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                     'Contratos': num_contratos,
                                     'Opcion': option_name,
                                     #'Open': df_option[['open']]
+                                    'ROI SPY': ROI_SPY,
                                     'Open': etf_open_price,
                                     'Close': etf_close_price,
                                     #'Open2': etf_open_price3,
@@ -1850,6 +1857,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         'Contratos': num_contratos,
                         'Opcion': option_name,
                         #'Open': df_option[['open']]
+                        'ROI SPY': ROI_SPY,
                         'Open': etf_open_price,
                         'Close': etf_close_price,
                         #'Open2': etf_open_price3,
