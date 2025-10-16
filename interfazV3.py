@@ -732,8 +732,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         else:
             date = pd.Timestamp(date)
             
-        if date < fecha_inicio or date > fecha_fin:
-            continue
+        #if date < fecha_inicio or date > fecha_fin:
+            #continue
         if row[column_name] not in [0, 1]:
             continue
         
