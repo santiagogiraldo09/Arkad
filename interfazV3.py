@@ -806,7 +806,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             break
                     
                     # Opcional: Log del cierre
-                    #st.write(f"✅ Cerrada posición: {pos['option_name']}, Resultado: ${trade_result_pos:.2f}")
+                    st.write(f"✅ Cerrada posición: {pos['option_name']}, Resultado: ${trade_result_pos:.2f}")
                     
                 else:
                     # Esta posición sigue abierta, mantenerla
@@ -819,14 +819,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             balance_posiciones = balance - sum([p['cost_trade'] for p in posiciones_abiertas])
             # ========== FIN DE CIERRE DE POSICIONES ==========
             
-            #st.write("Si está tomando el archivo")
-            #st.write(start_time)
-            #st.write(next_start_time)
-            #st.write(end_time)
-            #st.write(precio_usar_apertura_excel)
-            #st.write(precio_usar_cierre_excel)
-            #st.write(option_price)
-            #st.write(señal_actual)
+            st.write("Si está tomando el archivo")
+            st.write(start_time)
+            st.write(next_start_time)
+            st.write(end_time)
+            st.write(precio_usar_apertura_excel)
+            st.write(precio_usar_cierre_excel)
+            st.write(option_price)
+            st.write(señal_actual)
             
             if señal_actual in [0,1]:
                                        
@@ -854,13 +854,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                  
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
-                #st.write("option date")
-                #st.write(option_date)
+                st.write("option date")
+                st.write(option_date)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-                    #st.write("Option name:")
-                    #st.write(option_name)
+                    st.write("Option name:")
+                    st.write(option_name)
                     
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
                     #st.write("df_option_start_time:")
@@ -1023,7 +1023,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 HORA_DE_CORTE_NY = 14
                                 #st.write(f"La fecha {latest_timestamp_ny.date()} está en horario de INVIERNO (EST).")
                             
-                            #st.write(f"==> Se usará la hora de corte: {HORA_DE_CORTE_NY}:00 Hora de NY")
+                            st.write(f"==> Se usará la hora de corte: {HORA_DE_CORTE_NY}:00 Hora de NY")
                             
                             # Construir el punto de inicio del filtro usando la hora decidida y la zona horaria de NY
                             punto_de_inicio_ny = pd.Timestamp(
@@ -1033,8 +1033,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # Le quitas la zona horaria
                             punto_de_inicio_ny = punto_de_inicio_ny.tz_localize(None)
                             
-                            #st.write("Punto de inicio para el filtro:")
-                            #st.write(punto_de_inicio_ny)
+                            st.write("Punto de inicio para el filtro:")
+                            st.write(punto_de_inicio_ny)
                             
                             # PASO 4 (CORREGIDO): Cortar/Filtrar el DataFrame que SÍ está en la zona horaria de NY
                             #df_recortado_final = df_ny_time.loc[punto_de_inicio_ny:]
