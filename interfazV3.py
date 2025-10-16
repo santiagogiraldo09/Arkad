@@ -882,8 +882,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #st.write(df_option_end_time.index)
                         #df_option_end_time = df_option_end_time.loc[end_time:] #para end_time de minuto
                         df_option_end_time = df_option_start_time.loc[end_time:]
-                        #st.write("data frame empezando desde end_time o cercano: debería de ser el exacto")
-                        #st.write(df_option_end_time)
+                        st.write("data frame empezando desde end_time o cercano: debería de ser el exacto")
+                        st.write(df_option_end_time)
                         #if not end_time in df_option.index:
                             #hacer end_time el siguiente registro del dataframe df_option.index 
                         #if end_time in df_option_end_time.index:
@@ -987,7 +987,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             posicion_actual_abierta = False
                             #print(trade_result)
                         else:
-                            #st.write("No entró al end_time en df_option.index")
+                            st.write("No entró al end_time en df_option.index")
                             df_option_end_time = df_option_start_time.loc[start_time:]
                             
                             # PASO 1: Asegurarse de que el índice es de tipo Datetime.
@@ -1041,8 +1041,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             df_recortado_final = df_option_end_time.loc[punto_de_inicio_ny:]
                             
                             # Ahora, la variable `df_recortado_final` contiene el resultado correcto.
-                            #st.write("DataFrame después de ser cortado:")
-                            #st.write(df_recortado_final)              
+                            st.write("DataFrame después de ser cortado:")
+                            st.write(df_recortado_final)              
                             
                             
                             
