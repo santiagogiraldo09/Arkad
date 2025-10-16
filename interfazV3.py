@@ -863,19 +863,19 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.write(option_name)
                     
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_start_time:")
-                    #st.write(df_option_start_time)
+                    st.write("df_option_start_time:")
+                    st.write(df_option_start_time)
                     #df_option_end_time = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days)) #para end_time de minuto
                     df_option_end_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_end_time:")
-                    #st.write(df_option_end_time)
+                    st.write("df_option_end_time:")
+                    st.write(df_option_end_time)
                     df_option_start_time = df_option_start_time.loc[start_time:]
-                    #st.write("df_option_start_time recortado a start_time:")
-                    #st.write(df_option_start_time)
+                    st.write("df_option_start_time recortado a start_time:")
+                    st.write(df_option_start_time)
                     #df_option_end_time = df_option_end_time.loc[start_time:] #para end_time de minuto
                     df_option_end_time = df_option_start_time.loc[start_time:]
-                    #st.write("df_option_end_time recortado a start_time: esto es lo que quiero revisar")
-                    #st.write(df_option_end_time)
+                    st.write("df_option_end_time recortado a start_time: esto es lo que quiero revisar")
+                    st.write(df_option_end_time)
                     
                     if not df_option_start_time.empty:
                         #st.write("entra porque el df_option_start_time no está vacío")
