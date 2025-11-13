@@ -820,11 +820,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             # ========== FIN DE CIERRE DE POSICIONES ==========
             
             #st.write("Si está tomando el archivo")
-            #st.write(start_time)
-            #st.write(next_start_time)
-            #st.write(end_time)
-            #st.write(precio_usar_apertura_excel)
-            #st.write(precio_usar_cierre_excel)
+            st.write(start_time)
+            st.write(next_start_time)
+            st.write(end_time)
+            st.write(precio_usar_apertura_excel)
+            st.write(precio_usar_cierre_excel)
             #st.write(option_price)
             #st.write(señal_actual)
             
@@ -854,21 +854,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                  
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
-                #st.write("option date")
-                #st.write(option_date)
+                st.write("option date")
+                st.write(option_date)
                 if option_date:
                     option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-                    #st.write("Option name:")
-                    #st.write(option_name)
+                    st.write("Option name:")
+                    st.write(option_name)
                     
                     df_option_start_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_start_time:")
-                    #st.write(df_option_start_time)
+                    st.write("df_option_start_time:")
+                    st.write(df_option_start_time)
                     #df_option_end_time = obtener_historico_30min(option_name, api_key, date, date + timedelta(days=option_days)) #para end_time de minuto
                     df_option_end_time = obtener_historico_30min_start_time(option_name, api_key, date, date + timedelta(days=option_days))
-                    #st.write("df_option_end_time:")
-                    #st.write(df_option_end_time)
+                    st.write("df_option_end_time:")
+                    st.write(df_option_end_time)
                     df_option_start_time = df_option_start_time.loc[start_time:]
                     #st.write("df_option_start_time recortado a start_time:")
                     #st.write(df_option_start_time)
@@ -878,12 +878,12 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write(df_option_end_time)
                     
                     if not df_option_start_time.empty:
-                        #st.write("entra porque el df_option_start_time no está vacío")
-                        #st.write(df_option_end_time.index)
+                        st.write("entra porque el df_option_start_time no está vacío")
+                        st.write(df_option_end_time.index)
                         #df_option_end_time = df_option_end_time.loc[end_time:] #para end_time de minuto
                         df_option_end_time = df_option_start_time.loc[end_time:]
-                        #st.write("data frame empezando desde end_time o cercano: debería de ser el exacto")
-                        #st.write(df_option_end_time)
+                        st.write("data frame empezando desde end_time o cercano: debería de ser el exacto")
+                        st.write(df_option_end_time)
                         #if not end_time in df_option.index:
                             #hacer end_time el siguiente registro del dataframe df_option.index 
                         #if end_time in df_option_end_time.index:
@@ -891,8 +891,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             #st.write("entra acá porque end_time si está en df_option.index")
                             df_option_cierre = df_option_end_time.loc[end_time:] #para end_time de minuto
                             df_option_cierre = df_option_start_time.loc[end_time:]
-                            #st.write("df_option recortado al cierre: a revisar")
-                            #st.write(df_option_cierre)
+                            st.write("df_option recortado al cierre: a revisar")
+                            st.write(df_option_cierre)
                             posicion_actual_abierta = True
                             option_open_price = df_option_start_time[precio_usar_apertura].iloc[0]##PENDIENTE DE REVISAR
                             #st.write("Precio de entrada para la opción día actual:")
