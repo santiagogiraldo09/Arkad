@@ -879,6 +879,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     
                     if not df_option_start_time.empty:
                         
+                        st.write("Esto es lo nuevo")
+                        
                         # 1. Calcular la diferencia de tiempo (valor absoluto) para todos los índices
                         time_diff = abs(df_option_start_time.index - end_time)
                         
