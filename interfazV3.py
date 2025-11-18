@@ -878,6 +878,21 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #st.write(df_option_end_time)
                     
                     if not df_option_start_time.empty:
+                        
+                        # 1. Calcular la diferencia de tiempo (valor absoluto) para todos los índices
+                        time_diff = abs(df_option_start_time.index - end_time)
+                        
+                        # 2. Encontrar el índice (timestamp) que tiene la mínima diferencia
+                        # idxmin() retorna el índice (timestamp) cuyo valor absoluto de diferencia es mínimo
+                        ts_mas_cercano = time_diff.idxmin()
+                        
+                        # 3. Crear el DataFrame final de cierre (df_option_cierre) con la fila más cercana
+                        # Usamos doble corchete para que el resultado sea un DataFrame de una sola fila
+                        df_option_cierre = df_option_start_time.loc[[ts_mas_cercano]]
+                        
+                        st.write("df option cierre (NUEVO)")
+                        st.write(df_option_cierre)
+                        
                         st.write("entra porque el df_option_start_time no está vacío")
                         st.write(df_option_end_time.index)
                         #df_option_end_time = df_option_end_time.loc[end_time:] #para end_time de minuto
