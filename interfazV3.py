@@ -882,18 +882,18 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         st.write("Esto es lo nuevo")
                         
                         # 1. Calcular la diferencia de tiempo (valor absoluto) para todos los índices
-                        time_diff = abs(df_option_start_time.index - end_time)
+                        #time_diff_series = abs(df_option_start_time.index - end_time).to_series()
                         
                         # 2. Encontrar el índice (timestamp) que tiene la mínima diferencia
                         # idxmin() retorna el índice (timestamp) cuyo valor absoluto de diferencia es mínimo
-                        ts_mas_cercano = time_diff.idxmin()
+                        #ts_mas_cercano = time_diff_series.idxmin()
                         
                         # 3. Crear el DataFrame final de cierre (df_option_cierre) con la fila más cercana
                         # Usamos doble corchete para que el resultado sea un DataFrame de una sola fila
-                        df_option_cierre = df_option_start_time.loc[[ts_mas_cercano]]
+                        #df_option_cierre = df_option_start_time.loc[[ts_mas_cercano]]
                         
-                        st.write("df option cierre (NUEVO)")
-                        st.write(df_option_cierre)
+                        #st.write("df option cierre (NUEVO)")
+                        #st.write(df_option_cierre)
                         
                         st.write("entra porque el df_option_start_time no está vacío")
                         st.write(df_option_end_time.index)
@@ -1004,12 +1004,16 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             posicion_actual_abierta = False
                             #print(trade_result)
                         else:
-                            #st.write("No entró al end_time en df_option.index")
+                            st.write("No entró al end_time en df_option.index")
                             df_option_end_time = df_option_start_time.loc[start_time:]
+                            st.write("Nuevo df_option_end_time")
+                            st.write(df_option_end_time)
                             
                             # PASO 1: Asegurarse de que el índice es de tipo Datetime.
                             # Esto debe hacerse ANTES de cualquier operación de zona horaria.
                             df_option_end_time.index = pd.to_datetime(df_option_end_time.index)
+                            st.write("paso 1 (df_option_end_time.index)")
+                            st.write(df_option_end_time.index)
                             
                             # PASO 2: ASIGNAR la zona horaria original (Localize). ¡ESTE ES EL PASO CLAVE!
                             # Le decimos a pandas que tus datos están en UTC. Si estuvieran en hora de Colombia,
@@ -1024,6 +1028,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # PASO 3: CONVERTIR la zona horaria a la de Nueva York.
                             # Ahora que pandas sabe que los datos originales son UTC, sí puede convertirlos.
                             df_ny_time = df_localized.tz_convert('America/New_York')
+                            st.write("df_ny_time")
+                            st.write(df_ny_time)
                             
                             # -------------------------------------------------------------------------
                             # A partir de aquí, trabajamos SIEMPRE con 'df_ny_time'
@@ -1047,8 +1053,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 f"{latest_timestamp_ny.date()} {HORA_DE_CORTE_NY}:00:00",
                                 tz='America/New_York')
                             
+                            
                             # Le quitas la zona horaria
                             punto_de_inicio_ny = punto_de_inicio_ny.tz_localize(None)
+                            st.write("punto de inicio:")
+                            st.write(punto_de_inicio_ny)
                             
                             #st.write("Punto de inicio para el filtro:")
                             #st.write(punto_de_inicio_ny)
@@ -1056,16 +1065,31 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             # PASO 4 (CORREGIDO): Cortar/Filtrar el DataFrame que SÍ está en la zona horaria de NY
                             #df_recortado_final = df_ny_time.loc[punto_de_inicio_ny:]
                             df_recortado_final = df_option_end_time.loc[punto_de_inicio_ny:]
+                            st.write("df_recortado_final:")
+                            st.write(df_recortado_final)
                             
+                            if df_recortado_final.empty:
+                                st.write("Por estar vacío el df_recortado_final")
+                                st.write(df_option_end_time.index[-1])
+                                df_recortado_final = df_option_end_time.loc[df_option_end_time.index[-1]:]
+                                st.write("df recortado final al index[-1], es decir estaba vacío el otro")
+                                st.write(df_recortado_final)
+                                df_option_cierre = df_option_end_time.loc[df_option_end_time.index[-1]:] #para end_time de minuto
+                                df_option_cierre = df_option_start_time.loc[df_option_end_time.index[-1]:]
+                            else:
+                                st.write("Sin estar vacío el df_recortado_final")
+                                st.write(df_option_end_time.index[-1])
+                                #st.write("entra acá porque end_time si está en df_option.index")
+                                df_option_cierre = df_option_end_time.loc[punto_de_inicio_ny:] #para end_time de minuto
+                                df_option_cierre = df_option_start_time.loc[punto_de_inicio_ny:]
+                                #df_recortado_final
                             # Ahora, la variable `df_recortado_final` contiene el resultado correcto.
                             #st.write("DataFrame después de ser cortado:")
                             #st.write(df_recortado_final)              
                             
                             
                             
-                            #st.write("entra acá porque end_time si está en df_option.index")
-                            df_option_cierre = df_option_end_time.loc[punto_de_inicio_ny:] #para end_time de minuto
-                            df_option_cierre = df_option_start_time.loc[punto_de_inicio_ny:]
+                            
                             #st.write("df_option recortado al cierre: a revisar (este es el que lo corta en punto_de_inicio_ny)")
                             #st.write(df_option_cierre)
                             #posicion_actual_abierta = True
