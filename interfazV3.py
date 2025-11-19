@@ -2111,7 +2111,7 @@ def main():
     else:
         esce1 = False
         
-    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2020, 1, 1))
+    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2005, 1, 1))
     fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
     #if periodo == '15 minutos':
         #open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
