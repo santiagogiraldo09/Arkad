@@ -732,8 +732,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         else:
             date = pd.Timestamp(date)
             
-        #if date < fecha_inicio or date > fecha_fin:
-            #continue
+        if date < fecha_inicio or date > fecha_fin:
+            continue
+        
         if row[column_name] not in [0, 1]:
             continue
         
@@ -1923,10 +1924,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
 
     resultados_df = pd.DataFrame(resultados)
     if not resultados_df.empty and 'Resultado' in resultados_df.columns:
-        graficar_resultados(resultados_df, balance, balance_inicial)
+        #graficar_resultados(resultados_df, balance, balance_inicial)
         resultados_df.to_excel('resultados_trades_1.xlsx')
     else:
         st.error("No se encontraron resultados válidos para el periodo especificado.")
+        pass
     return resultados_df, balance
 
 # Modificación en la definición de la función para aceptar 'spy_full_data'
