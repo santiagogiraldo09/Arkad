@@ -1989,6 +1989,7 @@ def graficar_resultados(df, final_balance, balance_inicial, spy_full_data=None):
 def main():
     st.title("Backtesting ARKAD")
 
+    # --- ESTILOS CSS ---
     tooltip_style = """
     <style>
     .tooltip {
@@ -2023,6 +2024,7 @@ def main():
     """
     st.markdown(tooltip_style, unsafe_allow_html=True)
 
+    # --- CARGA DE ARCHIVOS ---
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
@@ -2068,6 +2070,7 @@ def main():
             """
        info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
         
+    # --- INPUTS DE USUARIO ---
     option_days_input = st.number_input("*Option Days:*", min_value=0, max_value=90, value=30, step=1)
     option_offset_input = st.number_input("*Option Offset:*", min_value=0, max_value=90, value=7, step=1)
     balance_inicial = st.number_input("*Balance inicial*", min_value=0, value=100000, step= 1000)
@@ -2107,14 +2110,15 @@ def main():
     
     trade_type = st.radio('*Tipo de Operación*', ('Open to Close', 'Close to Close', 'Close to Open'))
     
+    # --- EJECUCIÓN DEL BACKTEST ---
     if st.button("Run Backtest"):
-        # 1. Ejecutar Backtest
+        # 1. Ejecutar Lógica Principal
         resultados_df, final_balance = realizar_backtest(data_filepath, 'rlD0rjy9q_pT4Pv2UBzYlXl6SY5Wj7UT', "SPY", balance_inicial, pct_allocation, fixed_amount, 
         allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, method, offset, esce1)
         
         st.success("Backtest ejecutado correctamente!")
         
-        # 2. Descargar Histórico Completo SPY (Tu nuevo bloque)
+        # 2. Descargar Histórico Completo SPY (para la gráfica)
         st.write("Obteniendo datos completos del SPY para graficar...")
         try:
             spy_full_data = yf.download("SPY", start=fecha_inicio, end=fecha_fin + timedelta(days=1), progress=False)
@@ -2124,23 +2128,88 @@ def main():
             st.warning(f"No se pudo descargar el histórico completo del SPY: {e}")
             spy_full_data = None
         
-        # Guardar en sesión
-        st.session_state['resultados_df'] = resultados_df
-        st.session_state['final_balance'] = final_balance
+        # 3. PROCESAMIENTO DE MÉTRICAS (LO HACEMOS AHORA PARA QUE EL EXCEL SALGA COMPLETO)
+        # Aseguramos formato fecha y orden
+        resultados_df['Fecha'] = pd.to_datetime(resultados_df['Fecha'])
         
-        # 3. Preparar Excel de Resultados (Buffer 1)
-        st.write("### Descargar Resultados")
-        excel_buffer_raw = io.BytesIO() # ### CORRECCIÓN: Nombre específico para diferenciar
-        resultados_df.to_excel(excel_buffer_raw, index=False)
-        st.download_button(label="Descargar Resultados Excel", data=excel_buffer_raw, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        # FILTRO IMPORTANTE: Aseguramos que el DF solo tenga datos del rango seleccionado por el usuario
+        # Esto corrige el error de que la línea azul empiece antes de tiempo
+        resultados_df = resultados_df[(resultados_df['Fecha'] >= pd.Timestamp(fecha_inicio)) & (resultados_df['Fecha'] <= pd.Timestamp(fecha_fin))]
+        resultados_df = resultados_df.sort_values('Fecha').reset_index(drop=True)
         
-        # 4. Generar Gráfico
-        st.write("### Gráfico")
-        fig, ax = plt.subplots(figsize=(14, 7))
+        # Recalculamos acumulado después del filtro
         resultados_df['Ganancia acumulada'] = resultados_df['Resultado'].cumsum() + balance_inicial
         
-        # Eje Izquierdo (Ganancias)
-        ax.plot(pd.to_datetime(resultados_df['Fecha']), resultados_df['Ganancia acumulada'], marker='o', linestyle='-', color='b', label='Ganancia Acumulada')
+        # Lógica de Métricas (Direction, Acierto, etc.)
+        if trade_type == 'Close to Close':
+            resultados_df['Direction'] = (resultados_df['Close'].shift(-1) > resultados_df['Close']).astype(int)
+        elif trade_type == 'Close to Open':
+            resultados_df['Direction'] = (resultados_df['Close'] < resultados_df['Open'].shift(-1)).astype(int)
+        elif trade_type == 'Open to Close':
+            resultados_df['Direction'] = (resultados_df['Open'] < resultados_df['Close']).astype(int)
+        else:
+            resultados_df['Direction'] = 0
+
+        resultados_df['acierto'] = np.where(resultados_df['Direction'] == resultados_df[column_name], 1, 0)
+        resultados_df['asertividad'] = resultados_df['acierto'].sum()/len(resultados_df['acierto']) if len(resultados_df['acierto']) > 0 else 0
+        resultados_df['cumsum'] = resultados_df['acierto'].cumsum()
+        resultados_df['accu'] = resultados_df['cumsum']/(resultados_df.index + 1)
+        
+        if trade_type == 'Open to Close':
+            resultados_df['open_to_close_pct'] = resultados_df['Close']/resultados_df['Open'] - 1
+            resultados_df['Ganancia'] = resultados_df.apply(lambda row: abs(row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
+        elif trade_type == 'Close to Close':
+            resultados_df['close_to_close_pct'] = resultados_df['Close'].shift(-1) / resultados_df['Close'] - 1
+            resultados_df['Ganancia'] = resultados_df.apply(lambda row: abs(row['close_to_close_pct']) if row['acierto'] else -abs(row['close_to_close_pct']), axis=1)
+        else:
+            resultados_df['close_to_open_pct'] = resultados_df['Open'].shift(-1) / resultados_df['Close'] - 1 
+            resultados_df['Ganancia'] = resultados_df.apply(lambda row: abs(row['close_to_open_pct']) if row['acierto'] else -abs(row['close_to_open_pct']), axis=1)
+
+        resultados_df['Ganancia_Acumulada'] = resultados_df['Ganancia'].cumsum()
+
+        # Cálculo de métricas ML (Matriz de Confusión)
+        matrix=np.zeros((2,2)) 
+        for i in range(len(resultados_df)):
+            try:
+                if int(resultados_df[column_name][i])==1 and int(resultados_df['Direction'][i])==1: 
+                    matrix[0,0]+=1 
+                elif int(resultados_df[column_name][i])==1 and int(resultados_df['Direction'][i])==0:
+                    matrix[0,1]+=1 
+                elif int(resultados_df[column_name][i])==0 and int(resultados_df['Direction'][i])==1:
+                    matrix[1,0]+=1 
+                elif int(resultados_df[column_name][i])==0 and int(resultados_df['Direction'][i])==0:
+                    matrix[1,1]+=1 
+            except:
+                pass # Manejo de errores por si hay nulos
+        
+        tp, fp, fn, tn = matrix.ravel()
+        resultados_df['tp'] = tp; resultados_df['tn'] = tn; resultados_df['fp'] = fp; resultados_df['fn'] = fn
+        
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        resultados_df['precision'] = precision
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        resultados_df['recall'] = recall
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        resultados_df['f1_score'] = f1_score
+
+        # Guardar resultados finales en session
+        st.session_state['resultados_df'] = resultados_df
+        st.session_state['final_balance'] = final_balance
+        st.session_state['balance_inicial'] = balance_inicial
+        
+        # 4. GENERAR DESCARGAS (Ahora sí usamos el DF completo con todas las columnas)
+        st.write("### Descargar Resultados")
+        excel_buffer = io.BytesIO()
+        resultados_df.to_excel(excel_buffer, index=False)
+        st.download_button(label="Descargar Resultados Excel", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        
+        # 5. GENERAR GRÁFICO (Con DF filtrado y completo)
+        st.write("### Gráfico")
+        fig, ax = plt.subplots(figsize=(14, 7))
+        
+        # Usamos resultados_df que ya filtramos por fechas arriba
+        ax.plot(resultados_df['Fecha'], resultados_df['Ganancia acumulada'], marker='o', linestyle='-', color='b', label='Ganancia Acumulada')
+        
         ax.set_title(f'Resultados del Backtesting - Balance final: ${final_balance:,.2f}')
         ax.set_xlabel('Fecha')
         ax.set_ylabel('Ganancia/Pérdida Acumulada', color='b')
@@ -2150,17 +2219,14 @@ def main():
         
         # Eje Derecho (SPY)
         ax2 = ax.twinx()
-        
-        # ### CORRECCIÓN: Usar spy_full_data si existe
         if spy_full_data is not None and not spy_full_data.empty:
             ax2.plot(spy_full_data.index, spy_full_data['Close'], color='orange', linestyle='-', alpha=0.6, label='SPY (Continuo)')
         else:
-            ax2.plot(pd.to_datetime(resultados_df['Fecha']), resultados_df['Close'], color='orange', linestyle='-', label='SPY (Solo Trades)')
+            ax2.plot(resultados_df['Fecha'], resultados_df['Close'], color='orange', linestyle='-', label='SPY (Solo Trades)')
             
         ax2.set_ylabel('Precio del S&P (Close)', color='orange')
         ax2.tick_params(axis='y', labelcolor='orange')
         
-        # Leyendas unificadas
         lines_1, labels_1 = ax.get_legend_handles_labels()
         lines_2, labels_2 = ax2.get_legend_handles_labels()
         ax.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
@@ -2168,80 +2234,17 @@ def main():
         plt.grid(True, which='both', linestyle='-', linewidth=0.5)
         plt.tight_layout()
         
-        # Guardar gráfico en Buffer
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
         st.image(img_buffer)
         st.download_button(label="Descargar Gráfico", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
-        # 5. Procesamiento de Estadísticas (Matriz de Confusión)
-        datos = pd.read_excel(excel_buffer_raw) # Leemos del buffer en memoria
-        datos['Fecha'] = pd.to_datetime(datos['Fecha']) # Asegurar formato fecha
-        
-        # Lógica de filtros y métricas (Mantenemos tu lógica igual)
-        datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio)) & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
-        
-        if trade_type == 'Close to Close':
-            datos['Direction'] = (datos['Close'].shift(-1) > datos['Close']).astype(int)
-        elif trade_type == 'Close to Open':
-            datos['Direction'] = (datos['Close'] < datos['Open'].shift(-1)).astype(int)
-        elif trade_type == 'Open to Close':
-            datos['Direction'] = (datos['Open'] < datos['Close']).astype(int)
-        else:
-            datos['Direction'] = 0
-
-        datos = datos.reset_index(drop=True)
-        datos['acierto'] = np.where(datos['Direction'] == datos[column_name], 1, 0)
-        datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto']) if len(datos['acierto']) > 0 else 0
-        datos['cumsum'] = datos['acierto'].cumsum()
-        datos['accu'] = datos['cumsum']/(datos.index + 1)
-        
-        if trade_type == 'Open to Close':
-            datos['open_to_close_pct'] = datos['Close']/datos['Open'] - 1
-            datos['Ganancia'] = datos.apply(lambda row: abs(row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
-        elif trade_type == 'Close to Close':
-            datos['close_to_close_pct'] = datos['Close'].shift(-1) / datos['Close'] - 1
-            datos['Ganancia'] = datos.apply(lambda row: abs(row['close_to_close_pct']) if row['acierto'] else -abs(row['close_to_close_pct']), axis=1)
-        else:
-            datos['close_to_open_pct'] = datos['Open'].shift(-1) / datos['Close'] - 1 
-            datos['Ganancia'] = datos.apply(lambda row: abs(row['close_to_open_pct']) if row['acierto'] else -abs(row['close_to_open_pct']), axis=1)
-
-        datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
-
-        # Cálculo de métricas ML
-        matrix=np.zeros((2,2)) 
-        for i in range(len(datos)):
-            if int(datos[column_name][i])==1 and int(datos['Direction'][i])==1: 
-                matrix[0,0]+=1 
-            elif int(datos[column_name][i])==1 and int(datos['Direction'][i])==0:
-                   matrix[0,1]+=1 
-            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==1:
-                  matrix[1,0]+=1 
-            elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==0:
-                matrix[1,1]+=1 
-        
-        tp, fp, fn, tn = matrix.ravel()
-        datos['tp'] = tp; datos['tn'] = tn; datos['fp'] = fp; datos['fn'] = fn
-        
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        datos['precision'] = precision
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        datos['recall'] = recall
-        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        datos['f1_score'] = f1_score
-
-        # 6. Guardar Datos Procesados en un NUEVO Buffer (Buffer 2)
-        excel_buffer_processed = io.BytesIO() # ### CORRECCIÓN: Nuevo buffer
-        datos.to_excel(excel_buffer_processed, index=False)
-                
-        # 7. Crear ZIP con los dos buffers distintos
+        # 6. CREAR ZIP
         with zipfile.ZipFile("resultados.zip", "w") as zf:
-            # Archivo 1: Resultados del trade (Raw)
-            zf.writestr("resultados_trades_1.xlsx", excel_buffer_raw.getvalue())
-            # Archivo 2: Gráfica
+            zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
             zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
-            # Archivo 3: Datos procesados con métricas
-            zf.writestr("datos_procesados.xlsx", excel_buffer_processed.getvalue())
+            # Opcional: si quieres guardar también el archivo 'datos.xlsx' que es el mismo
+            zf.writestr("datos.xlsx", excel_buffer.getvalue())
 
         with open("resultados.zip", "rb") as f:
             st.download_button(
