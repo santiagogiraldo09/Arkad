@@ -606,18 +606,44 @@ def obtener_historico_15minn(ticker_opcion, api_key, fecha_inicio, fecha_fin):
        print(f"Error al obtener datos para {ticker_opcion}: {str(e)}")
        return pd.DataFrame()
     
+#def encontrar_opcion_cercana(client, base_date, option_price, column_name, option_days, option_offset, ticker):
+    #min_days = option_days - option_offset #23
+    #max_days = option_days + option_offset #37
+    #best_date = None
+    #for offset in range(min_days, max_days + 1):
+        #option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
+        #option_type = 'C' if column_name == 1 else 'P'
+        #option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+        #if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
+            #best_date = option_date
+            #break
+    #return best_date
+
 def encontrar_opcion_cercana(client, base_date, option_price, column_name, option_days, option_offset, ticker):
-    min_days = option_days - option_offset #23
-    max_days = option_days + option_offset #37
-    best_date = None
-    for offset in range(min_days, max_days + 1):
-        option_date = (base_date + timedelta(days=offset)).strftime('%y%m%d')
-        option_type = 'C' if column_name == 1 else 'P'
-        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
-        if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
-            best_date = option_date
-            break
-    return best_date
+    # Iteramos 'i' desde 0 hasta el límite del offset (ej: 0, 1, 2... 5)
+    for i in range(option_offset + 1):
+        # Definimos los intentos para este nivel de 'i'.
+        # Si i=0, solo probamos el objetivo (ej: 30).
+        # Si i>0, probamos primero ARRIBA (+i) y luego ABAJO (-i).
+        desplazamientos = [i] if i == 0 else [i, -i]
+        
+        for k in desplazamientos:
+            # Calculamos los días objetivo (Ej: 30 + 1 = 31)
+            dias_a_probar = option_days + k
+            
+            # Construimos la fecha usando el desplazamiento calculado
+            option_date = (base_date + timedelta(days=dias_a_probar)).strftime('%y%m%d')
+            option_type = 'C' if column_name == 1 else 'P'
+            
+            # Construimos el nombre del contrato
+            option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+            
+            # Verificamos si existe
+            if verificar_opcion(client, option_name, base_date, base_date + timedelta(days=1)):
+                # Si existe, retornamos esta fecha inmediatamente (la más cercana a la meta)
+                return option_date
+                
+    return None
 
 def encontrar_opcion_cercana_15min(client, base_date, option_price, column_name,option_days, option_offset, ticker):
     min_days = option_days - option_offset #23
