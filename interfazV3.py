@@ -1929,48 +1929,64 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         st.error("No se encontraron resultados válidos para el periodo especificado.")
     return resultados_df, balance
 
-def graficar_resultados(df, final_balance, balance_inicial):
+# Modificación en la definición de la función para aceptar 'spy_full_data'
+def graficar_resultados(df, final_balance, balance_inicial, spy_full_data=None):
     if df.empty or 'Resultado' not in df.columns:
         st.error("No se pueden graficar resultados porque el DataFrame está vacío o falta la columna 'Resultado'.")
         return
     
     plt.figure(figsize=(14, 7))
+    
+    # --- Gráfica de Ganancias (Eje Izquierdo) ---
+    # Convertimos 'Fecha' a datetime para asegurar compatibilidad con el índice de spy_full_data
+    df['Fecha'] = pd.to_datetime(df['Fecha'])
+    df = df.sort_values('Fecha') # Asegurar orden cronológico
+    
     df['Ganancia acumulada'] = df['Resultado'].cumsum() + balance_inicial
-    ax = df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b')
+    
+    # Graficamos la curva de equidad
+    ax = plt.gca() # Obtener eje actual
+    ax.plot(df['Fecha'], df['Ganancia acumulada'], marker='o', linestyle='-', color='b', label='Ganancia Acumulada')
+    
     ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
     ax.set_xlabel('Fecha')
-    ax.set_ylabel('Ganancia/Pérdida Acumulada')
+    ax.set_ylabel('Ganancia/Pérdida Acumulada', color='b')
+    ax.tick_params(axis='y', labelcolor='b')
+    
+    # Ajuste de fechas en eje X
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     plt.xticks(rotation=45)
-    
-    # Ajuste para mostrar correctamente fechas y horas en el eje x
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))  # Coloca marcas de horas en el eje x
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
 
-
-    ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
+    ax.axhline(y=balance_inicial, color='r', linestyle='--', label='Balance Inicial')
     
-    # Crear un segundo eje Y (eje derecho) para el precio de cierre
+    # --- Gráfica del SPY (Eje Derecho - Línea Amarilla/Naranja) ---
     ax2 = ax.twinx()
-    ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
-    ax2.plot(df['Fecha'], df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
-    ax2.set_ylabel('Precio del S&P (Close)', color='black')
-    ax2.tick_params(axis='y', labelcolor='black')
     
-    #plt.legend()
-    # Leyendas de ambos ejes
-    ax.legend(loc='upper left')
-    ax2.legend(loc='upper right')
-    plt.grid(True, which='both', linestyle='-', linewidth=0.5)
+    # Lógica condicional: Si tenemos datos completos, los usamos. Si no, usamos los datos del trade (método antiguo)
+    if spy_full_data is not None and not spy_full_data.empty:
+        # Aquí graficamos TODOS los días del rango, no solo los trades
+        ax2.plot(spy_full_data.index, spy_full_data['Close'], color='orange', linestyle='-', alpha=0.6, label='Precio del S&P (Close)')
+    else:
+        # Fallback al método anterior si no se pasan datos
+        ax2.plot(df['Fecha'], df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close - Solo Trades)')
+        
+    ax2.set_ylabel('Precio del S&P (Close)', color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+    
+    # Unificar leyendas
+    lines_1, labels_1 = ax.get_legend_handles_labels()
+    lines_2, labels_2 = ax2.get_legend_handles_labels()
+    ax.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
+    
+    plt.grid(True, which='both', linestyle='-', linewidth=0.5, alpha=0.3)
     plt.tight_layout()
     plt.savefig('resultados_backtesting.png')
-    plt.show()
+    st.pyplot(plt) # Usar st.pyplot para renderizar en Streamlit correctamente
+
 
 def main():
-
     st.title("Backtesting ARKAD")
 
-    
     tooltip_style = """
     <style>
     .tooltip {
@@ -1982,13 +1998,12 @@ def main():
         margin-left: 5px;
         vertical_align: middle;
     }
-
     .tooltip .tooltiptext {
         visibility: hidden;
         width: 220px;
         background-color: black;
         color: #fff;
-        text-align: left;  /Alineación de texto/
+        text-align: left;
         border-radius: 6px;
         padding: 10px;
         position: absolute;
@@ -1998,90 +2013,63 @@ def main():
         opacity: 0;
         transition: opacity 0.3s;
     }
-
     .tooltip:hover .tooltiptext {
         visibility: visible;
         opacity: 1;
     }
     </style>
     """
-
-    # Insertamos el estilo en la aplicación Streamlit
     st.markdown(tooltip_style, unsafe_allow_html=True)
 
-    
-    # Directorio donde se encuentran los archivos .xlsx
     directorio_datos = '.'
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
-    #Extraer información del nombre del archivo seleccionado
     def extract_file_info(filename):
-        #Valores por defecto
         default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
                       "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
         parts = filename.split('_')
-        if len(parts) < 6:  # Verifica que haya suficientes partes en el nombre del archivo
+        if len(parts) < 6:
             return default_values
-    
         try:
             operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
             info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
-            start_date = parts[3][2:4] + '/' + parts[3][4:6] #+ '/20' + parts[2][0:2]
-            end_date = parts[4][2:4] + '/' + parts[4][4:6] #+ '/20' + parts[3][0:2]
+            start_date = parts[3][2:4] + '/' + parts[3][4:6]
+            end_date = parts[4][2:4] + '/' + parts[4][4:6]
             version = parts[5].split('.')[0]
-        
             return operation, info, responsible, start_date, end_date, version
         except IndexError:
             return default_values
         
-
-    #placeholder para el ícono de información
     info_placeholder = st.empty()
-    
-    #Toogle
     toggle_activated = st.toggle("Se opera si se supera el Threshold")
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
-    
-    # Opción de selección del archivo .xlsx
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     
     if data_filepath:
        operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
        data = cargar_datos(data_filepath)
-       
-       #if data['threshold'] is not None:
-           #st.write(f"*Threshold óptimo: {data['threshold']}*")
-       #else:
-           #st.write("*Threshold óptimo:* No se pudo encontrar el valor del threshold en el archivo.")
-       # Actualizar el tooltip
        if operation.startswith("Información desconocida"):
            tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
        else:
            tooltip_text = f"""
            <div class="tooltip">
-                &#9432;  <!-- Ícono de información -->
+                &#9432;
                 <span class="tooltiptext">
                 Tipo de operación: {operation}<br>
                 {info}<br>
-                Responsable del algoritmo: {responsible}<br>
-                Rango de fechas: {start_date}<br>
-                {end_date}<br>
+                Responsable: {responsible}<br>
+                Fechas: {start_date} - {end_date}<br>
                 Versión: {version}
                 </span>
            </div>
             """
        info_placeholder.markdown(tooltip_text, unsafe_allow_html=True)
         
-    # Option Days input
-    option_days_input = st.number_input("*Option Days:* (Número de días de vencimiento de la opción que se está buscando durante el backtesting)", min_value=0, max_value=90, value=30, step=1)
-    
-    # Option Offset input
-    option_offset_input = st.number_input("*Option Offset:* (Rango de días de margen alrededor del número de días objetivo dentro del cual se buscará la opción más cercana)", min_value=0, max_value=90, value=7, step=1)
-    
-    # Additional inputs for the backtest function
+    option_days_input = st.number_input("*Option Days:*", min_value=0, max_value=90, value=30, step=1)
+    option_offset_input = st.number_input("*Option Offset:*", min_value=0, max_value=90, value=7, step=1)
     balance_inicial = st.number_input("*Balance inicial*", min_value=0, value=100000, step= 1000)
-    # Agregar opción para elegir el tipo de asignación
+    
     allocation_type = st.radio("Seleccionar tipo de asignación de capital:", ('Porcentaje de asignación', 'Monto fijo de inversión'))
     if allocation_type == 'Porcentaje de asignación':
         pct_allocation = st.number_input("*Porcentaje de Asignación de Capital:*", min_value=0.001, max_value=0.6, value=0.05)
@@ -2092,9 +2080,7 @@ def main():
         
     periodo = st.radio("*Seleccionar periodo de datos*", ('Diario','15 minutos'))
     
-    # Checkbox "Escenario 1" con ícono de información y texto condicional
     if periodo == 'Diario':
-        # Checkbox con tooltip usando el diseño flex
         col1, col2 = st.columns([1, 1])
         with col1:
             esce1 = st.checkbox("Aplicar estrategia para manejo de pérdida de ganancias")
@@ -2102,84 +2088,97 @@ def main():
             st.markdown("""
             <div class="tooltip" style="display: inline;">
                 &#9432;
-                <span class="tooltiptext">1. Si la opción es rentable, se cierra normalmente al final del día.
-                                         2. Si hay pérdidas, mantenemos la posición y al día siguiente: 
-                                             a. Si la señal sigue igual, dejamos la posición abierta hasta el final del día. 
-                                             b. Si la señal cambia, cerramos la posición inmediatamente.</span>
+                <span class="tooltiptext">Estrategia de recuperación de pérdidas intradía.</span>
             </div>
             """, unsafe_allow_html=True)
     else:
         esce1 = False
         
-    fecha_inicio = st.date_input("*Fecha de inicio del periodo de backtest:*", min_value=datetime(2005, 1, 1))
-    fecha_fin = st.date_input("*Fecha de finalización del periodo de backtest:*", max_value=datetime.today())
-    #if periodo == '15 minutos':
-        #open_hour = st.time_input("*Seleccionar Hora de Apertura:*", value=datetime.strptime("09:30", "%H:%M").time())
-        #close_hour = st.time_input("*Seleccionar Hora de Cierre:*", value=datetime.strptime("16:00", "%H:%M").time())
-        
+    fecha_inicio = st.date_input("*Fecha de inicio:*", min_value=datetime(2005, 1, 1))
+    fecha_fin = st.date_input("*Fecha de fin:*", max_value=datetime.today())
     method = st.radio("*Seleccionar Strikes a Considerar*", ('ATM','OTM'))
     
     if method == "OTM":   
-        offset = st.number_input("*Seleccionar cantidad de strikes a desplazarse*", min_value=0, value=5, step=1)
+        offset = st.number_input("*Strikes a desplazarse*", min_value=0, value=5, step=1)
     else:
         offset = 0
     
     trade_type = st.radio('*Tipo de Operación*', ('Open to Close', 'Close to Close', 'Close to Open'))
     
-    
-        
     if st.button("Run Backtest"):
+        # 1. Ejecutar Backtest
         resultados_df, final_balance = realizar_backtest(data_filepath, 'rlD0rjy9q_pT4Pv2UBzYlXl6SY5Wj7UT', "SPY", balance_inicial, pct_allocation, fixed_amount, 
         allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, method, offset, esce1)
+        
         st.success("Backtest ejecutado correctamente!")
-
-        # Guardar resultados en el estado de la sesión
+        
+        # 2. Descargar Histórico Completo SPY (Tu nuevo bloque)
+        st.write("Obteniendo datos completos del SPY para graficar...")
+        try:
+            spy_full_data = yf.download("SPY", start=fecha_inicio, end=fecha_fin + timedelta(days=1), progress=False)
+            if isinstance(spy_full_data.columns, pd.MultiIndex):
+                spy_full_data.columns = spy_full_data.columns.get_level_values(0)
+        except Exception as e:
+            st.warning(f"No se pudo descargar el histórico completo del SPY: {e}")
+            spy_full_data = None
+        
+        # Guardar en sesión
         st.session_state['resultados_df'] = resultados_df
         st.session_state['final_balance'] = final_balance
-        st.session_state['balance_inicial'] = balance_inicial
         
-        
-        # Provide download links for the generated files
+        # 3. Preparar Excel de Resultados (Buffer 1)
         st.write("### Descargar Resultados")
+        excel_buffer_raw = io.BytesIO() # ### CORRECCIÓN: Nombre específico para diferenciar
+        resultados_df.to_excel(excel_buffer_raw, index=False)
+        st.download_button(label="Descargar Resultados Excel", data=excel_buffer_raw, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         
-        # Resultados DataFrame to Excel
-        excel_buffer = io.BytesIO()
-        resultados_df.to_excel(excel_buffer, index=False)
-        st.download_button(label="Descargar Resultados Excel", data=excel_buffer, file_name="resultados_trades_1.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        
-        # Display and download the plot
+        # 4. Generar Gráfico
         st.write("### Gráfico")
         fig, ax = plt.subplots(figsize=(14, 7))
         resultados_df['Ganancia acumulada'] = resultados_df['Resultado'].cumsum() + balance_inicial
-        ax = resultados_df.set_index('Fecha')['Ganancia acumulada'].plot(kind='line', marker='o', linestyle='-', color='b', ax=ax)
-        ax.set_title(f'Resultados del Backtesting de Opciones - Balance final: ${final_balance:,.2f}')
+        
+        # Eje Izquierdo (Ganancias)
+        ax.plot(pd.to_datetime(resultados_df['Fecha']), resultados_df['Ganancia acumulada'], marker='o', linestyle='-', color='b', label='Ganancia Acumulada')
+        ax.set_title(f'Resultados del Backtesting - Balance final: ${final_balance:,.2f}')
         ax.set_xlabel('Fecha')
-        ax.set_ylabel('Ganancia/Pérdida Acumulada')
+        ax.set_ylabel('Ganancia/Pérdida Acumulada', color='b')
+        ax.tick_params(axis='y', labelcolor='b')
         plt.xticks(rotation=45)
         ax.axhline(y=balance_inicial, color='r', linestyle='-', label='Balance Inicial')
         
-        # Crear un segundo eje Y (eje derecho) para el precio de cierre
+        # Eje Derecho (SPY)
         ax2 = ax.twinx()
-        ax2.set_ylim(300, 700)  # Configurar límites del eje Y derecho
-        ax2.plot(resultados_df['Fecha'], resultados_df['Close'], color='orange', linestyle='-', label='Precio del S&P (Close)')
-        ax2.set_ylabel('Precio del S&P (Close)', color='black')
-        ax2.tick_params(axis='y', labelcolor='black')
         
-        #plt.legend()
-        # Leyendas de ambos ejes
-        ax.legend(loc='upper left')
-        ax2.legend(loc='upper right')
+        # ### CORRECCIÓN: Usar spy_full_data si existe
+        if spy_full_data is not None and not spy_full_data.empty:
+            ax2.plot(spy_full_data.index, spy_full_data['Close'], color='orange', linestyle='-', alpha=0.6, label='SPY (Continuo)')
+        else:
+            ax2.plot(pd.to_datetime(resultados_df['Fecha']), resultados_df['Close'], color='orange', linestyle='-', label='SPY (Solo Trades)')
+            
+        ax2.set_ylabel('Precio del S&P (Close)', color='orange')
+        ax2.tick_params(axis='y', labelcolor='orange')
+        
+        # Leyendas unificadas
+        lines_1, labels_1 = ax.get_legend_handles_labels()
+        lines_2, labels_2 = ax2.get_legend_handles_labels()
+        ax.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
+        
         plt.grid(True, which='both', linestyle='-', linewidth=0.5)
         plt.tight_layout()
+        
+        # Guardar gráfico en Buffer
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
         st.image(img_buffer)
         st.download_button(label="Descargar Gráfico", data=img_buffer, file_name="resultados_backtesting.png", mime="image/png")
 
+        # 5. Procesamiento de Estadísticas (Matriz de Confusión)
+        datos = pd.read_excel(excel_buffer_raw) # Leemos del buffer en memoria
+        datos['Fecha'] = pd.to_datetime(datos['Fecha']) # Asegurar formato fecha
         
-            
-        datos = pd.read_excel(r"resultados_trades_1.xlsx")
+        # Lógica de filtros y métricas (Mantenemos tu lógica igual)
         datos = datos[(datos['Fecha'] >= pd.Timestamp(fecha_inicio)) & (datos['Fecha'] <= pd.Timestamp(fecha_fin))]
+        
         if trade_type == 'Close to Close':
             datos['Direction'] = (datos['Close'].shift(-1) > datos['Close']).astype(int)
         elif trade_type == 'Close to Open':
@@ -2189,79 +2188,59 @@ def main():
         else:
             datos['Direction'] = 0
 
-            
-        
-            
         datos = datos.reset_index(drop=True)
-        datos['acierto'] = np.where(
-            datos['Direction'] == datos[column_name], 1, 0)
-        # desempeño de modelo en entrenamiento
-        datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto'])
+        datos['acierto'] = np.where(datos['Direction'] == datos[column_name], 1, 0)
+        datos['asertividad'] = datos['acierto'].sum()/len(datos['acierto']) if len(datos['acierto']) > 0 else 0
         datos['cumsum'] = datos['acierto'].cumsum()
-        # desempeño portafolio acumulado importante si definimos un inicio
         datos['accu'] = datos['cumsum']/(datos.index + 1)
         
-        # Muestra el DataFrame actualizado
         if trade_type == 'Open to Close':
             datos['open_to_close_pct'] = datos['Close']/datos['Open'] - 1
-    
-            # Calcula la ganancia
-            datos['Ganancia'] = datos.apply(lambda row: abs(
-                row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
-            
+            datos['Ganancia'] = datos.apply(lambda row: abs(row['open_to_close_pct']) if row['acierto'] else -abs(row['open_to_close_pct']), axis=1)
         elif trade_type == 'Close to Close':
             datos['close_to_close_pct'] = datos['Close'].shift(-1) / datos['Close'] - 1
-            # Calcula la ganancia
-            datos['Ganancia'] = datos.apply(lambda row: abs(
-                row['close_to_close_pct']) if row['acierto'] else -abs(row['close_to_close_pct']), axis=1)
+            datos['Ganancia'] = datos.apply(lambda row: abs(row['close_to_close_pct']) if row['acierto'] else -abs(row['close_to_close_pct']), axis=1)
         else:
             datos['close_to_open_pct'] = datos['Open'].shift(-1) / datos['Close'] - 1 
-            # Calcula la ganancia
-            datos['Ganancia'] = datos.apply(lambda row: abs(
-                row['close_to_open_pct']) if row['acierto'] else -abs(row['close_to_open_pct']), axis=1)
+            datos['Ganancia'] = datos.apply(lambda row: abs(row['close_to_open_pct']) if row['acierto'] else -abs(row['close_to_open_pct']), axis=1)
 
-        # Calcula la ganancia acumulada
         datos['Ganancia_Acumulada'] = datos['Ganancia'].cumsum()
 
-        matrix=np.zeros((2,2)) # form an empty matric of 2x2
-        for i in range(len(datos[column_name])): #the confusion matrix is for 2 classes: 1,0
-                #1=positive, 0=negative
+        # Cálculo de métricas ML
+        matrix=np.zeros((2,2)) 
+        for i in range(len(datos)):
             if int(datos[column_name][i])==1 and int(datos['Direction'][i])==1: 
-                matrix[0,0]+=1 #True Positives
+                matrix[0,0]+=1 
             elif int(datos[column_name][i])==1 and int(datos['Direction'][i])==0:
-                   matrix[0,1]+=1 #False Positives
+                   matrix[0,1]+=1 
             elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==1:
-                  matrix[1,0]+=1 #False Negatives
+                  matrix[1,0]+=1 
             elif int(datos[column_name][i])==0 and int(datos['Direction'][i])==0:
-                matrix[1,1]+=1 #True Negatives
-            
-                    
-        # Calculate F1-score
+                matrix[1,1]+=1 
+        
         tp, fp, fn, tn = matrix.ravel()
-        datos['tp'] = tp
-        datos['tn'] = tn
-        datos['fp'] = fp
-        datos['fn'] = fn
-        precision = tp / (tp + fp)
+        datos['tp'] = tp; datos['tn'] = tn; datos['fp'] = fp; datos['fn'] = fn
+        
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         datos['precision'] = precision
-        recall = tp / (tp + fn)
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
         datos['recall'] = recall
-        f1_score = 2 * (precision * recall) / (precision + recall)
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
         datos['f1_score'] = f1_score
 
-        
-        datos.to_excel(excel_buffer, index=False)
+        # 6. Guardar Datos Procesados en un NUEVO Buffer (Buffer 2)
+        excel_buffer_processed = io.BytesIO() # ### CORRECCIÓN: Nuevo buffer
+        datos.to_excel(excel_buffer_processed, index=False)
                 
-        # Crear archivo zip con ambos archivos
+        # 7. Crear ZIP con los dos buffers distintos
         with zipfile.ZipFile("resultados.zip", "w") as zf:
-            zf.writestr("resultados_trades_1.xlsx", excel_buffer.getvalue())
+            # Archivo 1: Resultados del trade (Raw)
+            zf.writestr("resultados_trades_1.xlsx", excel_buffer_raw.getvalue())
+            # Archivo 2: Gráfica
             zf.writestr("resultados_backtesting.png", img_buffer.getvalue())
-            zf.writestr("datos.xlsx", excel_buffer.getvalue())
+            # Archivo 3: Datos procesados con métricas
+            zf.writestr("datos_procesados.xlsx", excel_buffer_processed.getvalue())
 
-        '''
-        Comprimir ambos archivos y descargarlos en un archivo ZIP:
-        '''
-        
         with open("resultados.zip", "rb") as f:
             st.download_button(
                 label="Descargar Resultados ZIP",
