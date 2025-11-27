@@ -2057,7 +2057,7 @@ def main():
     def extract_file_info(filename):
         # Variables de relleno si faltan partes
         default_values = ("Operación desconocida", "Modelo desconocido", "Responsable desconocido", 
-                          "Fecha desconocida", "Fecha desconocida")
+                          "Fecha de inicio desconocida", "Fecha de fin desconocida")
                           
         parts = filename.split('_')
         # Quitar la extensión del último segmento (ej: 251125.xlsx -> 251125)
@@ -2065,7 +2065,6 @@ def main():
             parts[-1] = parts[-1].split('.')[0]
         
         # Rellenar la lista 'parts' si tiene menos de 5 elementos (Operación, Modelo, Responsable, F_Inicio, F_Fin)
-        # Ejemplo: si solo tiene 3 partes, las dos últimas se rellenan como None.
         padded_parts = parts + [None] * (5 - len(parts))
     
         try:
@@ -2074,22 +2073,23 @@ def main():
                 padded_parts[0], default_values[0]) if padded_parts[0] else default_values[0]
     
             # 2. NOMBRE DEL MODELO (Ej: ModeloOpciones) - Índice 1
-            # Usamos el valor directo ya que no es un acrónimo.
             model_name = padded_parts[1] if padded_parts[1] else default_values[1]
             
             # 3. RESPONSABLE (Ej: Mateo) - Índice 2
             responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés', 'Mateo': 'Mateo'}.get(
                 padded_parts[2], default_values[2]) if padded_parts[2] else default_values[2]
                 
-            # 4. FECHA DE INICIO (Ej: 221001 -> 01/10/2022) - Índice 3
+            # 4. FECHA DE INICIO (ddmmyy -> dd/mm/yy) - Índice 3
             if padded_parts[3] and len(padded_parts[3]) >= 6:
-                start_date = f"{padded_parts[3][4:6]}/{padded_parts[3][2:4]}/{padded_parts[3][0:2]}"
+                # Los dos primeros dígitos son el DÍA (dd), los siguientes dos el MES (mm), y los últimos el AÑO (yy)
+                start_date = f"{padded_parts[3][0:2]}/{padded_parts[3][2:4]}/{padded_parts[3][4:6]}"
             else:
                 start_date = default_values[3]
     
-            # 5. FECHA DE FIN (Ej: 251125 -> 25/11/2025) - Índice 4
+            # 5. FECHA DE FIN (ddmmyy -> dd/mm/yy) - Índice 4
             if padded_parts[4] and len(padded_parts[4]) >= 6:
-                end_date = f"{padded_parts[4][4:6]}/{padded_parts[4][2:4]}/{padded_parts[4][0:2]}"
+                # Los dos primeros dígitos son el DÍA (dd), los siguientes dos el MES (mm), y los últimos el AÑO (yy)
+                end_date = f"{padded_parts[4][0:2]}/{padded_parts[4][2:4]}/{padded_parts[4][4:6]}"
             else:
                 end_date = default_values[4]
     
