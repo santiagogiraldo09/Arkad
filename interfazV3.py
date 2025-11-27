@@ -2055,20 +2055,49 @@ def main():
     archivos_disponibles = [archivo for archivo in os.listdir(directorio_datos) if archivo.endswith('.xlsx')]
     
     def extract_file_info(filename):
-        default_values = ("Operación desconocida", "Información desconocida", "Responsable desconocido", 
-                      "Fecha desconocida", "Fecha desconocida", "Versión desconocida")
+        # Variables de relleno si faltan partes
+        default_values = ("Operación desconocida", "Modelo desconocido", "Responsable desconocido", 
+                          "Fecha desconocida", "Fecha desconocida")
+                          
         parts = filename.split('_')
-        if len(parts) < 6:
-            return default_values
+        # Quitar la extensión del último segmento (ej: 251125.xlsx -> 251125)
+        if parts:
+            parts[-1] = parts[-1].split('.')[0]
+        
+        # Rellenar la lista 'parts' si tiene menos de 5 elementos (Operación, Modelo, Responsable, F_Inicio, F_Fin)
+        # Ejemplo: si solo tiene 3 partes, las dos últimas se rellenan como None.
+        padded_parts = parts + [None] * (5 - len(parts))
+    
         try:
-            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(parts[0], 'Operación desconocida')
-            info ={'Proba': 'Probabilidades', 'Pred': 'Predicciones'}.get(parts[1], 'Información desconocida')
-            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés'}.get(parts[2], 'Responsable desconocido')
-            start_date = parts[3][2:4] + '/' + parts[3][4:6]
-            end_date = parts[4][2:4] + '/' + parts[4][4:6]
-            version = parts[5].split('.')[0]
-            return operation, info, responsible, start_date, end_date, version
-        except IndexError:
+            # 1. TIPO DE OPERACIÓN (Ej: OC) - Índice 0
+            operation = {'CC': 'Close to Close', 'OC': 'Open to Close', 'CO': 'Close to Open'}.get(
+                padded_parts[0], default_values[0]) if padded_parts[0] else default_values[0]
+    
+            # 2. NOMBRE DEL MODELO (Ej: ModeloOpciones) - Índice 1
+            # Usamos el valor directo ya que no es un acrónimo.
+            model_name = padded_parts[1] if padded_parts[1] else default_values[1]
+            
+            # 3. RESPONSABLE (Ej: Mateo) - Índice 2
+            responsible = {'Valen': 'Valentina', 'Santi': 'Santiago', 'Andres': 'Andrés', 'Mateo': 'Mateo'}.get(
+                padded_parts[2], default_values[2]) if padded_parts[2] else default_values[2]
+                
+            # 4. FECHA DE INICIO (Ej: 221001 -> 01/10/2022) - Índice 3
+            if padded_parts[3] and len(padded_parts[3]) >= 6:
+                start_date = f"{padded_parts[3][4:6]}/{padded_parts[3][2:4]}/{padded_parts[3][0:2]}"
+            else:
+                start_date = default_values[3]
+    
+            # 5. FECHA DE FIN (Ej: 251125 -> 25/11/2025) - Índice 4
+            if padded_parts[4] and len(padded_parts[4]) >= 6:
+                end_date = f"{padded_parts[4][4:6]}/{padded_parts[4][2:4]}/{padded_parts[4][0:2]}"
+            else:
+                end_date = default_values[4]
+    
+            # Devolvemos los 5 campos en el nuevo orden
+            return operation, model_name, responsible, start_date, end_date
+    
+        except Exception:
+            # Si ocurre cualquier error, devolvemos los valores por defecto
             return default_values
         
     info_placeholder = st.empty()
@@ -2077,20 +2106,21 @@ def main():
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     
     if data_filepath:
-       operation, info, responsible, start_date, end_date, version = extract_file_info(data_filepath)
-       data = cargar_datos(data_filepath)
-       if operation.startswith("Información desconocida"):
-           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>{operation}</span></div>"
+       # Ahora solo se esperan 5 valores: (operación, nombre_modelo, responsable, f_inicio, f_fin)
+       operation, model_name, responsible, start_date, end_date = extract_file_info(data_filepath)
+       
+       # La comprobación de errores se puede hacer verificando si el primer campo es "desconocida"
+       if operation.endswith("desconocida"):
+           tooltip_text = f"<div class='tooltip'>&#9432; <span class='tooltiptext'>Error al decodificar el nombre del archivo. Verifique el formato.</span></div>"
        else:
            tooltip_text = f"""
            <div class="tooltip">
                 &#9432;
                 <span class="tooltiptext">
                 Tipo de operación: {operation}<br>
-                {info}<br>
+                Nombre del Modelo: {model_name}<br>
                 Responsable: {responsible}<br>
-                Fechas: {start_date} - {end_date}<br>
-                Versión: {version}
+                Fechas: {start_date} - {end_date}
                 </span>
            </div>
             """
