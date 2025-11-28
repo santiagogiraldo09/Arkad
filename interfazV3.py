@@ -17,10 +17,38 @@ import requests
 import pytz
 from datetime import time
 import datetime as dt
+import pyodbc
 
 # Variables globales para almacenar datos1 y datos2
 datos1 = None
 datos2 = None
+
+# --- NUEVAS VARIABLES DE CONEXIÓN A AZURE SQL (MODIFICAR CON TUS DATOS REALES) ---
+AZURE_SQL_DRIVER = '{ODBC Driver 17 for SQL Server}'
+AZURE_SQL_SERVER = 'moneylabsql.database.windows.net'  # Reemplazar
+AZURE_SQL_DATABASE = 'BDmoneylab'                  # Reemplazar
+AZURE_SQL_USERNAME = 'adminmoneylab'                       # Reemplazar
+AZURE_SQL_PASSWORD = 'Moneylab1234'                       # Reemplazar
+
+# Objeto de conexión que se usará globalmente si se activa el checkbox
+sql_connection = None
+
+def establecer_conexion_sql():
+    """Establece la conexión a Azure SQL Database usando pyodbc."""
+    global sql_connection
+    try:
+        connection_string = f'DRIVER={AZURE_SQL_DRIVER};SERVER={AZURE_SQL_SERVER};DATABASE={AZURE_SQL_DATABASE};UID={AZURE_SQL_USERNAME};PWD={AZURE_SQL_PASSWORD}'
+        
+        # Intentar conectar
+        conn = pyodbc.connect(connection_string)
+        sql_connection = conn
+        st.success("✅ Conexión a Azure SQL Database establecida correctamente.")
+        return True
+    except Exception as e:
+        st.error(f"❌ Error al conectar a la Base de Datos: {e}")
+        st.info("El backtesting continuará usando la API de Polygon.io.")
+        sql_connection = None
+        return False
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -2106,6 +2134,18 @@ def main():
         "### Realizar testing con contratos específicos",
         value=False
     )
+    
+    # --- NUEVA LÓGICA CONDICIONAL DE CONEXIÓN (A INSERTAR) ---
+    if contratos_especificos:
+        # st.empty() es un buen lugar para mostrar el estado de la conexión
+        status_placeholder = st.empty()
+        status_placeholder.info("Intentando conectar a Azure SQL Database...")
+        establecer_conexion_sql()
+        status_placeholder.empty() # Limpia el mensaje 'Intentando...'
+    # --------------------------------------------------------
+
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
     
