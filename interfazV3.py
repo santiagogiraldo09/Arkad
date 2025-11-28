@@ -2129,10 +2129,11 @@ def main():
             return default_values
         
     info_placeholder = st.empty()
-    toggle_activated = st.toggle("Se opera si se supera el Threshold")
+    toggle_activated = st.toggle("Se opera si se supera el Threshold", key='toggle_threshold')
     contratos_especificos= st.checkbox(
         "### Realizar testing con contratos específicos",
-        value=False
+        value=False,
+        key='check_contratos_especificos'
     )
     
     # --- NUEVA LÓGICA CONDICIONAL DE CONEXIÓN (A INSERTAR) ---
@@ -2144,7 +2145,7 @@ def main():
         status_placeholder.empty() # Limpia el mensaje 'Intentando...'
     # --------------------------------------------------------
 
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles, key='select_archivo_historico')
     
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
