@@ -2102,9 +2102,8 @@ def main():
         
     info_placeholder = st.empty()
     toggle_activated = st.toggle("Se opera si se supera el Threshold")
-    st.markdown("### Realizar testing con contratos específicos:")
     contratos_especificos= st.checkbox(
-        "### Realizar testing con contratos específicos:",
+        "### Realizar testing con contratos específicos",
         value=False
     )
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
