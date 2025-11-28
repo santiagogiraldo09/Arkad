@@ -50,6 +50,79 @@ def establecer_conexion_sql():
         sql_connection = None
         return False
 
+def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd.Timestamp) -> pd.DataFrame:
+    """
+    Obtiene los precios OHLCV de un contrato específico desde Azure SQL Database.
+    
+    Args:
+        option_name: Nombre del contrato de opción (Ej: O:SPY251128C00450000).
+        start_time: Timestamp de inicio (inclusive).
+        end_time: Timestamp de fin (inclusive).
+        
+    Returns:
+        pd.DataFrame: DataFrame con índice 'Date' y columnas OHLCV, o DataFrame vacío.
+    """
+    global sql_connection
+    if sql_connection is None:
+        st.error("No hay conexión a la base de datos SQL disponible.")
+        return pd.DataFrame()
+
+    # Formatear los timestamps para SQL Server (incluyendo los milisegundos si es necesario)
+    sql_start_time = start_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] # Quita la parte final, dejando 3 ms
+    sql_end_time = end_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    
+    # El nombre de tu tabla parece ser OptionsData. AJUSTA ESTO SI ES DIFERENTE.
+    table_name = "OptionData2" 
+    
+    # La consulta SQL para filtrar por OptionName y rango de tiempo
+    sql_query = f"""
+    SELECT 
+        [Date], [Open], [High], [Low], [Close], [Volume] 
+    FROM 
+        {table_name}
+    WHERE 
+        [OptionName] = ?
+        AND [Date] >= ?
+        AND [Date] <= ?
+    ORDER BY 
+        [Date] ASC
+    """
+    
+    try:
+        # Usar Pandas para leer el resultado de la consulta directamente
+        cursor = sql_connection.cursor()
+        
+        # Ejecutar la consulta con parámetros (más seguro que f-strings para OptionName)
+        cursor.execute(sql_query, (option_name, sql_start_time, sql_end_time))
+        
+        # Obtener los datos y nombres de columna
+        data = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        
+        df = pd.DataFrame.from_records(data, columns=columns)
+
+        if df.empty:
+            return pd.DataFrame()
+
+        # Procesamiento final para replicar el formato de Polygon
+        df['Date'] = pd.to_datetime(df['Date'])
+        df.set_index('Date', inplace=True)
+        df.index.name = None # Limpiamos el nombre del índice
+        
+        # Aseguramos que los nombres de columna estén en minúsculas (como Polygon)
+        df.columns = [col.lower() for col in df.columns] 
+        
+        return df
+
+    except pyodbc.Error as ex:
+        sqlstate = ex.args[0]
+        st.error(f"❌ Error de consulta SQL: {sqlstate}")
+        return pd.DataFrame()
+    except Exception as e:
+        st.error(f"❌ Error al procesar datos SQL: {e}")
+        return pd.DataFrame()
+
+
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
     local_tz = pytz.timezone('America/New_York')
