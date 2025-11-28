@@ -2144,11 +2144,9 @@ def main():
         establecer_conexion_sql()
         status_placeholder.empty() # Limpia el mensaje 'Intentando...'
     # --------------------------------------------------------
-
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles, key='select_archivo_historico')
     
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
-    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles)
+    data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles, key='select_archivo_historico')
     
     if data_filepath:
        # Ahora solo se esperan 5 valores: (operación, nombre_modelo, responsable, f_inicio, f_fin)
