@@ -900,6 +900,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             end_time = end_time.tz_localize(ny_tz)
             end_time = end_time.tz_localize(None)
             
+            #if "OptionName" in data.columns:
+                #continue
+            #else:
+                #precio_usar_apertura_excel = row['start_price']
+                #precio_usar_cierre_excel = row['end_price']
+                #option_price = round(row['start_price'])
+            
+            #Eliminar esto o comentarlo cuando esté la lógica de los precios del ETF sacados de SQL Database   
             precio_usar_apertura_excel = row['start_price']
             precio_usar_cierre_excel = row['end_price']
             option_price = round(row['start_price'])
@@ -979,7 +987,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     precio_usar_cierre = 'close'
                     index = 0
                     #option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
-                 
+                
+                #if contratos_especificos and "OptionName" in data.columns:
+                    #continue
+                #else:
+                    
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
                 #st.write("option date")
