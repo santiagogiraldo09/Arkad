@@ -790,7 +790,7 @@ def encontrar_strike_cercano(client, base_date, option_price, column_name, optio
 option_hours = 1  # Buscar opciones cercanas en un rango de 1 hora
 option_offset_minutes = 30  # Margen de 30 minutos en ambos sentidos
               
-def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Open to Close', periodo='Diario', column_name='toggle_false', method = "ATM", offset = 5, esce1=False, contratos_especificos=contratos_especificos):
+def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_allocation, fixed_amount, allocation_type, fecha_inicio, fecha_fin, option_days=30, option_offset=0, trade_type='Open to Close', periodo='Diario', column_name='toggle_false', method = "ATM", offset = 5, esce1=False, contratos_especificos=False):
     data = cargar_datos(data_filepath)
     balance = balance_inicial
     balance_posiciones = balance
