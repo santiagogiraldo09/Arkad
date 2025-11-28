@@ -2148,6 +2148,19 @@ def main():
     column_name = 'toggle_true' if toggle_activated else 'toggle_false'
     data_filepath = st.selectbox("*Seleccionar archivo de datos históricos:*", archivos_disponibles, key='select_archivo_historico')
     
+    # -------------------------------------------------------------
+    # VALIDACIÓN DE COLUMNA ESPECÍFICA (NUEVO BLOQUE)
+    # -------------------------------------------------------------
+    if data_filepath:
+        data = cargar_datos(data_filepath)
+        # 1. Validación de 'OptionName' si el checkbox está marcado
+        if contratos_especificos and 'OptionName' not in data.columns:
+            st.error("🚨 Error: Al seleccionar 'Testing con contratos específicos', el archivo de entrada debe contener una columna llamada 'OptionName'.")
+            st.stop() # Detiene la ejecución de la app
+        # 2. Validación de columnas intradía si las necesitamos (asumiendo que es intradía si se usa OptionName)
+        if contratos_especificos and not all(col in data.columns for col in ['start_time', 'end_time']):
+            st.warning("⚠️ Advertencia: Se recomienda incluir 'start_time' y 'end_time' en el archivo Excel para el backtesting intradía con contratos específicos.")
+    
     if data_filepath:
        # Ahora solo se esperan 5 valores: (operación, nombre_modelo, responsable, f_inicio, f_fin)
        operation, model_name, responsible, start_date, end_date = extract_file_info(data_filepath)
@@ -2213,7 +2226,7 @@ def main():
     if st.button("Run Backtest"):
         # 1. Ejecutar Lógica Principal
         resultados_df, final_balance = realizar_backtest(data_filepath, 'rlD0rjy9q_pT4Pv2UBzYlXl6SY5Wj7UT', "SPY", balance_inicial, pct_allocation, fixed_amount, 
-        allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, method, offset, esce1)
+        allocation_type, pd.Timestamp(fecha_inicio), pd.Timestamp(fecha_fin), option_days_input, option_offset_input, trade_type, periodo, column_name, method, offset, esce1, contratos_especificos=contratos_especificos)
         
         st.success("Backtest ejecutado correctamente!")
         
