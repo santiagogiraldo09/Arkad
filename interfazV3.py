@@ -918,24 +918,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "start_time" and "end_time" in data.columns:
-            #df_subyacente = descargar_historico_completo_spy(api_key, date)
-            #st.write("Data frame con valores del subyacente:")
-            #st.write(df_subyacente)
-            
         
-        #if "Trades_H1" or "Trades_H1_Best1" or "Trades_H1_Best2" or "Trades_H1_Best3" in data_filepath:
-        #if "Trades_H1_Best1_v3" in data_filepath:
-            #st.write("--------------------------------------------------------------------------------")
-        
+            #Se establece la conexión a SQL Server para consultar el precio del subyacente
             establecer_conexion_sql()
         
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
-
-            
+         
             señal_actual = row[column_name]
-            
-            
                 
             #2. Extraer tiempos de entrada y salida del archivo
             start_time = pd.to_datetime(row['start_time'])
@@ -943,7 +933,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #start_time = start_time.tz_localize(ny_tz)
             start_time = start_time.tz_localize(None)
             
-            start_time = start_time.round('s')
+            #start_time = start_time.round('s')
 
             next_start_time = pd.to_datetime(row['siguiente_start_time'])
             # Verificar que existe un siguiente válido
@@ -956,31 +946,31 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             #end_time = end_time.tz_localize(ny_tz)
             end_time = end_time.tz_localize(None)
             
-            #if contratos_especificos and "OptionName" in data.columns:
-                # 'start_time' ya es el Timestamp exacto de la fila del Excel (con fecha y hora)
-                #spy_open, spy_close = obtener_precios_spy_sql(start_time)
-                #if spy_open is not None and spy_close is not None:
-                    ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
-                    #precio_usar_apertura_excel = spy_open
-                    #precio_usar_cierre_excel = spy_close
-                    # option_price usa el precio de apertura para encontrar el strike
-                    #option_price = round(spy_open)
-                #else:
-                    #st.write("No se encontraron datos de open o close del subyacente SPY")
-            #else:
+            # 'start_time' ya es el Timestamp exacto de la fila del Excel (con fecha y hora)
+            spy_open, spy_close = obtener_precios_spy_sql_final(start_time)
+            if spy_open is not None and spy_close is not None:
+                ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
+                precio_usar_apertura_excel = spy_open
+                precio_usar_cierre_excel = spy_close
+                # option_price usa el precio de apertura para encontrar el strike
+                option_price = round(spy_open)
+            else:
+                st.write("No se encontraron datos de open o close del subyacente SPY en la BD")
                 #precio_usar_apertura_excel = row['start_price']
                 #precio_usar_cierre_excel = row['end_price']
                 #option_price = round(row['start_price'])
+        
             
-            st.write(f"1. Timestamp de Python (start_time): {start_time}")
-            st.write(f"   - Tipo: {type(start_time)}")
-            st.write(f"   - Zona Horaria: {start_time.tzinfo}")
             
-            spy_open, spy_close = obtener_precios_spy_sql_final(start_time)
-            st.write("Precio del open del SPY:")
-            st.write(spy_open)
-            st.write("Precio del close del SPY:")
-            st.write(spy_close)
+            #st.write(f"1. Timestamp de Python (start_time): {start_time}")
+            #st.write(f"   - Tipo: {type(start_time)}")
+            #st.write(f"   - Zona Horaria: {start_time.tzinfo}")
+            
+            #spy_open, spy_close = obtener_precios_spy_sql_final(start_time)
+            #st.write("Precio del open del SPY:")
+            #st.write(spy_open)
+            #st.write("Precio del close del SPY:")
+            #st.write(spy_close)
             #if spy_open is not None and spy_close is not None:
                 ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
                 #precio_usar_apertura_excel = spy_open
