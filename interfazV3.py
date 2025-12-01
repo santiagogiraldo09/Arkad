@@ -122,26 +122,29 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         st.error(f"❌ Error al procesar datos SQL: {e}")
         return pd.DataFrame()
 
-def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
+def obtener_precios_spy_sql_final(date: pd.Timestamp) -> tuple:
     """
-    Obtiene el Open y Close del SPY para un Timestamp exacto desde Azure SQL Database.
-    
-    Args:
-        date: El Timestamp exacto (fecha y hora) de la barra de tiempo (ej: 2015-11-19 09:30:00).
-        
-    Returns:
-        tuple: (Open Price, Close Price) o (None, None) si no encuentra datos.
+    Busca los precios Open y Close en Azure SQL Database usando una coincidencia exacta 
+    de Fecha y Hora, redondeada al segundo, para coincidir con DATETIME2(0).
     """
     global sql_connection
     if sql_connection is None:
+        # st.error("No hay conexión a la base de datos SQL disponible.") # Puedes descomentar para debug
         return None, None
+
+    # --- PASO 1: Normalizar el Timestamp de Python ---
+    # a) Eliminar zona horaria si la tiene (quedarse en 'naive')
+    date_naive = date.tz_localize(None) if date.tzinfo is not None else date
+    # b) Redondear el Timestamp a nivel de SEGUNDO para eliminar nanosegundos
+    date_rounded = date_naive.round('s') 
     
-    # 🚨 NOTA: NO se necesita formatear el Timestamp a una cadena (strftime). 
-    # Pasamos el objeto 'date' (pd.Timestamp) directamente al cursor.execute().
+    # --- PASO 2: Crear la Cadena SQL exacta para la BD ---
+    # Forzamos la cadena a YYYY-MM-DD HH:MM:SS (exactamente lo que tienes en tu BD)
+    sql_datetime_str = date_rounded.strftime('%Y-%m-%d %H:%M:%S')
     
-    table_name = "SPYhistorical" # Asegúrate de que este nombre sea correcto
+    table_name = "SPYhistorical" 
     
-    # Consulta SQL para filtrar por el Timestamp exacto
+    # Consulta SQL
     sql_query = f"""
     SELECT 
         [Open], [Close] 
@@ -154,25 +157,21 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     try:
         cursor = sql_connection.cursor()
         
-        # 🟢 SOLUCIÓN #2 APLICADA: Pasar el objeto pd.Timestamp directamente.
-        # pyodbc lo convierte correctamente al tipo DATETIME2(0) de SQL.
-        cursor.execute(sql_query, (date,)) 
+        # 🟢 Pasamos la CADENA DE TEXTO (sql_datetime_str) en lugar del objeto Timestamp
+        # Esto funciona de forma más fiable con DATETIME2(0) en pyodbc.
+        cursor.execute(sql_query, (sql_datetime_str,)) 
         
         row = cursor.fetchone()
         
         if row:
-            # row[0] es 'Open', row[1] es 'Close'
+            # st.success(f"✅ Éxito al encontrar datos para: {sql_datetime_str}") # Puedes descomentar para debug
             return row[0], row[1]
         else:
-            # Esto ocurrirá si el Timestamp exacto no existe en la BD
+            # st.warning(f"❌ SQL Fallo: No se encontró el Timestamp exacto: {sql_datetime_str}") # Puedes descomentar para debug
             return None, None
 
-    except pyodbc.Error as ex:
-        # Aquí puedes dejar un log de error si la consulta falla
-        # print(f"❌ Error de consulta SQL: {ex}")
-        return None, None
     except Exception as e:
-        # print(f"❌ Error general en SPY SQL: {e}")
+        # st.error(f"❌ Error durante la ejecución SQL: {e}") # Puedes descomentar para debug
         return None, None
 
 
@@ -975,7 +974,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             st.write(f"   - Tipo: {type(start_time)}")
             st.write(f"   - Zona Horaria: {start_time.tzinfo}")
             
-            spy_open, spy_close = obtener_precios_spy_sql(start_time)
+            spy_open, spy_close = obtener_precios_spy_sql_final(start_time)
             st.write("Precio del open del SPY:")
             st.write(spy_open)
             st.write("Precio del close del SPY:")
