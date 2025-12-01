@@ -127,7 +127,7 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     Obtiene el Open y Close del SPY para un Timestamp exacto desde Azure SQL Database.
     
     Args:
-        date: El Timestamp exacto (fecha y hora) de la barra de tiempo.
+        date: El Timestamp exacto (fecha y hora) de la barra de tiempo (ej: 2015-11-19 09:30:00).
         
     Returns:
         tuple: (Open Price, Close Price) o (None, None) si no encuentra datos.
@@ -135,11 +135,9 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     global sql_connection
     if sql_connection is None:
         return None, None
-
-    # Formatear el Timestamp para la consulta SQL (incluyendo hora, minuto, segundo y milisegundos)
-    # Se utiliza slicing [:-3] para asegurar que solo haya 3 dígitos para milisegundos, 
-    # ya que SQL Server (DATETIME2) o el driver pyodbc lo requiere.
-    sql_datetime = date.strftime('%Y-%m-%d %H:%M:%S')
+    
+    # 🚨 NOTA: NO se necesita formatear el Timestamp a una cadena (strftime). 
+    # Pasamos el objeto 'date' (pd.Timestamp) directamente al cursor.execute().
     
     table_name = "SPYhistorical" # Asegúrate de que este nombre sea correcto
     
@@ -155,8 +153,10 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     
     try:
         cursor = sql_connection.cursor()
-        # Pasamos el string de fecha/hora/milisegundos al ejecutor
-        cursor.execute(sql_query, (sql_datetime,)) 
+        
+        # 🟢 SOLUCIÓN #2 APLICADA: Pasar el objeto pd.Timestamp directamente.
+        # pyodbc lo convierte correctamente al tipo DATETIME2(0) de SQL.
+        cursor.execute(sql_query, (date,)) 
         
         row = cursor.fetchone()
         
@@ -164,14 +164,15 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
             # row[0] es 'Open', row[1] es 'Close'
             return row[0], row[1]
         else:
+            # Esto ocurrirá si el Timestamp exacto no existe en la BD
             return None, None
 
     except pyodbc.Error as ex:
-        # Aquí puedes dejar un print o st.error para depuración si es necesario
-        # st.error(f"❌ Error SQL consultando SPY en {sql_datetime}: {ex}")
+        # Aquí puedes dejar un log de error si la consulta falla
+        # print(f"❌ Error de consulta SQL: {ex}")
         return None, None
     except Exception as e:
-        # st.error(f"❌ Error general en SPY SQL: {e}")
+        # print(f"❌ Error general en SPY SQL: {e}")
         return None, None
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
