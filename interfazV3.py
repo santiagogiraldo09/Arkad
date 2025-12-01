@@ -122,8 +122,6 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         st.error(f"❌ Error al procesar datos SQL: {e}")
         return pd.DataFrame()
 
-
-'''
 def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     """
     Obtiene el Open y Close del SPY para un Timestamp exacto desde Azure SQL Database.
@@ -176,38 +174,7 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     except Exception as e:
         # print(f"❌ Error general en SPY SQL: {e}")
         return None, None
-'''
-def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
-    global sql_connection
-    if sql_connection is None:
-        return None, None
-    
-    table_name = "SPYhistorical"
-    
-    sql_query = f"""
-    SELECT 
-        [Open], [Close] 
-    FROM 
-        {table_name}
-    WHERE 
-        [Date] = ?  -- Usando la comparación directa
-    """
-    
-    try:
-        cursor = sql_connection.cursor()
-        
-        # Pasamos el objeto Timestamp ya redondeado
-        cursor.execute(sql_query, (date,)) 
-        
-        row = cursor.fetchone()
-        
-        if row:
-            return row[0], row[1]
-        else:
-            return None, None
-    except Exception as e:
-        # Manejo de error
-        return None, None
+
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
