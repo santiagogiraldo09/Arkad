@@ -936,8 +936,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 
             #2. Extraer tiempos de entrada y salida del archivo
             start_time = pd.to_datetime(row['start_time'])
-            #start_time = start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
-            start_time = start_time.tz_localize(ny_tz)
+            start_time = start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
+            #start_time = start_time.tz_localize(ny_tz)
             start_time = start_time.tz_localize(None)
 
             next_start_time = pd.to_datetime(row['siguiente_start_time'])
@@ -947,8 +947,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 next_start_time = next_start_time.tz_localize(None)
             
             end_time = pd.to_datetime(row['end_time'])
-            #end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
-            end_time = end_time.tz_localize(ny_tz)
+            end_time = end_time.tz_localize(colombia_tz).tz_convert(ny_tz)
+            #end_time = end_time.tz_localize(ny_tz)
             end_time = end_time.tz_localize(None)
             
             #if contratos_especificos and "OptionName" in data.columns:
@@ -967,7 +967,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #precio_usar_cierre_excel = row['end_price']
                 #option_price = round(row['start_price'])
             
-            #spy_open, spy_close = obtener_precios_spy_sql(start_time)
+            spy_open, spy_close = obtener_precios_spy_sql(start_time)
+            st.write("Precio del open del SPY:")
+            st.write(spy_open)
+            st.write("Precio del close del SPY:")
+            st.write(spy_close)
             #if spy_open is not None and spy_close is not None:
                 ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
                 #precio_usar_apertura_excel = spy_open
