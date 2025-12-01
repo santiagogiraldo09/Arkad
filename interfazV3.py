@@ -927,6 +927,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         #if "Trades_H1_Best1_v3" in data_filepath:
             #st.write("--------------------------------------------------------------------------------")
         
+            establecer_conexion_sql()
+        
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
 
