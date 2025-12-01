@@ -122,6 +122,57 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         st.error(f"❌ Error al procesar datos SQL: {e}")
         return pd.DataFrame()
 
+def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
+    """
+    Obtiene el Open y Close del SPY para un Timestamp exacto desde Azure SQL Database.
+    
+    Args:
+        date: El Timestamp exacto (fecha y hora) de la barra de tiempo.
+        
+    Returns:
+        tuple: (Open Price, Close Price) o (None, None) si no encuentra datos.
+    """
+    global sql_connection
+    if sql_connection is None:
+        return None, None
+
+    # Formatear el Timestamp para la consulta SQL (incluyendo hora, minuto, segundo y milisegundos)
+    # Se utiliza slicing [:-3] para asegurar que solo haya 3 dígitos para milisegundos, 
+    # ya que SQL Server (DATETIME2) o el driver pyodbc lo requiere.
+    sql_datetime = date.strftime('%Y-%m-%d %H:%M:%S')[:-3] 
+    
+    table_name = "SPYhistorical" # Asegúrate de que este nombre sea correcto
+    
+    # Consulta SQL para filtrar por el Timestamp exacto
+    sql_query = f"""
+    SELECT 
+        [Open], [Close] 
+    FROM 
+        {table_name}
+    WHERE 
+        [Date] = ?
+    """
+    
+    try:
+        cursor = sql_connection.cursor()
+        # Pasamos el string de fecha/hora/milisegundos al ejecutor
+        cursor.execute(sql_query, (sql_datetime,)) 
+        
+        row = cursor.fetchone()
+        
+        if row:
+            # row[0] es 'Open', row[1] es 'Close'
+            return row[0], row[1]
+        else:
+            return None, None
+
+    except pyodbc.Error as ex:
+        # Aquí puedes dejar un print o st.error para depuración si es necesario
+        # st.error(f"❌ Error SQL consultando SPY en {sql_datetime}: {ex}")
+        return None, None
+    except Exception as e:
+        # st.error(f"❌ Error general en SPY SQL: {e}")
+        return None, None
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
     client = RESTClient(api_key)
@@ -900,17 +951,34 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             end_time = end_time.tz_localize(ny_tz)
             end_time = end_time.tz_localize(None)
             
-            #if "OptionName" in data.columns:
-                #continue
+            #if contratos_especificos and "OptionName" in data.columns:
+                # 'start_time' ya es el Timestamp exacto de la fila del Excel (con fecha y hora)
+                #spy_open, spy_close = obtener_precios_spy_sql(start_time)
+                #if spy_open is not None and spy_close is not None:
+                    ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
+                    #precio_usar_apertura_excel = spy_open
+                    #precio_usar_cierre_excel = spy_close
+                    # option_price usa el precio de apertura para encontrar el strike
+                    #option_price = round(spy_open)
+                #else:
+                    #st.write("No se encontraron datos de open o close del subyacente SPY")
             #else:
                 #precio_usar_apertura_excel = row['start_price']
                 #precio_usar_cierre_excel = row['end_price']
                 #option_price = round(row['start_price'])
             
+            spy_open, spy_close = obtener_precios_spy_sql(start_time)
+            if spy_open is not None and spy_close is not None:
+                ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
+                precio_usar_apertura_excel = spy_open
+                precio_usar_cierre_excel = spy_close
+                # option_price usa el precio de apertura para encontrar el strike
+                option_price = round(spy_open)
+            
             #Eliminar esto o comentarlo cuando esté la lógica de los precios del ETF sacados de SQL Database   
-            precio_usar_apertura_excel = row['start_price']
-            precio_usar_cierre_excel = row['end_price']
-            option_price = round(row['start_price'])
+            #precio_usar_apertura_excel = row['start_price']
+            #precio_usar_cierre_excel = row['end_price']
+            #option_price = round(row['start_price'])
             
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
@@ -991,6 +1059,11 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #if contratos_especificos and "OptionName" in data.columns:
                     #continue
                 #else:
+                    #option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
+                    #option_price = actual_option_price
+                    #if option_date:
+                        #option_type = 'C' if row[column_name] == 1 else 'P'
+                        #option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     
                 option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 option_price = actual_option_price
