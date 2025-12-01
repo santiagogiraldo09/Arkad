@@ -122,6 +122,8 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         st.error(f"❌ Error al procesar datos SQL: {e}")
         return pd.DataFrame()
 
+
+'''
 def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     """
     Obtiene el Open y Close del SPY para un Timestamp exacto desde Azure SQL Database.
@@ -173,6 +175,71 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
         return None, None
     except Exception as e:
         # print(f"❌ Error general en SPY SQL: {e}")
+        return None, None
+'''
+def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
+    global sql_connection
+    if sql_connection is None:
+        return None, None
+    
+    # --- DEPURACIÓN: Forzar el formato de SQL ---
+    # Usamos el formato exacto de tu BD: YYYY-MM-DD HH:MM:SS
+    # Si la fecha tiene zona horaria (tz-aware), conviértela a naive antes de formatear
+    date_naive = date.tz_localize(None) if date.tzinfo is not None else date
+    sql_datetime_str = date_naive.strftime('%Y-%m-%d %H:%M:%S')
+    
+    st.write(f"2. Cadena SQL de Búsqueda Forzada: {sql_datetime_str}")
+    
+    table_name = "SPYhistorical"
+    
+    # 🚨 IMPORTANTE: Aquí usaremos el string de búsqueda para la consulta
+    sql_query = f"""
+    SELECT 
+        [Open], [Close] 
+    FROM 
+        {table_name}
+    WHERE 
+        [Date] = ?
+    """
+    
+    try:
+        cursor = sql_connection.cursor()
+        
+        # Pasamos la CADENA DE TEXTO formateada para la depuración
+        cursor.execute(sql_query, (sql_datetime_str,)) 
+        
+        row = cursor.fetchone()
+        
+        if row:
+            st.write(f"✅ Éxito en la Búsqueda! Open: {row[0]}")
+            return row[0], row[1]
+        else:
+            st.write(f"❌ Fallo: La base de datos no encontró el Timestamp '{sql_datetime_str}'.")
+            
+            # --- TERCER PUNTO DE DEPURACIÓN: ¿Qué hay cerca? ---
+            # Intenta una consulta de rango para ver si el valor es muy cercano.
+            # Convertimos la cadena a datetime para la lógica de rango
+            dt_base = datetime.strptime(sql_datetime_str, '%Y-%m-%d %H:%M:%S')
+            dt_next = dt_base + timedelta(minutes=1)
+
+            range_query = f"""
+            SELECT TOP 1 [Date]
+            FROM {table_name}
+            WHERE [Date] >= '{sql_datetime_str}' 
+            ORDER BY [Date] ASC
+            """
+            cursor.execute(range_query)
+            closest_row = cursor.fetchone()
+            
+            if closest_row:
+                 st.write(f"3. Timestamp más cercano encontrado en SQL: {closest_row[0]}")
+            else:
+                 st.write("3. No se encontró ningún Timestamp cercano en SQL.")
+
+            return None, None
+            
+    except Exception as e:
+        st.error(f"❌ Error durante la ejecución SQL (Depuración): {e}")
         return None, None
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
@@ -967,6 +1034,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #precio_usar_apertura_excel = row['start_price']
                 #precio_usar_cierre_excel = row['end_price']
                 #option_price = round(row['start_price'])
+            
+            st.write(f"1. Timestamp de Python (start_time): {start_time}")
+            st.write(f"   - Tipo: {type(start_time)}")
+            st.write(f"   - Zona Horaria: {start_time.tzinfo}")
             
             spy_open, spy_close = obtener_precios_spy_sql(start_time)
             st.write("Precio del open del SPY:")
