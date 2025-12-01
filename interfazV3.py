@@ -139,7 +139,7 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     # Formatear el Timestamp para la consulta SQL (incluyendo hora, minuto, segundo y milisegundos)
     # Se utiliza slicing [:-3] para asegurar que solo haya 3 dígitos para milisegundos, 
     # ya que SQL Server (DATETIME2) o el driver pyodbc lo requiere.
-    sql_datetime = date.strftime('%Y-%m-%d %H:%M:%S')[:-3] 
+    sql_datetime = date.strftime('%Y-%m-%d %H:%M:%S')
     
     table_name = "SPYhistorical" # Asegúrate de que este nombre sea correcto
     
