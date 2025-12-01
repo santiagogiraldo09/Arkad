@@ -967,18 +967,18 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #precio_usar_cierre_excel = row['end_price']
                 #option_price = round(row['start_price'])
             
-            spy_open, spy_close = obtener_precios_spy_sql(start_time)
-            if spy_open is not None and spy_close is not None:
+            #spy_open, spy_close = obtener_precios_spy_sql(start_time)
+            #if spy_open is not None and spy_close is not None:
                 ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
-                precio_usar_apertura_excel = spy_open
-                precio_usar_cierre_excel = spy_close
+                #precio_usar_apertura_excel = spy_open
+                #precio_usar_cierre_excel = spy_close
                 # option_price usa el precio de apertura para encontrar el strike
-                option_price = round(spy_open)
+                #option_price = round(spy_open)
             
             #Eliminar esto o comentarlo cuando esté la lógica de los precios del ETF sacados de SQL Database   
-            #precio_usar_apertura_excel = row['start_price']
-            #precio_usar_cierre_excel = row['end_price']
-            #option_price = round(row['start_price'])
+            precio_usar_apertura_excel = row['start_price']
+            precio_usar_cierre_excel = row['end_price']
+            option_price = round(row['start_price'])
             
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
