@@ -182,64 +182,31 @@ def obtener_precios_spy_sql(date: pd.Timestamp) -> tuple:
     if sql_connection is None:
         return None, None
     
-    # --- DEPURACIÓN: Forzar el formato de SQL ---
-    # Usamos el formato exacto de tu BD: YYYY-MM-DD HH:MM:SS
-    # Si la fecha tiene zona horaria (tz-aware), conviértela a naive antes de formatear
-    date_naive = date.tz_localize(None) if date.tzinfo is not None else date
-    sql_datetime_str = date_naive.strftime('%Y-%m-%d %H:%M:%S')
-    
-    st.write(f"2. Cadena SQL de Búsqueda Forzada: {sql_datetime_str}")
-    
     table_name = "SPYhistorical"
     
-    # 🚨 IMPORTANTE: Aquí usaremos el string de búsqueda para la consulta
     sql_query = f"""
     SELECT 
         [Open], [Close] 
     FROM 
         {table_name}
     WHERE 
-        [Date] = ?
+        [Date] = ?  -- Usando la comparación directa
     """
     
     try:
         cursor = sql_connection.cursor()
         
-        # Pasamos la CADENA DE TEXTO formateada para la depuración
-        cursor.execute(sql_query, (sql_datetime_str,)) 
+        # Pasamos el objeto Timestamp ya redondeado
+        cursor.execute(sql_query, (date,)) 
         
         row = cursor.fetchone()
         
         if row:
-            st.write(f"✅ Éxito en la Búsqueda! Open: {row[0]}")
             return row[0], row[1]
         else:
-            st.write(f"❌ Fallo: La base de datos no encontró el Timestamp '{sql_datetime_str}'.")
-            
-            # --- TERCER PUNTO DE DEPURACIÓN: ¿Qué hay cerca? ---
-            # Intenta una consulta de rango para ver si el valor es muy cercano.
-            # Convertimos la cadena a datetime para la lógica de rango
-            dt_base = datetime.strptime(sql_datetime_str, '%Y-%m-%d %H:%M:%S')
-            dt_next = dt_base + timedelta(minutes=1)
-
-            range_query = f"""
-            SELECT TOP 1 [Date]
-            FROM {table_name}
-            WHERE [Date] >= '{sql_datetime_str}' 
-            ORDER BY [Date] ASC
-            """
-            cursor.execute(range_query)
-            closest_row = cursor.fetchone()
-            
-            if closest_row:
-                 st.write(f"3. Timestamp más cercano encontrado en SQL: {closest_row[0]}")
-            else:
-                 st.write("3. No se encontró ningún Timestamp cercano en SQL.")
-
             return None, None
-            
     except Exception as e:
-        st.error(f"❌ Error durante la ejecución SQL (Depuración): {e}")
+        # Manejo de error
         return None, None
 
 def open_close_30min(ticker, api_key, fecha_inicio, fecha_fin):
@@ -1007,6 +974,8 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             start_time = start_time.tz_localize(colombia_tz).tz_convert(ny_tz)
             #start_time = start_time.tz_localize(ny_tz)
             start_time = start_time.tz_localize(None)
+            
+            start_time = start_time.round('s')
 
             next_start_time = pd.to_datetime(row['siguiente_start_time'])
             # Verificar que existe un siguiente válido
