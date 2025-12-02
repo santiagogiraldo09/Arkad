@@ -42,7 +42,7 @@ def establecer_conexion_sql():
         # Intentar conectar
         conn = pyodbc.connect(connection_string)
         sql_connection = conn
-        st.success("✅ Conexión a Azure SQL Database establecida correctamente.")
+        #st.success("✅ Conexión a Azure SQL Database establecida correctamente.")
         return True
     except Exception as e:
         st.error(f"❌ Error al conectar a la Base de Datos: {e}")
