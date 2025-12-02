@@ -1095,18 +1095,73 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     #option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
                 
                 if contratos_especificos and "OptionName" in data.columns:
+                    option_type = 'C' if row[column_name] == 1 else 'P'
                     option_name = row['OptionName']
-                    df_option_prices = obtener_precios_sql(option_name, start_time, end_time)
+                    df_option_prices_db = obtener_precios_sql(option_name, start_time, end_time)
                     st.write(f"Precios de la Opción '{option_name} obtenidos de SQL:")
-                    st.dataframe(df_option_prices)
-                    st.write(df_option_prices)
-                    #continue
+                    st.dataframe(df_option_prices_db)
+                    
+                    if not df_option_prices_db.empty: 
+                        df_option_cierre = df_option_prices_db.loc[end_time:]
+                        st.write("df option cierre:")
+                        st.write(df_option_cierre)
+                        posicion_actual_abierta = True
+                        option_open_price = df_option_prices_db[precio_usar_apertura].iloc[0]##PENDIENTE DE REVISAR
+                        st.write("Precio de entrada para la opción día actual:")
+                        st.write(option_open_price)
+                        option_close_price = df_option_prices_db[precio_usar_cierre].iloc[index] #Revisar si debería ser -1 y no index(0)
+                        st.write("Precio de salida opción día actual:")
+                        st.write(option_close_price)
+                        #option_close_price_cierre = df_option_cierre[precio_usar_cierre].iloc[index]#A revisar también
+                        #st.write("Precio de salida opción día de cierre:")
+                        #st.write(option_close_price_cierre)
+                        max_contract_value = option_open_price * 100
+                        #st.write("max_contract_value")
+                        #st.write(max_contract_value)
+                        
+                        # Calcular número de contratos basado en balance_posiciones
+                        if allocation_type == 'Porcentaje de asignación':
+                            num_contratos = int((balance_posiciones * pct_allocation) / max_contract_value)
+                        else: #allocation_type == 'Monto fijo de inversión':
+                            if balance_posiciones < max_contract_value:
+                                continue
+                                #return pd.DataFrame(resultados), balance
+                            else:
+                                num_contratos = int(fixed_amount / max_contract_value)
+                    
+                        #st.write("Numero de contratos día actual:")
+                        #st.write(num_contratos)
+                        #st.write("Option Type actual:")
+                        #st.write(option_type)
+                        cost_trade = max_contract_value * num_contratos
+                        #st.write("Costo de la operación:")
+                        #st.write(cost_trade)
+                        # ✅ VALIDAR ANTES DE ABRIR
+                        if cost_trade > balance_posiciones or num_contratos == 0:
+                            
+                            continue
+                        # Restar el costo de la nueva posición
+                        balance_posiciones -= cost_trade
+                    
+                        # Agregar esta nueva posición a la lista de abiertas
+                        posiciones_abiertas.append({
+                            'num_contratos': num_contratos,
+                            'option_open_price': option_open_price,
+                            'option_name': option_name,
+                            'df_option_cierre': df_option_cierre,
+                            'precio_usar_cierre': precio_usar_cierre,
+                            'index': index,
+                            'cost_trade': cost_trade,
+                            'end_time': end_time,  # IMPORTANTE: Guardar el end_time
+                            'start_time': start_time  # Opcional, para debugging
+                        })
+                            
+                            
                 else:
                     option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                     option_price = actual_option_price
-                    if option_date:
-                        option_type = 'C' if row[column_name] == 1 else 'P'
-                        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                    #st.write("option date")
+                    #st.write(option_date)
                     
                 #option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
                 #option_price = actual_option_price
