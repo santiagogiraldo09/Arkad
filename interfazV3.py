@@ -2273,9 +2273,15 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     for pos in posiciones_abiertas:
         # Comparar end_time de la posición con fecha_fin del backtest
         if pos['end_time'] <= pd.Timestamp(fecha_fin):
-            # Esta posición SÍ debió cerrarse porque su end_time ya pasó
-            trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
-                               - pos['option_open_price']) * 100 * pos['num_contratos']
+            
+            if contratos_especificos and "OptionName" in data.columns:
+                # Esta posición SÍ debió cerrarse porque su end_time ya pasó
+                trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']] 
+               - pos['option_open_price']) * 100 * pos['num_contratos']
+            else:                       
+                trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
+                                   - pos['option_open_price']) * 100 * pos['num_contratos']
+                       
             balance += trade_result_pos
             
             # Actualizar el resultado en resultados
