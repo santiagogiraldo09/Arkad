@@ -1182,7 +1182,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                             'Fecha Apertura': start_time,
                             'Fecha Cierre': end_time,
                             'Precio Entrada': option_open_price, 
-                            'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre].iloc[index],
+                            'Precio Salida Utilizado': df_option_cierre[precio_usar_cierre],
                             'Resultado': 0,  # Solo para mostrar
                             'Resultado Potencial': trade_result_display,
                             'Contratos': num_contratos,
