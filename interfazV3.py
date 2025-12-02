@@ -54,25 +54,24 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
     """
     Obtiene los precios OHLCV de un contrato específico desde Azure SQL Database.
     
-    Args:
-        option_name: Nombre del contrato de opción (Ej: O:SPY251128C00450000).
-        start_time: Timestamp de inicio (inclusive).
-        end_time: Timestamp de fin (inclusive).
-        
-    Returns:
-        pd.DataFrame: DataFrame con índice 'Date' y columnas OHLCV, o DataFrame vacío.
+    MODIFICADO: Aplica redondeo, usa coincidencia estricta y busca el Timestamp más cercano 
+    si no hay coincidencia exacta en el rango.
     """
     global sql_connection
     if sql_connection is None:
         st.error("No hay conexión a la base de datos SQL disponible.")
         return pd.DataFrame()
 
-    # Formatear los timestamps para SQL Server (incluyendo los milisegundos si es necesario)
-    sql_start_time = start_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] # Quita la parte final, dejando 3 ms
-    sql_end_time = end_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    # 1. Normalizar y Formatear los Timestamps para Coincidencia Exacta (YYYY-MM-DD HH:MM:SS)
+    #    Esto es crucial para tu BD DATETIME2(0).
+    start_time_rounded = start_time.tz_localize(None).round('s') if start_time.tzinfo else start_time.round('s')
+    end_time_rounded = end_time.tz_localize(None).round('s') if end_time.tzinfo else end_time.round('s')
     
-    # El nombre de tu tabla parece ser OptionsData. AJUSTA ESTO SI ES DIFERENTE.
-    table_name = "OptionData2" 
+    # Usaremos estos para la consulta de rango
+    sql_start_time = start_time_rounded.strftime('%Y-%m-%d %H:%M:%S')
+    sql_end_time = end_time_rounded.strftime('%Y-%m-%d %H:%M:%S')
+    
+    table_name = "OptionData2"  # Ajustar si es diferente.
     
     # La consulta SQL para filtrar por OptionName y rango de tiempo
     sql_query = f"""
@@ -89,27 +88,62 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
     """
     
     try:
-        # Usar Pandas para leer el resultado de la consulta directamente
         cursor = sql_connection.cursor()
         
-        # Ejecutar la consulta con parámetros (más seguro que f-strings para OptionName)
+        # 🟢 PASO A: EJECUTAR LA CONSULTA DE RANGO
         cursor.execute(sql_query, (option_name, sql_start_time, sql_end_time))
         
-        # Obtener los datos y nombres de columna
         data = cursor.fetchall()
         columns = [column[0] for column in cursor.description]
-        
         df = pd.DataFrame.from_records(data, columns=columns)
 
+        # -------------------------------------------------------------
+        # 3. ¿QUÉ PASA SI NO ENCUENTRA LA OPCIÓN EXACTA? -> SALTAR TRADE
+        # -------------------------------------------------------------
         if df.empty:
+            # Si el DataFrame está vacío, significa que el 'OptionName' no existe 
+            # o no tiene datos en el rango. Esto salta el trade (retorna DF vacío).
+            st.warning(f"⚠️ Opción no encontrada o sin datos en el rango: {option_name}")
+            return pd.DataFrame()
+        
+        # -------------------------------------------------------------
+        # 4. ¿QUÉ PASA SI NO ENCUENTRA ALGUNA FECHA EXACTA? -> USAR CERCANA
+        # -------------------------------------------------------------
+        
+        df['Date'] = pd.to_datetime(df['Date'])
+        
+        # Buscar el índice más cercano al start_time_rounded
+        try:
+            # Encuentra la posición del índice (iloc) para el valor más cercano al inicio
+            loc_start = df['Date'].searchsorted(start_time_rounded, side='left')
+            # Si el 'left' excede el límite y no es la fecha exacta, ajustamos.
+            if loc_start >= len(df) or df.iloc[loc_start]['Date'] != start_time_rounded:
+                loc_start = max(0, loc_start - 1) # Usar el anterior si no es exacto, a menos que sea el primero.
+            
+            # Buscar el índice más cercano al end_time_rounded
+            # Encuentra la posición del índice (iloc) para el valor más cercano al final
+            loc_end = df['Date'].searchsorted(end_time_rounded, side='left')
+            # Si el 'left' excede el límite y no es la fecha exacta, ajustamos al último.
+            if loc_end >= len(df):
+                loc_end = len(df) - 1 # Usar el último registro disponible.
+                
+            # Recortar el DataFrame para asegurar que empiece en la fecha encontrada más cercana
+            # y termine en la fecha más cercana.
+            df = df.iloc[loc_start : loc_end + 1] # +1 para incluir el índice final
+            
+        except Exception as e:
+            # Esto captura errores raros de indexación/conversión.
+            st.error(f"❌ Error al ajustar fechas: {e}")
             return pd.DataFrame()
 
-        # Procesamiento final para replicar el formato de Polygon
-        df['Date'] = pd.to_datetime(df['Date'])
+
+        if df.empty:
+            st.warning(f"⚠️ Rango recortado quedó vacío después de buscar fechas cercanas.")
+            return pd.DataFrame()
+
+        # Procesamiento final (limpieza y formato)
         df.set_index('Date', inplace=True)
         df.index.name = None # Limpiamos el nombre del índice
-        
-        # Aseguramos que los nombres de columna estén en minúsculas (como Polygon)
         df.columns = [col.lower() for col in df.columns] 
         
         return df
@@ -119,7 +153,7 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         st.error(f"❌ Error de consulta SQL: {sqlstate}")
         return pd.DataFrame()
     except Exception as e:
-        st.error(f"❌ Error al procesar datos SQL: {e}")
+        st.error(f"❌ Error general al procesar datos SQL: {e}")
         return pd.DataFrame()
 
 def obtener_precios_spy_sql_final(date: pd.Timestamp) -> tuple:
@@ -877,6 +911,10 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
         fecha_fin = pd.Timestamp(fecha_fin)
         
     if "start_time" and "end_time" in data.columns:
+        
+        #Se establece la conexión a SQL Server para consultar el precio del subyacente
+        establecer_conexion_sql()
+        
         #st.write("El archivo contiene datos intra día")
         nombre_de_la_columna = 'start_time'
         # Se crea la columna una sola vez, antes de recorrer
@@ -918,9 +956,6 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             continue
         
         if "start_time" and "end_time" in data.columns:
-        
-            #Se establece la conexión a SQL Server para consultar el precio del subyacente
-            establecer_conexion_sql()
         
             colombia_tz = 'America/Bogota'
             ny_tz = 'America/New_York'
