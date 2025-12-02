@@ -1173,7 +1173,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         #st.write("Precio salida día actual:")
                         #st.write(etf_close_price)
                         
-                        trade_result_display = (df_option_cierre[precio_usar_cierre].iloc[index] - option_open_price) * 100 * num_contratos
+                        trade_result_display = (df_option_cierre[precio_usar_cierre] - option_open_price) * 100 * num_contratos
                         resultados.append({
                             'Fecha': start_time, 
                             'Tipo': 'Call' if row[column_name] == 1 else 'Put',
