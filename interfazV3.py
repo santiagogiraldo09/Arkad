@@ -1014,9 +1014,9 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                 #option_price = round(spy_open)
             
             #Eliminar esto o comentarlo cuando esté la lógica de los precios del ETF sacados de SQL Database   
-            precio_usar_apertura_excel = row['start_price']
-            precio_usar_cierre_excel = row['end_price']
-            option_price = round(row['start_price'])
+            #precio_usar_apertura_excel = row['start_price']
+            #precio_usar_cierre_excel = row['end_price']
+            #option_price = round(row['start_price'])
             
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
@@ -1094,17 +1094,22 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     index = 0
                     #option_price = round(spy_intraday_historial['open'].iloc[0]) #Se basa en la apertura del día actual
                 
-                #if contratos_especificos and "OptionName" in data.columns:
+                if contratos_especificos and "OptionName" in data.columns:
+                    option_name = row['OptionName']
+                    df_option_prices = obtener_precios_sql(option_name, start_time, end_time)
+                    st.write(f"Precios de la Opción '{option_name} obtenidos de SQL:")
+                    st.dataframe(df_option_prices)
+                    st.write(df_option_prices)
                     #continue
-                #else:
-                    #option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
-                    #option_price = actual_option_price
-                    #if option_date:
-                        #option_type = 'C' if row[column_name] == 1 else 'P'
-                        #option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
+                else:
+                    option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
+                    option_price = actual_option_price
+                    if option_date:
+                        option_type = 'C' if row[column_name] == 1 else 'P'
+                        option_name = f'O:{ticker}{option_date}{option_type}00{option_price}000'
                     
-                option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
-                option_price = actual_option_price
+                #option_date, actual_option_price = encontrar_strike_cercano(client, date, option_price, row[column_name], option_days, option_offset, ticker, method, offset)
+                #option_price = actual_option_price
                 #st.write("option date")
                 #st.write(option_date)
                 if option_date:
