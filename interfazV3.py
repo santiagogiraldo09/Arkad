@@ -945,10 +945,19 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
     for date, row in data.iterrows():
         
         if periodo == 'Diario':
-            date = date.date()
+            # Intentamos obtener solo la fecha, pero manejamos la excepción si date ya es NaT
+            try:
+                date = date.date()
+            except AttributeError:
+                # Si esto falla (porque el índice ya era NaT), saltamos la iteración
+                continue
         else:
             date = pd.Timestamp(date)
-            
+        
+        # 🟢 INSERTAR AQUÍ LA SOLUCIÓN AL TypeError (NaT)
+        if pd.isnull(date): # Verifica si la variable 'date' es nula/inválida
+            continue        # Si es nula, salta esta fila inmediatamente     
+        
         if date < fecha_inicio or date > fecha_fin:
             continue
         
