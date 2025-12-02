@@ -1029,9 +1029,13 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             for pos in posiciones_abiertas:
                 # Si el start_time actual >= end_time de esta posición, CERRARLA
                 if start_time >= pos['end_time']:
-                    # Calcular ganancia/pérdida de ESTA posición específica
-                    trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
-                                       - pos['option_open_price']) * 100 * pos['num_contratos']
+                    if contratos_especificos and "OptionName" in data.columns:
+                        # Calcular ganancia/pérdida de ESTA posición específica
+                        trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']].iloc[pos['index']] 
+                                           - pos['option_open_price']) * 100 * pos['num_contratos']
+                    else:
+                        trade_result_pos = (pos['df_option_cierre'][pos['precio_usar_cierre']] 
+                       - pos['option_open_price']) * 100 * pos['num_contratos']
                     
                     # Actualizar balance con la ganancia de esta posición cerrada
                     balance += trade_result_pos
