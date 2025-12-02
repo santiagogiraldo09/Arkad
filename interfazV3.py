@@ -992,6 +992,14 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             # 'start_time' ya es el Timestamp exacto de la fila del Excel (con fecha y hora)
             spy_open, spy_close = obtener_precios_spy_sql_final(start_time)
+            st.write("start time:")
+            st.write(start_time)
+            st.write("end time:")
+            st.write(end_time)
+            st.write("spy open:")
+            st.write(spy_open)
+            st.write("spy close:")
+            st.write(spy_close)
             if spy_open is not None and spy_close is not None:
                 ## Usamos los precios obtenidos de SQL para ese Timestamp exacto
                 precio_usar_apertura_excel = spy_open
@@ -1529,7 +1537,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                                 })
                             
         
-        else: #El archivo no es Trades_H1
+        else: #El archivo no contiene las columnas start_time y end_time
             if periodo == 'Diario':
                 señal_actual = row[column_name]
                 
@@ -1964,7 +1972,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         else:
                             continue
                         
-                    else: #esce1 = False  
+                    else: #esce1 = False
                         data_for_date = yf.download("SPY", start=date, end=date + pd.DateOffset(days=1), multi_level_index=False, auto_adjust=False)
                         #st.write("datos con data_for_date (yahoo finance)")
                         #st.write(data_for_date)
