@@ -1102,7 +1102,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                     st.dataframe(df_option_prices_db)
                     
                     if not df_option_prices_db.empty: 
-                        df_option_cierre = df_option_prices_db.iloc[]
+                        df_option_cierre = df_option_prices_db.iloc[-1]
                         st.write("df option cierre:")
                         st.write(df_option_cierre)
                         posicion_actual_abierta = True
