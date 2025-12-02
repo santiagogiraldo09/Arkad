@@ -1109,7 +1109,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
                         option_open_price = df_option_prices_db[precio_usar_apertura].iloc[0]##PENDIENTE DE REVISAR
                         st.write("Precio de entrada para la opción día actual:")
                         st.write(option_open_price)
-                        option_close_price = df_option_prices_db[precio_usar_cierre].iloc[index] #Revisar si debería ser -1 y no index(0)
+                        option_close_price = df_option_prices_db[precio_usar_cierre].iloc[-1] #Revisar si debería ser -1 y no index(0)
                         st.write("Precio de salida opción día actual:")
                         st.write(option_close_price)
                         #option_close_price_cierre = df_option_cierre[precio_usar_cierre].iloc[index]#A revisar también
