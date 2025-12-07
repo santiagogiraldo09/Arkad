@@ -1037,7 +1037,7 @@ def realizar_backtest(data_filepath, api_key, ticker, balance_inicial, pct_alloc
             
             #st.write(f"Descargando historial intradía del SPY para la fecha {start_time}...")
             # Llama a tu función existente para obtener los datos del ETF
-            spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
+            #spy_intraday_historial = open_close_30min("SPY", api_key, fecha_inicio, fecha_fin)
             #st.write(spy_intraday_historial)
             
             # ========== NUEVO: CERRAR POSICIONES QUE YA LLEGARON A SU END_TIME ==========
