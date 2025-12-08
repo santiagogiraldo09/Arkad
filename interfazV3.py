@@ -52,87 +52,117 @@ def establecer_conexion_sql():
 
 def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd.Timestamp) -> pd.DataFrame:
     """
-    Obtiene los precios OHLCV de un contrato específico desde Azure SQL Database.
-    
-    MODIFICADO: Aplica redondeo, usa coincidencia estricta y busca el Timestamp más cercano 
-    si no hay coincidencia exacta en el rango.
+    Consulta a la BD con lógica optimizada (intradía o multidía) 
+    para asegurar la captura de precios cercanos a la apertura/cierre.
     """
     global sql_connection
     if sql_connection is None:
         st.error("No hay conexión a la base de datos SQL disponible.")
         return pd.DataFrame()
 
-    # 1. Normalizar y Formatear los Timestamps para Coincidencia Exacta (YYYY-MM-DD HH:MM:SS)
-    #    Esto es crucial para tu BD DATETIME2(0).
+    table_name = "OptionData2"
+    
+    # 1. Normalizar y Redondear los Timestamps originales (se usan en el recorte final)
     start_time_rounded = start_time.tz_localize(None).round('s') if start_time.tzinfo else start_time.round('s')
     end_time_rounded = end_time.tz_localize(None).round('s') if end_time.tzinfo else end_time.round('s')
     
-    # Usaremos estos para la consulta de rango
-    sql_start_time = start_time_rounded.strftime('%Y-%m-%d %H:%M:%S')
-    sql_end_time = end_time_rounded.strftime('%Y-%m-%d %H:%M:%S')
+    # 2. Lógica para definir el rango de consulta (SQL_QUERY_START y SQL_QUERY_END)
     
-    table_name = "OptionData2"  # Ajustar si es diferente.
-    
-    # La consulta SQL para filtrar por OptionName y rango de tiempo
-    sql_query = f"""
+    # Define la plantilla de la consulta base
+    base_query = f"""
     SELECT 
         [Date], [Open], [High], [Low], [Close], [Volume] 
     FROM 
         {table_name}
     WHERE 
         [OptionName] = ?
-        AND [Date] >= ?
-        AND [Date] <= ?
-    ORDER BY 
-        [Date] ASC
     """
+    
+    # Lista para almacenar DataFrames de los días consultados
+    dataframes_para_unir = []
     
     try:
         cursor = sql_connection.cursor()
         
-        # 🟢 PASO A: EJECUTAR LA CONSULTA DE RANGO
-        cursor.execute(sql_query, (option_name, sql_start_time, sql_end_time))
-        
-        data = cursor.fetchall()
-        columns = [column[0] for column in cursor.description]
-        df = pd.DataFrame.from_records(data, columns=columns)
+        # ------------------------------------------------------------------
+        # A. ESCENARIO INTRADÍA (start_time y end_time caen en el mismo día)
+        # ------------------------------------------------------------------
+        if start_time_rounded.date() == end_time_rounded.date():
+            # Margen de ±1 hora para asegurar la captura de precios cercanos
+            margen = pd.Timedelta(hours=1)
+            
+            sql_start_time = (start_time_rounded - margen).strftime('%Y-%m-%d %H:%M:%S')
+            sql_end_time = (end_time_rounded + margen).strftime('%Y-%m-%d %H:%M:%S')
 
-        # -------------------------------------------------------------
-        # 3. ¿QUÉ PASA SI NO ENCUENTRA LA OPCIÓN EXACTA? -> SALTAR TRADE
-        # -------------------------------------------------------------
-        if df.empty:
-            # Si el DataFrame está vacío, significa que el 'OptionName' no existe 
-            # o no tiene datos en el rango. Esto salta el trade (retorna DF vacío).
+            sql_query = base_query + " AND [Date] >= ? AND [Date] <= ? ORDER BY [Date] ASC"
+            
+            # Ejecutar consulta con rango ampliado
+            cursor.execute(sql_query, (option_name, sql_start_time, sql_end_time))
+            data = cursor.fetchall()
+            
+            if data:
+                columns = [column[0] for column in cursor.description]
+                df = pd.DataFrame.from_records(data, columns=columns)
+                dataframes_para_unir.append(df)
+
+        # ------------------------------------------------------------------
+        # B. ESCENARIO MULTIDÍA (start_time y end_time caen en días diferentes)
+        # ------------------------------------------------------------------
+        else:
+            # 1. Consultar el DÍA DE INICIO (Día completo)
+            sql_date_start = start_time_rounded.strftime('%Y-%m-%d')
+            sql_query_start = base_query + " AND CONVERT(DATE, [Date]) = ? ORDER BY [Date] ASC"
+            
+            cursor.execute(sql_query_start, (option_name, sql_date_start))
+            data_start = cursor.fetchall()
+            
+            if data_start:
+                columns = [column[0] for column in cursor.description]
+                df_start = pd.DataFrame.from_records(data_start, columns=columns)
+                dataframes_para_unir.append(df_start)
+
+            # 2. Consultar el DÍA DE CIERRE (Día completo)
+            sql_date_end = end_time_rounded.strftime('%Y-%m-%d')
+            sql_query_end = base_query + " AND CONVERT(DATE, [Date]) = ? ORDER BY [Date] ASC"
+            
+            cursor.execute(sql_query_end, (option_name, sql_date_end))
+            data_end = cursor.fetchall()
+
+            if data_end:
+                columns = [column[0] for column in cursor.description]
+                df_end = pd.DataFrame.from_records(data_end, columns=columns)
+                dataframes_para_unir.append(df_end)
+        
+        # ------------------------------------------------------------------
+        # C. COMBINACIÓN DE RESULTADOS Y PROCESAMIENTO FINAL
+        # ------------------------------------------------------------------
+        
+        if not dataframes_para_unir:
+            # Si el DataFrame está vacío, significa que el 'OptionName' no existe
             st.warning(f"⚠️ Opción no encontrada o sin datos en el rango: {option_name}")
             return pd.DataFrame()
-        
-        # -------------------------------------------------------------
-        # 4. ¿QUÉ PASA SI NO ENCUENTRA ALGUNA FECHA EXACTA? -> USAR CERCANA
-        # -------------------------------------------------------------
-        
+            
+        # Combinar los resultados (si es multidía serán 2 DF, si es intradía será 1)
+        df = pd.concat(dataframes_para_unir).drop_duplicates(subset=['Date']).sort_values('Date')
+
+        # El resto de la lógica (searchsorted) maneja el recorte y la proximidad
         df['Date'] = pd.to_datetime(df['Date'])
         
         # Buscar el índice más cercano al start_time_rounded
+        # (Esta lógica ahora se ejecuta sobre un DataFrame que contiene los datos cercanos)
         try:
-            # Encuentra la posición del índice (iloc) para el valor más cercano al inicio
             loc_start = df['Date'].searchsorted(start_time_rounded, side='left')
-            # Si el 'left' excede el límite y no es la fecha exacta, ajustamos.
             if loc_start >= len(df) or df.iloc[loc_start]['Date'] != start_time_rounded:
-                loc_start = max(0, loc_start - 1) # Usar el anterior si no es exacto, a menos que sea el primero.
+                loc_start = max(0, loc_start - 1)
             
-            # Buscar el índice más cercano al end_time_rounded
-            # Encuentra la posición del índice (iloc) para el valor más cercano al final
             loc_end = df['Date'].searchsorted(end_time_rounded, side='left')
-            # Si el 'left' excede el límite y no es la fecha exacta, ajustamos al último.
             if loc_end >= len(df):
-                loc_end = len(df) - 1 # Usar el último registro disponible.
+                loc_end = len(df) - 1
                 
-            # Recortar el DataFrame para asegurar que empiece en la fecha encontrada más cercana
-            # y termine en la fecha más cercana.
-            df = df.iloc[loc_start : loc_end + 1] # +1 para incluir el índice final
+            # Recortar el DataFrame para asegurar que empiece y termine en la fecha encontrada más cercana
+            df = df.iloc[loc_start : loc_end + 1]
             
         except Exception as e:
-            # Esto captura errores raros de indexación/conversión.
             st.error(f"❌ Error al ajustar fechas: {e}")
             return pd.DataFrame()
 
@@ -143,7 +173,7 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
 
         # Procesamiento final (limpieza y formato)
         df.set_index('Date', inplace=True)
-        df.index.name = None # Limpiamos el nombre del índice
+        df.index.name = None
         df.columns = [col.lower() for col in df.columns] 
         
         return df
@@ -155,6 +185,7 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
     except Exception as e:
         st.error(f"❌ Error general al procesar datos SQL: {e}")
         return pd.DataFrame()
+
 
 def obtener_precios_spy_sql_final(date: pd.Timestamp) -> tuple:
     """
