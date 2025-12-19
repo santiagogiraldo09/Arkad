@@ -140,7 +140,7 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
         if not dataframes_para_unir:
             # Si el DataFrame está vacío, significa que el 'OptionName' no existe
             st.warning(f"⚠️ Opción no encontrada o sin datos en el rango: {option_name}")
-            return pd.DataFrame()
+            return pd.DataFrame(), False
             
         # Combinar los resultados (si es multidía serán 2 DF, si es intradía será 1)
         df = pd.concat(dataframes_para_unir).drop_duplicates(subset=['Date']).sort_values('Date')
@@ -169,14 +169,14 @@ def obtener_precios_sql(option_name: str, start_time: pd.Timestamp, end_time: pd
 
         if df.empty:
             st.warning(f"⚠️ Rango recortado quedó vacío después de buscar fechas cercanas.")
-            return pd.DataFrame()
+            return pd.DataFrame(), False
 
         # Procesamiento final (limpieza y formato)
         df.set_index('Date', inplace=True)
         df.index.name = None
         df.columns = [col.lower() for col in df.columns] 
         
-        return df
+        return df, True
 
     except pyodbc.Error as ex:
         sqlstate = ex.args[0]
