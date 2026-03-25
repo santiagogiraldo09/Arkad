@@ -26,6 +26,7 @@ def get_information_firebase(collection,db):
         direction = data.get("direction")
         result = data.get("result")
         vector = data.get("vector")
+        probability = data.get("probability")
  
         if vector is None:
             vector = np.array([100, 0]) if pred_direction == 0 else np.array([0, 100])
@@ -46,7 +47,8 @@ def get_information_firebase(collection,db):
         "toggle_false": pred_direction,
         "Resultado": result,
         "proba0": vector[0]/100,
-        "proba1": vector[1]/100
+        "proba1": vector[1]/100,
+        "probability": probability
     })
         
     df = pd.DataFrame(data_list)
@@ -65,7 +67,7 @@ def get_information_firebase(collection,db):
 # Función principal
 def main():
     db = initialize_firebase()
-    collections = ["spyVOC"]
+    collections = ["spyOOC", "EnsembleVO"]
     #collections = ["spyVOC", "spyEnsembleVM", "spyEnsembleVS", "spyEnsembleVSMO", "spyEnsembleEOE+VSMO"]
     
     for collection in collections:
